@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 20:59:57 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 18:55:34 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/02/24 04:42:40 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,15 @@ typedef struct s_token_word
 	struct s_token_word	*next;
 }	t_token_word;
 
+// modified version
+typedef struct	s_file_redir
+{
+	t_type					type_redirection;
+	t_token_word			*word_parts;
+	char					*file_redirection;
+	struct s_file_redir		*next;
+}	t_file_redir;
+
 typedef struct s_cmd
 {
 	char			*name;
@@ -95,8 +104,9 @@ typedef struct s_cmd
 	char			**arg;
 	t_token_word	**list_word;
 	int				ac;
-	int				type_redirection;
-	char			*file_redirection;
+	t_file_redir	*type_redir;
+	// int			type_redirection;
+	// char			*file_redirection; 
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -206,7 +216,7 @@ t_ast			*parse_tokens(t_token *tokens);
 // redir_utils.c
 int				is_redirection(t_type type);
 int				add_redirection(t_ast *node, t_token *redir_token);
-int				add_redirection_to_node(t_ast *node, t_token *current);
+int				add_redirection_to_cmd(t_cmd *cmd, t_token *current);
 t_token			*skip_redirection(t_token *current);
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
@@ -268,5 +278,9 @@ void			free_tokens(t_token *tokens);
 void			free_ast(t_ast *node);
 void			free_cmd(t_cmd *cmd);
 void			free_array(char **array);
+
+
+int	add_redirection_to_node(t_cmd *cmd, t_token *current);
+int	init_cmd(t_cmd *cmd, t_token *tokens);
 
 #endif

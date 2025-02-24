@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:49:49 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 16:26:52 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/02/24 04:12:06 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,9 @@ int	init_cmd(t_cmd *cmd, t_token *tokens)
 	cmd->ac = count_args(tokens);
 	cmd->name = NULL;
 	cmd->path = NULL;
-	cmd->type_redirection = 0;
-	cmd->file_redirection = NULL;
+	// cmd->type_redirection = 0;
+	// cmd->file_redirection = NULL;
+	cmd->type_redir = NULL;
 	cmd->list_word = NULL;
 	cmd->next = NULL;
 	cmd->arg = NULL;

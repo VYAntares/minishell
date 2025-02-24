@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_parsing.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:38:50 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 16:46:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/02/24 01:24:51 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ void	free_cmd(t_cmd *cmd)
 		}
 		free(cmd->arg);
 	}
-	if (cmd->file_redirection)
-		free(cmd->file_redirection);
+	// if (cmd->file_redirection)
+	// 	free(cmd->file_redirection);
 	free(cmd);
 }
 
