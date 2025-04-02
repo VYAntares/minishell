@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 20:59:57 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/24 04:42:40 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/02 18:42:36 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 
 # include "libft/libft.h"
 # include <stdio.h>
+# include <fcntl.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <stdlib.h>
@@ -92,8 +93,8 @@ typedef struct s_token_word
 typedef struct	s_file_redir
 {
 	t_type					type_redirection;
-	t_token_word			*word_parts;
 	char					*file_redirection;
+	t_token_word			*word_parts;
 	struct s_file_redir		*next;
 }	t_file_redir;
 
@@ -266,6 +267,8 @@ char   			*extract_path(char *path, char *command_name);
 char			*find_command_path(char *name, t_shell *shell);
 int				execute_command(t_cmd *cmd, t_shell *shell);
 int				execute_ast(t_ast *ast, t_shell *shell);
+int				execute_command(t_cmd *cmd, t_shell *shell);
+
 
 /*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*/
 /*                                                                           */

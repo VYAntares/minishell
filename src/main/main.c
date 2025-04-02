@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/24 20:51:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/02 19:05:12 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,11 @@
 sig_atomic_t	g_sigint_received;
 
 // static const char *TREE_VERTICAL	= "│";
-static const char *TREE_BRANCH		= "├";
-static const char *TREE_CORNER		= "└";
-static const char *TREE_HORIZONTAL	= "──";
+// static const char *TREE_BRANCH		= "├";
+// static const char *TREE_CORNER		= "└";
+// static const char *TREE_HORIZONTAL	= "──";
 
-/* Petite fonction qui renvoie une couleur ANSI selon le type du noeud AST */
+// /* Petite fonction qui renvoie une couleur ANSI selon le type du noeud AST */
 // static const char *ast_type_color(t_ast_type type)
 // {
 // 	switch (type)
@@ -37,37 +37,37 @@ static const char *TREE_HORIZONTAL	= "──";
 // 	}
 // }
 
-/* Fonctions de conversion des types (inchangées) */
-static const char *token_type_to_str(t_type type)
-{
-	switch (type)
-	{
-		case T_WORD:			return "WORD";
-		case T_PIPE:			return "PIPE";
-		case T_REDIR_IN:		return "REDIR_IN";
-		case T_REDIR_OUT:		return "REDIR_OUT";
-		case T_HEREDOC:			return "HEREDOC";
-		case T_APPEND:			return "APPEND";
-		case T_ENV_VAR:			return "ENV_VAR";
-		case T_WILDCARD:		return "WILDCARD";
-		case T_AND:				return "AND";
-		case T_OR:				return "OR";
-		case T_PARENTH_OPEN:	return "PARENTH_OPEN";
-		case T_PARENTH_CLOSE:	return "PARENTH_CLOSE";
-		default:				return "UNKNOWN";
-	}
-}
+// /* Fonctions de conversion des types (inchangées) */
+// static const char *token_type_to_str(t_type type)
+// {
+// 	switch (type)
+// 	{
+// 		case T_WORD:			return "WORD";
+// 		case T_PIPE:			return "PIPE";
+// 		case T_REDIR_IN:		return "REDIR_IN";
+// 		case T_REDIR_OUT:		return "REDIR_OUT";
+// 		case T_HEREDOC:			return "HEREDOC";
+// 		case T_APPEND:			return "APPEND";
+// 		case T_ENV_VAR:			return "ENV_VAR";
+// 		case T_WILDCARD:		return "WILDCARD";
+// 		case T_AND:				return "AND";
+// 		case T_OR:				return "OR";
+// 		case T_PARENTH_OPEN:	return "PARENTH_OPEN";
+// 		case T_PARENTH_CLOSE:	return "PARENTH_CLOSE";
+// 		default:				return "UNKNOWN";
+// 	}
+// }
 
-static const char *token_word_type_to_str(t_type_word type)
-{
-	switch (type)
-	{
-		case T_NO_QUOTE:	return "NO_QUOTE";
-		case T_S_QUOTE:		return "SINGLE_QUOTE";
-		case T_D_QUOTE:		return "DOUBLE_QUOTE";
-		default:			return "UNKNOWN";
-	}
-}
+// static const char *token_word_type_to_str(t_type_word type)
+// {
+// 	switch (type)
+// 	{
+// 		case T_NO_QUOTE:	return "NO_QUOTE";
+// 		case T_S_QUOTE:		return "SINGLE_QUOTE";
+// 		case T_D_QUOTE:		return "DOUBLE_QUOTE";
+// 		default:			return "UNKNOWN";
+// 	}
+// }
 
 // static const char *ast_type_to_str(t_ast_type type)
 // {
@@ -83,23 +83,23 @@ static const char *token_word_type_to_str(t_type_word type)
 // 	}
 // }
 
-static void debug_print_token_words(t_token_word *word_list, const char *indent)
-{
-	t_token_word *current = word_list;
-	while (current)
-	{
-		// On utilise "└──" pour chaque entrée de la liste, mais c'est purement décoratif
-		printf("%s%s%s Content: '%s' (Type: %s)\n",
-			   indent,
-			   TREE_CORNER,
-			   TREE_HORIZONTAL,
-			   current->content,
-			   token_word_type_to_str(current->type));
-		current = current->next;
-	}
-}
-
-
+// static void debug_print_token_words(t_token_word *word_list,
+// 									const char *indent)
+// {
+// 	t_token_word *current = word_list;
+// 	while (current)
+// 	{
+// 		// On utilise "└──" pour chaque entrée de la liste,
+// 		// mais c'est purement décoratif
+// 		printf("%s%s%s Content: '%s' (Type: %s)\n",
+// 			   indent,
+// 			   TREE_CORNER,
+// 			   TREE_HORIZONTAL,
+// 			   current->content,
+// 			   token_word_type_to_str(current->type));
+// 		current = current->next;
+// 	}
+// }
 
 // static void	debug_print_cmd(t_cmd *cmd, const char *prefix)
 // {
@@ -112,7 +112,8 @@ static void debug_print_token_words(t_token_word *word_list, const char *indent)
 //     printf("%s%s%s Nom: %s\n",
 //            prefix, TREE_BRANCH, TREE_HORIZONTAL, cmd->name);
 
-//     // Arguments (on utilise TREE_BRANCH si il y a des redirections, sinon TREE_CORNER)
+//     // Arguments 
+// 	// (on utilise TREE_BRANCH si il y a des redirections, sinon TREE_CORNER)
 //     printf("%s%s%s Arguments:\n",
 //         prefix, cmd->type_redir ? TREE_BRANCH : TREE_CORNER, TREE_HORIZONTAL);
 //     int i = 0;
@@ -187,56 +188,6 @@ static void debug_print_token_words(t_token_word *word_list, const char *indent)
 //     }
 // }
 
-// // static void	debug_print_cmd(t_cmd *cmd, const char *prefix)
-// // {
-// // 	printf("%sCommande:\n", prefix);
-
-// // 	// Nom de la commande
-// // 	printf("%s%s%s Nom: %s\n",
-// // 		   prefix, TREE_BRANCH, TREE_HORIZONTAL, cmd->name);
-
-// // 	// Arguments
-// // 	printf("%s%s%s Arguments:\n",
-// // 		   prefix, TREE_CORNER, TREE_HORIZONTAL);
-// // 	int i = 0;
-// // 	while (cmd->arg && cmd->arg[i])
-// // 	{
-// // 		printf("%s     %s%s arg[%d]: %s\n",
-// // 			   prefix, TREE_CORNER, TREE_HORIZONTAL,
-// // 			   i, cmd->arg[i]);
-
-// // 		// Affichage des Token Words s'il y en a pour cet argument
-// // 		if (cmd->list_word && cmd->list_word[i])
-// // 		{
-// // 			printf("%s          %s%s Token Words:\n",
-// // 				   prefix, TREE_CORNER, TREE_HORIZONTAL);
-// // 			t_token_word *word = cmd->list_word[i];
-// // 			while (word)
-// // 			{
-// // 				printf("%s               %s%s Content: '%s' (Type: %s)\n",
-// // 					   prefix,
-// // 					   TREE_CORNER, TREE_HORIZONTAL,
-// // 					   word->content,
-// // 					   token_word_type_to_str(word->type));
-// // 				word = word->next;
-// // 			}
-// // 		}
-// // 		i++;
-// // 	}
-
-// // 	// // Redirection éventuelle
-// // 	// if (cmd->file_redirection)
-// // 	// {
-// // 	// 	printf("%s\n%s%s%s Redirection Type: %s\n",
-// // 	// 		   prefix,
-// // 	// 		   prefix, TREE_BRANCH, TREE_HORIZONTAL,
-// // 	// 		   token_type_to_str(cmd->type_redirection));
-// // 	// 	printf("%s%s%s Fichier: %s\n",
-// // 	// 		   prefix, TREE_CORNER, TREE_HORIZONTAL,
-// // 	// 		   cmd->file_redirection);
-// // 	// }
-// // }
-
 // static void	debug_print_ast(t_ast *node, const char *prefix, bool is_last)
 // {
 // 	if (!node)
@@ -300,33 +251,33 @@ static void debug_print_token_words(t_token_word *word_list, const char *indent)
 // 	}
 // }
 
-static void debug_print_tokens(t_token *tokens)
-{
-    t_token *current = tokens;
-    int count = 0;
+// static void debug_print_tokens(t_token *tokens)
+// {
+//     t_token *current = tokens;
+//     int count = 0;
 
-    printf("\n=== DÉBUT DES TOKENS ===\n\n\n\n\n");
-    while (current)
-    {
-        printf("Token %d:\n", count++);
-        printf("%s%s Type: %s\n",
-               TREE_BRANCH, TREE_HORIZONTAL,
-               token_type_to_str(current->type));
-        printf("%s%s Value: '%s'\n",
-               TREE_BRANCH, TREE_HORIZONTAL,
-               current->value);
+//     printf("\n=== DÉBUT DES TOKENS ===\n\n\n\n\n");
+//     while (current)
+//     {
+//         printf("Token %d:\n", count++);
+//         printf("%s%s Type: %s\n",
+//                TREE_BRANCH, TREE_HORIZONTAL,
+//                token_type_to_str(current->type));
+//         printf("%s%s Value: '%s'\n",
+//                TREE_BRANCH, TREE_HORIZONTAL,
+//                current->value);
 
-        if (current->type == T_WORD && current->type_word)
-        {
-            printf("%s%s Token Words:\n",
-                   TREE_CORNER, TREE_HORIZONTAL);
-            debug_print_token_words(current->type_word, "        ");
-        }
-        printf("\n");
-        current = current->next;
-    }
-    printf("\n\n\n\n\n=== FIN DES TOKENS ===\n\n\n\n\n");
-}
+//         if (current->type == T_WORD && current->type_word)
+//         {
+//             printf("%s%s Token Words:\n",
+//                    TREE_CORNER, TREE_HORIZONTAL);
+//             debug_print_token_words(current->type_word, "        ");
+//         }
+//         printf("\n");
+//         current = current->next;
+//     }
+//     printf("\n\n\n\n\n=== FIN DES TOKENS ===\n\n\n\n\n");
+// }
 
 int	main(int ac, char **av, char **envp)
 {
@@ -367,12 +318,12 @@ int	main(int ac, char **av, char **envp)
 			if (ast)
 				free_ast(ast);
 			tokens = tokenize(input);
-			debug_print_tokens(tokens);
+			// debug_print_tokens(tokens);
 			if (check_syntax_error_parenthesis(tokens) == 0) // BIEN GERER ERREUR !
 				exit (0);
 			else
 				ast = parse_tokens(tokens);
-			// if (ast)
+			if (ast)
 			// {
 			// 	printf("\n\n\n\n\n=== DÉBUT DE L'AST ===\n%s\n%s\n%s\n", TREE_VERTICAL, TREE_VERTICAL, TREE_VERTICAL);
 			// 	debug_print_ast(ast, "", true);

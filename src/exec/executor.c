@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 18:45:48 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/02 23:17:44 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 // int	is_builtin(char *cmd)
 // {
-// 	return (!ft_strcmp(cmd, "echo")
-// 		|| !ft_strcmp(cmd, "cd")
-// 		|| !ft_strcmp(cmd, "pwd")
-// 		|| !ft_strcmp(cmd, "export")
-// 		|| !ft_strcmp(cmd, "unset")
-// 		|| !ft_strcmp(cmd, "env")
-// 		|| !ft_strcmp(cmd, "exit"));
+// 	return (!ft_strcmp(cmd, "echo", 4)
+// 		|| !ft_strncmp(cmd, "cd", 2)
+// 		|| !ft_strncmp(cmd, "pwd", 3)
+// 		|| !ft_strncmp(cmd, "export", 6)
+// 		|| !ft_strncmp(cmd, "unset", 5)
+// 		|| !ft_strncmp(cmd, "env", 3)
+// 		|| !ft_strncmp(cmd, "exit", 4));
 // }
 
 // int	excecute_builtin(t_cmd *cmd)
@@ -125,6 +125,83 @@ char    *find_command_path(char *name, t_shell *shell)
 	return (extract_path(env_path, name));
 }
 
+int handle_heredoc(char *delimiter)
+{
+	int			pipe_fd[2];
+	size_t		delimiter_len;
+	char		*line;
+
+	if (pipe(pipe_fd) == -1)
+		return (perror("pipe"), -1);
+	delimiter_len = ft_strlen(delimiter);
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file\n", 2);
+			break;
+		}
+		if (ft_strlen(line) == delimiter_len && ft_strncmp(line, delimiter, delimiter_len) == 0)
+		{
+			free(line);
+			break ;
+		}
+		ft_putstr_fd(line, pipe_fd[1]);
+		ft_putstr_fd("\n", pipe_fd[1]);
+		free(line);	
+	}
+	close(pipe_fd[1]);
+	return (pipe_fd[0]);
+}
+
+int handle_redirections(t_cmd *cmd)
+{
+	t_file_redir	*redir;
+	int				fd;
+
+	if (!cmd || !cmd->type_redir)
+		return (0);
+	redir = cmd->type_redir;
+	while (redir)
+	{
+		if (redir->type_redirection == T_REDIR_IN)
+		{
+			fd = open(redir->file_redirection, O_RDONLY);
+			if (fd == -1)
+				return (perror(redir->file_redirection), -1);
+			dup2(fd, STDIN_FILENO);
+			close(fd);
+		}
+		else if (redir->type_redirection == T_REDIR_OUT)
+		{
+			fd = open(redir->file_redirection, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (fd == -1)
+				return (perror(redir->file_redirection), -1);
+			dup2(fd, STDOUT_FILENO);
+			close(fd);
+		}
+		else if (redir->type_redirection == T_APPEND)
+		{
+			fd = open(redir->file_redirection, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (fd == -1)
+				return (perror(redir->file_redirection), -1);
+			dup2(fd, STDOUT_FILENO);
+			close(fd);
+		}
+		if (redir->type_redirection == T_HEREDOC)
+		{
+			fd = handle_heredoc(redir->file_redirection);
+			if (fd == -1)
+				return (-1);
+			dup2(fd, STDIN_FILENO);
+			close(fd);
+		}
+		redir = redir->next;
+	}
+	return (0);
+}
+
 int execute_command(t_cmd *cmd, t_shell *shell)
 {
 	int		status;
@@ -140,7 +217,8 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 		return (perror("fork"), 1);
 	if (pid == 0)
 	{
-		// gerer redirection !!!
+		if (handle_redirections(cmd) == -1)
+			exit(1);
 
 		cmd->path = find_command_path(cmd->name, shell);
 		if (!cmd->path)
@@ -153,7 +231,7 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 		if (!env_array)
 			exit(1);
 		execve(cmd->path, cmd->arg, env_array);
-		//free_array(env_array);
+		free_array(env_array);
 		perror("execve");
 		exit(1);
 	}
@@ -165,6 +243,65 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
+int excecute_pipe(t_ast *ast_left, t_ast *ast_right, t_shell *shell)
+{
+    int		pipefd[2];
+    pid_t	pid1;
+	pid_t	pid2;
+    int		status1;
+	int		status2;
+
+    if (pipe(pipefd) == -1)
+        return (perror("pipe"), 1);
+
+    pid1 = fork();
+    if (pid1 == -1)
+        return (perror("fork"), 1);
+    
+    if (pid1 == 0)
+    {
+		close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+		if (ast_left->type == AST_CMD && ast_left->cmd)
+		{
+			if (handle_redirections(ast_left->cmd) == -1)
+				exit(1);
+		}
+        exit(execute_ast(ast_left, shell));
+    }
+    
+    pid2 = fork();
+    if (pid2 == -1)
+	{
+		kill(pid1, SIGKILL);
+        return (perror("fork"), close(pipefd[0]), close(pipefd[1]), 1);
+	}
+	
+    if (pid2 == 0)
+    {
+		close(pipefd[1]);
+        dup2(pipefd[0], STDIN_FILENO);
+        close(pipefd[0]);
+		if (ast_right->type == AST_CMD && ast_right->cmd)
+		{
+			if (handle_redirections(ast_right->cmd) == -1)
+				exit(1);
+		}
+        exit(execute_ast(ast_right, shell));
+    }
+    
+    close(pipefd[0]);
+    close(pipefd[1]);
+    
+    waitpid(pid1, &status1, 0);
+    waitpid(pid2, &status2, 0);
+    
+    if ((status2 & 0x7f) == 0)
+        return ((status2 & 0xff00) >> 8);
+    return (1);
+}
+
 int execute_ast(t_ast *ast, t_shell *shell)
 {
 	if (!ast)
@@ -173,8 +310,8 @@ int execute_ast(t_ast *ast, t_shell *shell)
 	else if (ast->type == AST_CMD)
 		return (execute_command(ast->cmd, shell));
 
-	// else if (ast->type == AST_PIPE)
-	// 	return (excecute_pipe(ast->left, ast->right, shell));
+	else if (ast->type == AST_PIPE)
+		return (excecute_pipe(ast->left, ast->right, shell));
 
 	else if (ast->type == AST_AND)
 	{
