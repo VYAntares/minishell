@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 14:48:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/03 22:11:23 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,6 @@ int	builtin_cd(t_cmd *cmd, t_shell *shell)
 	char	*old_pwd;
 	char	*new_pwd;
 	char	cwd[PATH_MAX];
-	// t_env	*env_pwd;
-	// t_env	*env_oldpwd;
 
 	// Récupérer le chemin
 	if (cmd->arg[1])

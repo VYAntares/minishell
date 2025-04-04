@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 14:56:10 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/04 15:49:45 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -325,6 +325,8 @@ int	main(int ac, char **av, char **envp)
 			
 			// Analyser l'entrée
 			tokens = tokenize(input);
+			// debug_print_tokens(tokens);
+			// debug_print_tokens(tokens);
 			if (tokens)
 			{
 				// Expansions des variables d'environnement
@@ -335,6 +337,13 @@ int	main(int ac, char **av, char **envp)
 				{
 					// Parser et exécuter
 					ast = parse_tokens(tokens);
+					// if (ast)
+					// {
+					// 	printf("\n\n\n\n\n=== DÉBUT DE L'AST ===\n%s\n%s\n%s\n", TREE_VERTICAL, TREE_VERTICAL, TREE_VERTICAL);
+					// 	debug_print_ast(ast, "", true);
+					// 	printf("=== FIN DE L'AST ===\n\n\n\n\n");
+					// }
+
 					if (ast)
 					{
 						shell->exit_status = execute_ast(ast, shell);

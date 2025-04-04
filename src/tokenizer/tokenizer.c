@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:37:11 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 16:40:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/04 01:36:00 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ int	process_token(t_token **tokens, int *i, char *input)
 			return (printf("bash: syntax error near unexpected token `&'\n"), 0); // gerer ce cas la
 		return (add_operator_token(tokens, i, input));
 	}
-	else if (input[*i] == '$')
-		return (add_env_var_token(tokens, i, input));
+	// else if (input[*i] == '$')
+	// 	return (add_env_var_token(tokens, i, input));
 	return (add_word_token(tokens, i, input));
 }
 

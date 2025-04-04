@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   word_quote_token.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 22:37:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 18:10:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/04 02:15:48 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,8 @@ t_token_word	*define_word_no_quote(t_token_word **list, char *content,
 		return (NULL);
 	*start = *i;
 	while (!is_operator(content[*i]) && content[*i] != ' '
-		&& content[*i] != '\t' && content[*i] != '$'
-		&& content[*i] && content[*i] != '\'' && content[*i] != '\"')
+		&& content[*i] != '\t' && content[*i] && content[*i] != '\''
+		&& content[*i] != '\"')
 		(*i)++;
 	new_word->content = ft_substr(content, *start, (*i) - (*start));
 	new_word->type = T_NO_QUOTE;
@@ -107,7 +107,7 @@ char	*create_content_word(char *input, int *i)
 
 	start = *i;
 	while (!is_operator(input[*i]) && input[*i] != ' ' && input[*i] != '\t'
-		&& input[*i] != '$' && input[*i])
+		&& input[*i])
 	{
 		if (input[*i] == '\'' || input[*i] == '\"')
 		{

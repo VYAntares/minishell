@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 14:54:05 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/04 15:54:47 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,9 +155,7 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 			
 			if (execute_redirections(cmd) != 0)
 				return (1);
-			
 			status = execute_builtin(cmd, shell);
-			
 			dup2(stdin_backup, STDIN_FILENO);
 			dup2(stdout_backup, STDOUT_FILENO);
 			close(stdin_backup);
@@ -195,6 +193,33 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
+int	execute_subshell(t_ast *sub_shell, t_shell *shell)
+{
+	pid_t	pid;
+	int		status;
+	int		exit_code;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		exit_code = execute_ast(sub_shell, shell);
+		exit(exit_code);
+	}
+	if (pid < 0)
+	{
+		perror("minishell: fork");
+		return (1);
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		if (status & 0xFF)
+			return (1);
+		else
+			return ((status >> 8) & 0xFF);
+	}
+}
+
 int execute_ast(t_ast *ast, t_shell *shell)
 {
 	if (!ast)
@@ -216,6 +241,6 @@ int execute_ast(t_ast *ast, t_shell *shell)
 		return (0);
 	}
 	else if (ast->type == AST_SUB_SHELL)
-		return (execute_ast(ast->sub_shell, shell));
+		return (execute_subshell(ast->sub_shell, shell));
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 14:51:53 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/04 13:19:39 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,55 +34,6 @@ char	*get_env_value(t_env *env, const char *name)
 }
 
 /**
- * @brief Remplace une variable d'environnement par sa valeur
- * 
- * @param token_word Structure token_word contenant la variable
- * @param shell Structure shell
- * @return int 0 en cas de succès, 1 en cas d'erreur
- */
-int	expand_env_var(t_token_word *token_word, t_shell *shell)
-{
-	char	*env_value;
-	char	*old_content;
-
-	// Si c'est dans une single quote, pas d'expansion
-	if (token_word->type == T_S_QUOTE)
-		return (0);
-
-	old_content = token_word->content;
-	
-	// Cas spécial "$?"
-	if (ft_strncmp(token_word->content, "?", 1) == 0)
-	{
-		token_word->content = ft_itoa(shell->exit_status);
-		if (!token_word->content)
-			return (1);
-		free(old_content);
-		return (0);
-	}
-	
-	// Cas général: chercher la variable
-	env_value = get_env_value(shell->env, token_word->content);
-	if (env_value)
-	{
-		token_word->content = ft_strdup(env_value);
-		if (!token_word->content)
-			return (1);
-		free(old_content);
-	}
-	else
-	{
-		// Variable inexistante: remplacer par chaîne vide
-		token_word->content = ft_strdup("");
-		if (!token_word->content)
-			return (1);
-		free(old_content);
-	}
-	
-	return (0);
-}
-
-/**
  * @brief Parcourt les tokens et applique l'expansion de variables
  * 
  * @param tokens Liste de tokens
@@ -105,7 +56,10 @@ int	expand_env_vars(t_token *tokens, t_shell *shell)
 			
 			// Cas spécial "$?"
 			if (ft_strncmp(current->value, "?", 1) == 0)
+			{
 				current->value = ft_itoa(shell->exit_status);
+				// printf("%s%c\n", current->value, 'c');
+			}
 			else if (env_value)
 				current->value = ft_strdup(env_value);
 			else

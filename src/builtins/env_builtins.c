@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 14:50:47 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/03 23:11:19 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,12 +99,14 @@ int	builtin_export(t_cmd *cmd, t_shell *shell)
 	char	*equals_pos;
 	char	*name;
 	char	*value;
+	int		status;
 
 	// Si pas d'arguments, afficher les variables avec "declare -x"
 	if (!cmd->arg[1])
 		return (print_sorted_env(shell));
 	
 	i = 1;
+	status = 0;
 	while (cmd->arg[i])
 	{
 		equals_pos = ft_strchr(cmd->arg[i], '=');
@@ -122,12 +124,13 @@ int	builtin_export(t_cmd *cmd, t_shell *shell)
 			
 			if (!is_valid_identifier(name))
 			{
-				ft_putstr_fd("export: '", 2);
+				ft_putstr_fd("minishell: export: '", 2);
 				ft_putstr_fd(cmd->arg[i], 2);
 				ft_putendl_fd("': not a valid identifier", 2);
 				free(name);
 				free(value);
 				i++;
+				status = 1;
 				continue;
 			}
 			
@@ -140,16 +143,17 @@ int	builtin_export(t_cmd *cmd, t_shell *shell)
 			// Format NAME
 			if (!is_valid_identifier(cmd->arg[i]))
 			{
-				ft_putstr_fd("export: '", 2);
+				ft_putstr_fd("minishell: export: '", 2);
 				ft_putstr_fd(cmd->arg[i], 2);
 				ft_putendl_fd("': not a valid identifier", 2);
+				status = 1;
 			}
 			// Pas d'action si pas de '='
 		}
 		i++;
 	}
 	
-	return (0);
+	return (status);
 }
 
 /**
@@ -251,7 +255,8 @@ int	print_sorted_env(t_shell *shell)
 		if (equals_pos)
 		{
 			// Afficher le nom
-			printf("%s", env_array[i]);
+			write(1, env_array[i], equals_pos - env_array[i] + 1);
+
 			// Afficher la valeur entre guillemets
 			ft_putchar_fd('"', 1);
 			ft_putstr_fd(equals_pos + 1, 1);
@@ -321,6 +326,5 @@ int	builtin_unset(t_cmd *cmd, t_shell *shell)
 		
 		i++;
 	}
-	
 	return (0);
 }
