@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/04 15:54:47 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/04 16:54:13 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,7 +143,8 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 	char	**env_array;
 	int		stdin_backup;
 	int		stdout_backup;
-	
+
+	expand_var(cmd, shell);
 	if (!cmd || !cmd->name)
 		return (1);
 	if (is_builtin(cmd->name))

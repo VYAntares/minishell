@@ -1,9 +1,0 @@
-42.code-workspace
-Makefile
-file1.txt
-libft
-minishell
-minishell.h
-minishell_tester
-obj
-src

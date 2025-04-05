@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/04 15:57:16 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/05 02:29:36 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,7 @@ typedef struct s_shell
 	t_cmd				*cmd;
 	t_env				*env;
 	char				**history;
+	int					pid;
 	int					exit_status;
 }	t_shell;
 

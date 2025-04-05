@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_shell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 19:04:34 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/23 17:47:12 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/05 02:30:11 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ t_shell	*init_shell(char **envp)
 	shell->env = env;
 	shell->cmd = NULL;
 	shell->history = NULL;
+	shell->pid = getpid();
 	shell->exit_status = 0;
 	return (shell);
 }
