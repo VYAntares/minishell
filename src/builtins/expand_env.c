@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/05 02:29:56 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/05 03:20:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,8 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 	char	*content;
 	char	*env_name;
 	char	*env_value;
-	char	*exit_status;
-	int		*pid;
 	int		start;
 	char	*new_content;
-	char	*tmp1;
-	char	*tmp2;
 
 	i = 0;
 	start = 0;
@@ -56,23 +52,21 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 			start = ++i;
 			if (content[i] == '$')
 			{
-				pid = ft_itoa(shell->pid);
-				if (!pid)
+				env_value = ft_itoa(shell->pid);
+				if (!env_value)
 					return (1);
-				env_value = pid;
 				i++;
 			}
 			else if (content[i] == '?')
 			{
-				exit_status = ft_itoa(shell->exit_status);
-				if (!exit_status)
+				env_value = ft_itoa(shell->exit_status);
+				if (!env_value)
 					return (1);
-				env_value = exit_status;
 				i++;
 			}
 			else
 			{
-				while (content[i] && ft_isalnum(content[i]) || content[i] == "_")
+				while (content[i] && (ft_isalnum(content[i]) || content[i] == '_'))
 					i++;
 				env_name = ft_substr(content, start, i - start);
 				if (!env_name)
@@ -103,6 +97,47 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 	return (0);
 }
 
+int	rebuild_command_arg(t_cmd *cmd)
+{
+	int				i;
+	t_token_word	*word;
+	char			*tmp;
+	char			*new_tmp;
+
+	i = 0;
+	if (!cmd || !cmd->list_word)
+		return (0);
+	while (i < cmd->ac)
+	{
+		if (cmd->arg[i])
+			free(cmd->arg[i]);
+		tmp = ft_strdup("");
+		if (!tmp)
+			return (1);
+		word = cmd->list_word[i];
+		while (word)
+		{
+			new_tmp = ft_strjoin(tmp, word->content);
+			free(tmp);
+			if (!tmp)
+				return (1);
+			tmp = new_tmp;
+			word = word->next;
+		}
+		cmd->arg[i] = tmp;
+		i++;
+	}
+	if (cmd->ac > 0)
+	{
+		if (cmd->name)
+			free(cmd->name);
+		cmd->name = ft_strdup(cmd->arg[0]);
+		if (!cmd->name)
+			return (1);
+	}
+	return (0);
+}
+
 int expand_var(t_cmd *cmd, t_shell *shell)
 {
 	int				i;
@@ -118,11 +153,14 @@ int expand_var(t_cmd *cmd, t_shell *shell)
 		{
 			if (list->type != T_S_QUOTE)
 			{
-				if (expand_env_var(list, shell));
+				if (expand_env_var(list, shell) != 0)
 					return (1);
 			}					
 			list = list->next;
 		}
 		i++;
 	}
+	if (rebuild_command_arg(cmd) != 0)
+		return (1);
+	return (0);
 }
