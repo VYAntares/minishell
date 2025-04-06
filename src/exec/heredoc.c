@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 15:05:00 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 16:37:13 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,12 @@ static char	*create_temp_file(void)
 	return (temp_file);
 }
 
-int	handle_heredoc(char *delimiter)
+int	handle_heredoc(char *delimiter, t_shell *shell)
 {
 	char	*line;
 	char	*temp_file;
 	int		fd;
+	char	*expanded_line;
 
 	temp_file = create_temp_file();
 	if (!temp_file)
@@ -43,26 +44,27 @@ int	handle_heredoc(char *delimiter)
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || ft_strncmp(line, delimiter, ft_strlen(delimiter) + 1) == 0)
+		if (!line || (ft_strlen(line) == ft_strlen(delimiter) && ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0))
 		{
 			free(line);
 			break;
 		}
-		ft_putendl_fd(line, fd);
-		free(line);
+		expanded_line = expand_env_heredoc(line, shell);
+		if (!expanded_line)
+		{
+			close(fd);
+			unlink(temp_file);
+			return (1);
+		}
+		ft_putendl_fd(expanded_line, fd);
 	}
-	
 	close(fd);
-	
 	fd = open(temp_file, O_RDONLY);
 	if (fd == -1)
 		return (free(temp_file), 1);
-	
 	dup2(fd, STDIN_FILENO);
 	close(fd);
-	
 	unlink(temp_file);
 	free(temp_file);
-	
 	return (0);
 }

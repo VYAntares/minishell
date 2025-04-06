@@ -6,13 +6,13 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/04 15:54:38 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 15:41:42 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	execute_redirections(t_cmd *cmd)
+int	execute_redirections(t_cmd *cmd, t_shell *shell)
 {
 	t_file_redir	*redir;
 	int				fd;
@@ -45,7 +45,7 @@ int	execute_redirections(t_cmd *cmd)
 			close(fd);
 		}
 		else if (redir->type_redirection == T_HEREDOC)
-			handle_heredoc(redir->file_redirection);
+			handle_heredoc(redir->file_redirection, shell);
 		redir = redir->next;
 	}
 	return (0);

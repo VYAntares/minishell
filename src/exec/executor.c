@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 14:51:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 15:56:15 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,7 +155,7 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 			stdin_backup = dup(STDIN_FILENO);
 			stdout_backup = dup(STDOUT_FILENO);
 			
-			if (execute_redirections(cmd) != 0)
+			if (execute_redirections(cmd, shell) != 0)
 				return (1);
 			status = execute_builtin(cmd, shell);
 			dup2(stdin_backup, STDIN_FILENO);
@@ -172,7 +172,7 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 		return (perror("fork"), 1);
 	if (pid == 0)
 	{
-		if (cmd->type_redir && execute_redirections(cmd) != 0)
+		if (cmd->type_redir && execute_redirections(cmd, shell) != 0)
 			exit(1);
 		cmd->path = find_command_path(cmd->name, shell);
 		if (!cmd->path)
