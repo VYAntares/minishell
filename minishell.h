@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/05 03:00:38 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 14:52:04 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,7 +233,7 @@ void		free_array(char **array);
 
 
 
-int expand_var(t_cmd *cmd, t_shell *shell);
+int 		expand_var(t_cmd *cmd, t_shell *shell);
 
 
 #endif
