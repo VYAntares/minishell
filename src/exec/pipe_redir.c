@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 15:41:42 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 20:05:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,35 +17,37 @@ int	execute_redirections(t_cmd *cmd, t_shell *shell)
 	t_file_redir	*redir;
 	int				fd;
 
+	if (expand_redir(cmd, shell) != 0)
+		return (1);
 	redir = cmd->type_redir;
 	while (redir)
 	{
 		if (redir->type_redirection == T_REDIR_OUT)
 		{
-			fd = open(redir->file_redirection, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			fd = open(redir->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 			if (fd == -1)
-				return (perror(redir->file_redirection), 1);
+				return (perror(redir->content), 1);
 			dup2(fd, STDOUT_FILENO);
 			close(fd);
 		}
 		else if (redir->type_redirection == T_REDIR_IN)
 		{
-			fd = open(redir->file_redirection, O_RDONLY);
+			fd = open(redir->content, O_RDONLY);
 			if (fd == -1)
-				return (perror(redir->file_redirection), 1);
+				return (perror(redir->content), 1);
 			dup2(fd, STDIN_FILENO);
 			close(fd);
 		}
 		else if (redir->type_redirection == T_APPEND)
 		{
-			fd = open(redir->file_redirection, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			fd = open(redir->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
 			if (fd == -1)
-				return (perror(redir->file_redirection), 1);
+				return (perror(redir->content), 1);
 			dup2(fd, STDOUT_FILENO);
 			close(fd);
 		}
 		else if (redir->type_redirection == T_HEREDOC)
-			handle_heredoc(redir->file_redirection, shell);
+			handle_heredoc(redir->content, shell);
 		redir = redir->next;
 	}
 	return (0);

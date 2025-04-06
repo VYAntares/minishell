@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/05 03:22:19 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 20:13:06 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,7 @@ sig_atomic_t	g_sigint_received;
 //                    redir_indent,
 //                    TREE_CORNER, TREE_HORIZONTAL,
 //                    token_type_to_str(current->type_redirection),
-//                    current->file_redirection);
+//                    current->content);
             
 //             // Afficher les parties du nom de fichier
 //             if (current->word_parts)

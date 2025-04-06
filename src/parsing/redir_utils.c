@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:45:45 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/24 03:56:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 20:05:40 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,8 @@ t_file_redir	*create_redir(t_token *current)
 	if (!redir)
 		return (NULL);
 	redir->type_redirection = current->type;
-	redir->file_redirection = ft_strdup(current->next->value);
-	if (!redir->file_redirection)
+	redir->content = ft_strdup(current->next->value);
+	if (!redir->content)
 		return (NULL);
 	redir->word_parts = current->next->type_word;
 	redir->next = NULL;

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 16:43:49 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 20:59:59 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,6 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 		return (line);
 	return (expanded_line);
 }
-
 int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
 	int		i;
@@ -202,6 +201,56 @@ int	rebuild_command_arg(t_cmd *cmd)
 		if (!cmd->name)
 			return (1);
 	}
+	return (0);
+}
+
+int	rebuild_redirection(t_cmd *cmd)
+{
+	char			*new_content;
+	t_file_redir	*redir;
+
+	new_content = ft_strdup("");
+	redir = cmd->type_redir;
+	if (!new_content)
+		return(1);
+	while (redir)
+	{
+		while (redir->word_parts)
+		{
+			new_content = ft_strjoin(new_content, cmd->type_redir->word_parts->content);
+			if (!new_content)
+				return (1);
+			redir->word_parts = redir->word_parts->next;
+		}
+		cmd->type_redir->content = new_content;
+		redir = redir->next;
+	}
+	return (0);
+}
+
+int expand_redir(t_cmd *cmd, t_shell *shell)
+{
+	t_file_redir	*redir;
+	t_token_word	*first;
+
+	redir = cmd->type_redir;
+	first = redir->word_parts;
+	while (redir)
+	{
+		while (redir->word_parts)
+		{
+			if (redir->word_parts->type != T_S_QUOTE)
+			{
+				if (expand_env_var(redir->word_parts, shell) != 0)
+					return (1);
+			}
+			redir->word_parts = redir->word_parts->next;
+		}
+		redir = redir->next;
+	}
+	cmd->type_redir->word_parts = first;
+	if (rebuild_redirection(cmd) != 0)
+		return (1);
 	return (0);
 }
 

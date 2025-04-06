@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 15:57:42 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/06 20:04:58 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ typedef struct s_token
 typedef struct s_file_redir
 {
 	int					type_redirection;
-	char				*file_redirection;
+	char				*content;
 	t_token_word		*word_parts;
 	struct s_file_redir	*next;
 }	t_file_redir;
@@ -235,6 +235,6 @@ void		free_array(char **array);
 
 int 		expand_var(t_cmd *cmd, t_shell *shell);
 char	*expand_env_heredoc(char *line, t_shell *shell);
-
+int 	expand_redir(t_cmd *cmd, t_shell *shell);
 
 #endif
