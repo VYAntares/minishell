@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   expand_envv.c                                      :+:      :+:    :+:   */
+/*   expand_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/07 16:32:33 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/07 17:26:19 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,7 +237,8 @@ int expand_redir(t_cmd *cmd, t_shell *shell)
 		current = redir->word_parts;
 		while (current)
 		{
-			if (current->type != T_S_QUOTE)
+			if (current->type != T_S_QUOTE
+				&& redir->type_redirection != T_HEREDOC)
 			{
 				if (expand_env_var(current, shell) != 0)
 					return (1);
