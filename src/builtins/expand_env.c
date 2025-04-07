@@ -1,24 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   expand_env.c                                       :+:      :+:    :+:   */
+/*   expand_envv.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 20:59:59 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/07 16:32:33 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
-/**
- * @brief Recherche une variable d'environnement par son nom
- * 
- * @param env Liste d'environnement
- * @param name Nom de la variable
- * @return char* Valeur de la variable ou NULL si non trouvée
- */
 char	*get_env_value(t_env *env, const char *name)
 {
 	t_env	*current;
@@ -26,7 +19,8 @@ char	*get_env_value(t_env *env, const char *name)
 	current = env;
 	while (current)
 	{
-		if (ft_strncmp(current->name, name, ft_strlen(name)) == 0)
+		if (ft_strlen(name) == ft_strlen(current->name)
+			&& ft_strncmp(current->name, name, ft_strlen(name)) == 0)
 			return (current->value);
 		current = current->next;
 	}
@@ -113,7 +107,7 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 	content = token_word->content;
 	while (content[i])
 	{
-		if (content[i] == '$' && content[i + 1])
+		if (content[i] == '$' && content[i + 1] && content[i + 1] != ' ')
 		{
 			start = ++i;
 			if (content[i] == '$')
@@ -208,19 +202,21 @@ int	rebuild_redirection(t_cmd *cmd)
 {
 	char			*new_content;
 	t_file_redir	*redir;
+	t_token_word	*current;
 
 	new_content = ft_strdup("");
 	redir = cmd->type_redir;
+	current = redir->word_parts;
 	if (!new_content)
-		return(1);
+		return (1);
 	while (redir)
 	{
-		while (redir->word_parts)
+		while (current)
 		{
-			new_content = ft_strjoin(new_content, cmd->type_redir->word_parts->content);
+			new_content = ft_strjoin(new_content, current->content);
 			if (!new_content)
 				return (1);
-			redir->word_parts = redir->word_parts->next;
+			current = current->next;
 		}
 		cmd->type_redir->content = new_content;
 		redir = redir->next;
@@ -231,24 +227,26 @@ int	rebuild_redirection(t_cmd *cmd)
 int expand_redir(t_cmd *cmd, t_shell *shell)
 {
 	t_file_redir	*redir;
-	t_token_word	*first;
+	// t_token_word	*first;
+	t_token_word	*current;
 
 	redir = cmd->type_redir;
-	first = redir->word_parts;
+	// first = redir->word_parts;
 	while (redir)
 	{
-		while (redir->word_parts)
+		current = redir->word_parts;
+		while (current)
 		{
-			if (redir->word_parts->type != T_S_QUOTE)
+			if (current->type != T_S_QUOTE)
 			{
-				if (expand_env_var(redir->word_parts, shell) != 0)
+				if (expand_env_var(current, shell) != 0)
 					return (1);
 			}
-			redir->word_parts = redir->word_parts->next;
+			current = current->next;
 		}
 		redir = redir->next;
 	}
-	cmd->type_redir->word_parts = first;
+	// cmd->type_redir->word_parts = first;
 	if (rebuild_redirection(cmd) != 0)
 		return (1);
 	return (0);

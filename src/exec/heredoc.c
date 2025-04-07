@@ -6,11 +6,11 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 16:37:13 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/07 16:26:47 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 static char	*create_temp_file(void)
 {

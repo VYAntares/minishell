@@ -6,11 +6,11 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/03 23:11:19 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/07 16:26:51 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../../minishell.h"
 
 /**
  * @brief Met à jour une variable d'environnement
