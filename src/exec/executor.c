@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/07 17:02:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/07 20:55:01 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 int	is_builtin(char *cmd)
 {
-	return (!ft_strncmp(cmd, "echo", 4)
-		|| !ft_strncmp(cmd, "cd", 2)
-		|| !ft_strncmp(cmd, "pwd", 3)
-		|| !ft_strncmp(cmd, "export", 6)
-		|| !ft_strncmp(cmd, "unset", 5)
-		|| !ft_strncmp(cmd, "env", 3)
-		|| !ft_strncmp(cmd, "exit", 4));
+	return ((!ft_strncmp(cmd, "echo", 4) && ft_strlen(cmd) == 4)
+		|| (!ft_strncmp(cmd, "cd", 2) && ft_strlen(cmd) == 2)
+		|| (!ft_strncmp(cmd, "pwd", 3) && ft_strlen(cmd) == 3)
+		|| (!ft_strncmp(cmd, "export", 6) && ft_strlen(cmd) == 6)
+		|| (!ft_strncmp(cmd, "unset", 5) && ft_strlen(cmd) == 5)
+		|| (!ft_strncmp(cmd, "env", 3) && ft_strlen(cmd) == 3)
+		|| (!ft_strncmp(cmd, "exit", 4) && ft_strlen(cmd) == 4));
 }
 
 int	execute_builtin(t_cmd *cmd, t_shell *shell)

@@ -1,0 +1,19 @@
+TODO
+
+cat << EOF | << EOF > t.txt
+
+export TEST="-l                  -a"
+ls $TEST
+    -> voir ls
+ls "$TEST"
+    -> ne PAS voir ls
+
+revoir expension variable (ordre)
+    -> environement
+    -> ~
+    -> wildcard
+    -> commandes
+
+ echo hi >
+
+cat <file1 <<OEF >file3 >file4 <<OEF2 >file5
