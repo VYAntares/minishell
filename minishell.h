@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/08 20:13:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 15:24:59 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -188,7 +188,7 @@ int			execute_ast(t_ast *ast, t_shell *shell);
 int			execute_command(t_cmd *cmd, t_shell *shell);
 int			execute_pipe(t_ast *left, t_ast *right, t_shell *shell);
 int			execute_redirections(t_cmd *cmd, t_shell *shell);
-int			handle_heredoc(char *delimiter, t_shell *shell);
+int			handle_heredoc(t_file_redir *redir, t_shell *shell);
 char		*extract_path(char *path, char *command_name);
 char		*find_command_path(char *name, t_shell *shell);
 char		**env_to_array(t_env *env);
@@ -226,15 +226,11 @@ void		free_env_list(t_env *head);
 void		free_array(char **array);
 
 
-
-
-
-
-
-
-
 int 		expand_var(t_cmd *cmd, t_shell *shell);
 char	*expand_env_heredoc(char *line, t_shell *shell);
 int 	expand_redir(t_cmd *cmd, t_shell *shell);
+
+void	cleanup_heredoc_files(t_cmd *cmd);
+void	launch_heredoc(t_ast *ast, t_shell *shell);
 
 #endif

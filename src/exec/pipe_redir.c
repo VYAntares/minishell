@@ -6,54 +6,11 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/09 01:08:36 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 13:21:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-	        
-void write_fake_heredoc(t_file_redir *heredoc)
-{
-	char	*delimiter;
-	char	*line;
-	
-	delimiter = heredoc->content;
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || (ft_strlen(line) == ft_strlen(delimiter)
-			&& ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0))
-		{
-			free(line);
-			break;
-		}
-	}
-}
-
-int fake_heredoc(t_file_redir *redir)
-{
-	t_file_redir	*heredoc;
-	t_file_redir	*count_heredoc;
-	int				count;
-
-	heredoc = redir;
-	count_heredoc = redir;
-	count = 0;
-	while (count_heredoc)
-	{
-		if (count_heredoc->type_redirection == T_HEREDOC)
-			count++;
-		count_heredoc = count_heredoc->next;
-	}
-	while (count)
-	{
-		if (heredoc->type_redirection == T_HEREDOC)
-			write_fake_heredoc(heredoc);
-		heredoc = heredoc->next;
-		count--;
-	}
-	return (0);
-}
 
 int execute_redirections(t_cmd *cmd, t_shell *shell)
 {
@@ -64,24 +21,36 @@ int execute_redirections(t_cmd *cmd, t_shell *shell)
 
 	if (expand_redir(cmd, shell) != 0)
 		return (1);
+
 	redir = cmd->type_redir;
 	while (redir)
 	{
-		if (redir->type_redirection == T_REDIR_IN || 
-			redir->type_redirection == T_HEREDOC)
+		if (redir->type_redirection == T_REDIR_IN
+			|| redir->type_redirection == T_HEREDOC)
+		{
+			if (redir->type_redirection == T_REDIR_IN)
+			{
+				fd = open(redir->content, O_RDONLY);
+				if (fd == -1)
+					return (perror(redir->content), 1);  // Erreur si fichier n'existe pas
+				close(fd);  // On ferme immédiatement, on vérifie juste l'existence
+			}
 			last_input = redir;
-		else if (redir->type_redirection == T_REDIR_OUT || 
-				 redir->type_redirection == T_APPEND)
+		}
+		else if (redir->type_redirection == T_REDIR_OUT
+				|| redir->type_redirection == T_APPEND)
 			last_output = redir;
 		
 		redir = redir->next;
 	}
+	redir = cmd->type_redir;
 
 	if (last_input)
 	{
-		if (fake_heredoc(redir) != 0)
-				return (1);
-		if (last_input->type_redirection == T_REDIR_IN)
+		// if (fake_heredoc(redir) != 0)
+		// 		return (1);
+		if (last_input->type_redirection == T_REDIR_IN
+			|| last_input->type_redirection == T_HEREDOC)
 		{
 			fd = open(last_input->content, O_RDONLY);
 			if (fd == -1)
@@ -89,11 +58,11 @@ int execute_redirections(t_cmd *cmd, t_shell *shell)
 			dup2(fd, STDIN_FILENO);
 			close(fd);
 		}
-		else if (last_input->type_redirection == T_HEREDOC)
-		{
-			if (handle_heredoc(last_input->content, shell) != 0)
-				return (1);
-		}
+		// else if (last_input->type_redirection == T_HEREDOC)
+		// {
+		// 	if (handle_heredoc(last_input->content, shell) != 0)
+		// 		return (1);
+		// }
 	}
 	redir = cmd->type_redir;
 	while (redir)
@@ -123,42 +92,6 @@ int execute_redirections(t_cmd *cmd, t_shell *shell)
 	return (0);
 }
 
-// int	execute_redirections(t_cmd *cmd, t_shell *shell)
-// {
-// 	t_file_redir	*redir;
-// 	int				fd;
-
-// 	if (expand_redir(cmd, shell) != 0)
-// 		return (1);
-// 	redir = cmd->type_redir;
-// 	while (redir)
-// 	{
-// 		if (redir->type_redirection == T_REDIR_OUT)
-// 		{
-// 			fd = open(redir->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-// 			if (fd == -1)
-// 				return (perror(redir->content), 1);
-// 			dup2(fd, STDOUT_FILENO);
-// 			close(fd);
-// 		}
-// 		else if (redir->type_redirection == T_REDIR_IN)
-// 		{
-// 			fd = open(redir->content, O_RDONLY);
-// 			if (fd == -1)
-// 				return (perror(redir->content), 1);
-// 			dup2(fd, STDIN_FILENO);
-// 			close(fd);
-// 		}
-// 		else if (redir->type_redirection == T_HEREDOC)
-// 		{
-// 			if (handle_heredoc(redir->content, shell) != 0)
-// 				return (1);
-// 		}
-// 		redir = redir->next;
-// 	}
-// 	return (0);
-// }
-
 int	execute_pipe(t_ast *left, t_ast *right, t_shell *shell)
 {
 	int		pipefd[2];
@@ -166,7 +99,7 @@ int	execute_pipe(t_ast *left, t_ast *right, t_shell *shell)
 	pid_t	pid2;
 	int		status1;
 	int		status2;
-
+	
 	if (pipe(pipefd) == -1)
 		return (perror("pipe"), 1);
 	

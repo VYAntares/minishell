@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:38:50 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/06 20:06:13 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 13:35:09 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,4 +80,26 @@ void	free_array(char **array)
 		i++;
 	}
 	free(array);
+}
+
+void cleanup_heredoc_files(t_cmd *cmd)
+{
+	t_file_redir	*redir;
+	t_cmd			*current;
+
+	redir = cmd->type_redir;
+	current = cmd;
+	while (current)
+	{
+		while (redir)
+		{
+			if (redir->type_redirection == T_HEREDOC)
+			{
+				// Supprime le fichier temporaire
+				unlink(redir->content);
+			}
+			redir = redir->next;
+		}
+		current = current->next;
+	}
 }

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/08 18:09:41 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 14:33:57 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -343,10 +343,12 @@ int	main(int ac, char **av, char **envp)
 					// 	debug_print_ast(ast, "", true);
 					// 	printf("=== FIN DE L'AST ===\n\n\n\n\n");
 					// }
-
+					
 					if (ast)
 					{
+						launch_heredoc(ast, shell);
 						shell->exit_status = execute_ast(ast, shell);
+						cleanup_heredoc_files(shell->cmd);
 					}
 				}
 			}

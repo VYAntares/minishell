@@ -2,6 +2,11 @@ TODO
 
 cat << EOF | << EOF > t.txt
 
+env -i ./minishell incrementer la variable $SHLVL
+
+./minishell ./minishell
+ensuite ctrl +c
+
 export TEST="-l                  -a"
 ls $TEST
     -> voir ls
@@ -16,4 +21,10 @@ revoir expension variable (ordre)
 
  echo hi >
 
-cat <file1 <<OEF >file3 >file4 <<OEF2 >file5
+cat <<EOF | grep "important" | wc -l > nombre.txt
+
+cat <<<test #modifie parsing ajouter erreur si 3 < a la suite
+
+cat << < test ou cat < << test ou cat < > test... plusieurs redirection
+
+cat <<oef | grep "oui" | wc -l >nbr <<oef
