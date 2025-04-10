@@ -6,11 +6,38 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 16:37:40 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 22:49:32 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
+int	only_redirection(t_cmd *cmd)
+{
+	t_file_redir	*redir;
+	int				fd;
+
+	redir = cmd->type_redir;
+	while (redir)
+	{
+		if (redir->type_redirection == T_REDIR_IN
+			|| redir->type_redirection == T_HEREDOC)
+		{
+			fd = open(redir->content, O_RDONLY);
+				if (fd == -1)
+					return (perror(redir->content), 1);  // Erreur si fichier n'existe pas
+				close(fd);  // On ferme immédiatement, on vérifie juste l'existence
+		}
+		else if (redir->type_redirection == T_REDIR_OUT)
+			fd = open(redir->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		else
+			fd = open(redir->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
+		if (fd == -1)
+			return (perror(redir->content), 1);
+		redir = redir->next;
+	}
+	return (0);
+}
 
 int execute_redirections(t_cmd *cmd, t_shell *shell)
 {
@@ -18,6 +45,9 @@ int execute_redirections(t_cmd *cmd, t_shell *shell)
 	t_file_redir    *last_input = NULL;
 	t_file_redir    *last_output = NULL;
 	int             fd;
+
+	if (!cmd->arg[0] && cmd->type_redir)
+		return (only_redirection(cmd));
 
 	if (expand_redir(cmd, shell) != 0)
 		return (1);

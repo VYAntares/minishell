@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 16:28:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 22:32:50 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,9 +143,13 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 	char	**env_array;
 	int		stdin_backup;
 	int		stdout_backup;
-
-	if (!cmd || !cmd->name)
+	
+	if (!cmd || !cmd->name || !cmd->arg[0])
+	{
+		if (execute_redirections(cmd, shell) != 0)
+			return (1);
 		return (1);
+	}
 	if (expand_var(cmd, shell) != 0)
 		return (1);
 	if (is_builtin(cmd->name))
@@ -171,6 +175,11 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 		return (perror("fork"), 1);
 	if (pid == 0)
 	{
+		if (cmd->arg[0] == NULL)
+			{
+				if (execute_redirections(cmd, shell) != 0)
+					exit(1);
+			}
 		if (cmd->type_redir && execute_redirections(cmd, shell) != 0)
 			exit(1);
 		cmd->path = find_command_path(cmd->name, shell);
@@ -226,7 +235,9 @@ int execute_ast(t_ast *ast, t_shell *shell)
 	if (!ast)
 		return (0);
 	else if (ast->type == AST_CMD)
+	{
 		return (execute_command(ast->cmd, shell));
+	}
 	else if (ast->type == AST_PIPE)
 		return (execute_pipe(ast->left, ast->right, shell));
 	else if (ast->type == AST_AND)
