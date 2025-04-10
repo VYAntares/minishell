@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 16:01:31 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 23:40:08 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,9 @@
 # include <errno.h>
 # include <string.h>
 # include <limits.h>
+# include <stdbool.h>
+# include <stdio.h>
+# include <string.h>
 
 # include "libft.h"
 
@@ -35,6 +38,16 @@ extern sig_atomic_t	g_sigint_received;
 # define STARTING_WITH_CLOSE_PARENTH -1
 # define UNMATCHING_PARENTH -2
 # define PARENTH_AFTER_WRONG_TOKEN -3
+
+// extern const char *TREE_VERTICAL	= "│";
+// extern const char *TREE_BRANCH		= "├";
+// extern const char *TREE_CORNER		= "└";
+// extern const char *TREE_HORIZONTAL	= "──";
+
+extern const char *TREE_VERTICAL;
+extern const char *TREE_BRANCH;
+extern const char *TREE_CORNER;
+extern const char *TREE_HORIZONTAL;
 
 /* Types de tokens */
 typedef enum e_type
@@ -232,5 +245,10 @@ int 	expand_redir(t_cmd *cmd, t_shell *shell);
 
 void	cleanup_heredoc_files(t_cmd *cmd);
 void	launch_heredoc(t_ast *ast, t_shell *shell);
+
+void	debug_print_ast(t_ast *node, const char *prefix, bool is_last);
+void	debug_print_tokens(t_token *tokens);
+
+
 
 #endif
