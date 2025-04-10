@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/07 17:26:19 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 16:46:48 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,8 +248,11 @@ int expand_redir(t_cmd *cmd, t_shell *shell)
 		redir = redir->next;
 	}
 	// cmd->type_redir->word_parts = first;
-	if (rebuild_redirection(cmd) != 0)
-		return (1);
+	if (cmd->type_redir->type_redirection != T_HEREDOC)
+	{
+		if (rebuild_redirection(cmd) != 0)
+			return (1);
+	}
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 13:02:06 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 16:28:29 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,7 +154,6 @@ int execute_command(t_cmd *cmd, t_shell *shell)
 		{
 			stdin_backup = dup(STDIN_FILENO);
 			stdout_backup = dup(STDOUT_FILENO);
-			
 			if (execute_redirections(cmd, shell) != 0)
 				return (1);
 			status = execute_builtin(cmd, shell);

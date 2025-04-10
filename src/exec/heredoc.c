@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 15:45:33 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/10 16:25:48 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static char	*create_temp_file(void)
 	char		*num_str;
 
     temp_file = NULL;
-	num_str = ft_itoa(counter++);
+	num_str = ft_itoa(++counter);
 	if (!num_str)
 		return (NULL);
 	temp_file = ft_strjoin("/tmp/minishell_heredoc_", num_str);
@@ -45,8 +45,6 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell)
 		return (free(temp_file), 1);
 	free(redir->content);
 	redir->content = ft_strdup(temp_file);
-	printf("file : %s\n", redir->content);
-	printf("del : %s\n", delimiter);
 	while (1)
 	{
 		line = readline("> ");
@@ -65,12 +63,6 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell)
 		ft_putendl_fd(expanded_line, fd);
 	}
 	close(fd);
-	// fd = open(temp_file, O_RDONLY);
-	// if (fd == -1)
-	// 	return (free(temp_file), 1);
-	// dup2(fd, STDIN_FILENO);
-	// close(fd);
-	//free(temp_file);
 	return (0);
 }
 
