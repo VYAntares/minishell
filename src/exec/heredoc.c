@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 02:24:41 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/11 02:27:47 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell)
 void	chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd)
 {
 	if (!ast)
-		return;
+		return ;
 	if (ast->type == AST_CMD)
 	{
 		if (*first_cmd == NULL)
@@ -86,11 +86,13 @@ void	chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd)
 	}
 }
 
-t_cmd *get_chained_commands(t_ast *ast)
+t_cmd	*get_chained_commands(t_ast *ast)
 {
-	t_cmd *first_cmd = NULL;
-	t_cmd *last_cmd = NULL;
-	
+	t_cmd	*first_cmd;
+	t_cmd	*last_cmd;
+
+	first_cmd = NULL;
+	last_cmd = NULL;
 	chain_commands(ast, &first_cmd, &last_cmd);
 	return (first_cmd);
 }
