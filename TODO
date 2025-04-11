@@ -1,7 +1,5 @@
 TODO
 
-cat << EOF | << EOF > t.txt
-
 env -i ./minishell incrementer la variable $SHLVL
 
 ./minishell ./minishell
