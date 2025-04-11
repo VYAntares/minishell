@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 16:46:48 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/11 01:26:29 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 		return (line);
 	return (expanded_line);
 }
+
 int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
 	int		i;
@@ -227,11 +228,9 @@ int	rebuild_redirection(t_cmd *cmd)
 int expand_redir(t_cmd *cmd, t_shell *shell)
 {
 	t_file_redir	*redir;
-	// t_token_word	*first;
 	t_token_word	*current;
 
 	redir = cmd->type_redir;
-	// first = redir->word_parts;
 	while (redir)
 	{
 		current = redir->word_parts;
@@ -247,7 +246,6 @@ int expand_redir(t_cmd *cmd, t_shell *shell)
 		}
 		redir = redir->next;
 	}
-	// cmd->type_redir->word_parts = first;
 	if (cmd->type_redir->type_redirection != T_HEREDOC)
 	{
 		if (rebuild_redirection(cmd) != 0)

@@ -35,10 +35,10 @@ FREE_DIR = $(SRCS_DIR)free/
 
 # Source files
 MAIN_SRCS = main.c init_shell.c signals.c debugger.c
-PARSING_SRCS = parser.c parser_utils.c redir_utils.c cmd_utils.c parenthesis_utils.c
-TOKENIZER_SRCS = tokenizer.c env_token.c operator_token.c word_quote_token.c
+PARSING_SRCS = parser.c parser_utils.c redir_utils.c cmd_utils.c parenthesis_utils.c parenthesis_utils2.c
+TOKENIZER_SRCS = tokenizer.c operator_token.c word_quote_token.c
 BUILTINS_SRCS = builtins.c env_builtins.c expand_env.c
-EXEC_SRCS = executor.c heredoc.c pipe_redir.c
+EXEC_SRCS = executor.c heredoc.c pipe_redir.c executor_utils.c
 PIPE_SRCS =
 FREE_SRCS = free_parsing.c
 

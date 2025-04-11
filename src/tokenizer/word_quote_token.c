@@ -6,30 +6,11 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 22:37:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/04 02:15:48 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/11 00:53:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-int	add_node_back_word(t_token_word **list, t_token_word *new)
-{
-	t_token_word	*last;
-
-	if (!list || !new)
-		return (0);
-	new->next = NULL;
-	if (!*list)
-	{
-		*list = new;
-		return (1);
-	}
-	last = *list;
-	while (last->next)
-		last = last->next;
-	last->next = new;
-	return (1);
-}
 
 t_token_word	*define_word_quote_type(t_token_word **list, char *content,
 									int *i, int *start)
@@ -97,7 +78,7 @@ void	analyze_quote_content(t_token_word **list, t_token *new,
 			new_word = define_word_no_quote(list, content, &i, &start);
 	}
 	new->type_word = *list;
-}	
+}
 
 char	*create_content_word(char *input, int *i)
 {
@@ -116,7 +97,8 @@ char	*create_content_word(char *input, int *i)
 			while (input[*i] && input[*i] != quote_type)
 				(*i)++;
 			if (input[*i] != quote_type)
-				return (printf("gerer erreur no quote"), NULL);   // GERER MESSAGE DERREUR
+				return (ft_putstr_fd
+					("minishell: syntax error: unclosed\n", 2), NULL);
 		}
 		(*i)++;
 	}

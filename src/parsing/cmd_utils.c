@@ -6,16 +6,11 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:49:49 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 14:11:54 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/11 00:39:40 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
-
-int	is_command_argument(t_type type)
-{
-	return (type == T_WORD || type == T_ENV_VAR || type == T_WILDCARD);
-}
 
 int	count_args(t_token *tokens)
 {
@@ -48,8 +43,6 @@ int	init_cmd(t_cmd *cmd, t_token *tokens)
 	cmd->ac = count_args(tokens);
 	cmd->name = NULL;
 	cmd->path = NULL;
-	// cmd->type_redirection = 0;
-	// cmd->file_redirection = NULL;
 	cmd->type_redir = NULL;
 	cmd->list_word = NULL;
 	cmd->next = NULL;

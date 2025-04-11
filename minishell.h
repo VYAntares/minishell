@@ -6,14 +6,14 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/10 23:40:08 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/11 01:40:48 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdio.h>
+# include <stdio.h>       /* Déplacé en premier pour définir FILE */
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
@@ -27,8 +27,6 @@
 # include <string.h>
 # include <limits.h>
 # include <stdbool.h>
-# include <stdio.h>
-# include <string.h>
 
 # include "libft.h"
 
@@ -39,15 +37,10 @@ extern sig_atomic_t	g_sigint_received;
 # define UNMATCHING_PARENTH -2
 # define PARENTH_AFTER_WRONG_TOKEN -3
 
-// extern const char *TREE_VERTICAL	= "│";
-// extern const char *TREE_BRANCH		= "├";
-// extern const char *TREE_CORNER		= "└";
-// extern const char *TREE_HORIZONTAL	= "──";
-
-extern const char *TREE_VERTICAL;
-extern const char *TREE_BRANCH;
-extern const char *TREE_CORNER;
-extern const char *TREE_HORIZONTAL;
+// extern const char *TREE_VERTICAL;
+// extern const char *TREE_BRANCH;
+// extern const char *TREE_CORNER;
+// extern const char *TREE_HORIZONTAL;
 
 /* Types de tokens */
 typedef enum e_type
@@ -225,8 +218,10 @@ int			builtin_env(t_shell *shell);
 int			builtin_exit(t_cmd *cmd, t_shell *shell);
 
 /* Fonctions auxiliaires pour les builtins */
-int			update_env_variable(t_shell *shell, const char *name, const char *value);
-int			add_env_variable(t_shell *shell, const char *name, const char *value);
+int			update_env_variable(t_shell *shell, const char *name,
+				const char *value);
+int			add_env_variable(t_shell *shell, const char *name,
+				const char *value);
 int			is_valid_identifier(const char *id);
 int			print_sorted_env(t_shell *shell);
 int			is_number(char *str);
@@ -238,17 +233,17 @@ void		free_cmd(t_cmd *cmd);
 void		free_env_list(t_env *head);
 void		free_array(char **array);
 
+int			expand_var(t_cmd *cmd, t_shell *shell);
+char		*expand_env_heredoc(char *line, t_shell *shell);
+int			expand_redir(t_cmd *cmd, t_shell *shell);
 
-int 		expand_var(t_cmd *cmd, t_shell *shell);
-char	*expand_env_heredoc(char *line, t_shell *shell);
-int 	expand_redir(t_cmd *cmd, t_shell *shell);
+void		cleanup_heredoc_files(t_cmd *cmd);
+void		launch_heredoc(t_ast *ast, t_shell *shell);
 
-void	cleanup_heredoc_files(t_cmd *cmd);
-void	launch_heredoc(t_ast *ast, t_shell *shell);
-
-void	debug_print_ast(t_ast *node, const char *prefix, bool is_last);
-void	debug_print_tokens(t_token *tokens);
-
-
+void		debug_print_ast(t_ast *node, const char *prefix, bool is_last);
+void		debug_print_tokens(t_token *tokens);
+int			add_node_back_word(t_token_word **list, t_token_word *new);
+t_token		*find_last_priority_operator(t_token *tokens);
+t_ast_type	get_ast_type(t_token *token);
 
 #endif
