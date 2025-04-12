@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/12 17:01:48 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/12 23:16:33 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,184 +94,69 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 	return (expanded_line);
 }
 
-int expand_env_var(t_token_word *token_word, t_shell *shell)
+int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
-    int i;
-    char *content;
-    char *env_name;
-    char *env_value;
-    int start;
-    char *new_content;
+	int		i;
+	char	*content;
+	char	*env_name;
+	char	*env_value;
+	int		start;
+	char	*new_content;
 
-    i = 0;
-    start = 0;
-    content = token_word->content;
-    while (content[i])
-    {
-        if (content[i] == '$' && content[i + 1] && content[i + 1] != ' ')
-        {
-            start = ++i;
-            if (content[i] == '$')
-            {
-                env_value = ft_itoa(shell->pid);
-                if (!env_value)
-                    return (1);
-                i++;
-            }
-            else if (content[i] == '?')
-            {
-                env_value = ft_itoa(shell->exit_status);
-                if (!env_value)
-                    return (1);
-                i++;
-            }
-            else
-            {
-                while (content[i] && (ft_isalnum(content[i]) || content[i] == '_'))
-                    i++;
-                env_name = ft_substr(content, start, i - start);
-                if (!env_name)
-                    return (1);
-                env_value = get_env_value(shell->env, env_name);
-                free(env_name);
-                if (!env_value)
-                {
-                    env_value = ft_strdup("");
-                    if (!env_value)
-                        return (1);
-                }
-            }
-            
-            // Préserver les espaces selon le type de token
-            new_content = ft_substr(content, 0, start - 1);
-            if (!new_content)
-                return (1);
-            
-            // Si nous sommes dans des guillemets doubles, on préserve les espaces multiples
-            // Sinon, on fait le word splitting
-            if (token_word->type == T_D_QUOTE)
-            {
-                new_content = ft_strjoin(new_content, env_value);
-            }
-            else
-            {
-                // Pour le word splitting, on va remplacer tous les espaces consécutifs par un seul
-                char *split_value = NULL;
-                int j = 0, k = 0;
-                int space_flag = 0;
-                
-                split_value = malloc(ft_strlen(env_value) + 1);
-                if (!split_value)
-                    return (free(new_content), 1);
-                
-                while (env_value[j])
-                {
-                    if (env_value[j] == ' ' || env_value[j] == '\t')
-                    {
-                        if (space_flag == 0)
-                        {
-                            split_value[k++] = ' ';
-                            space_flag = 1;
-                        }
-                    }
-                    else
-                    {
-                        split_value[k++] = env_value[j];
-                        space_flag = 0;
-                    }
-                    j++;
-                }
-                split_value[k] = '\0';
-                
-                char *tmp = ft_strjoin(new_content, split_value);
-                free(split_value);
-                free(new_content);
-                new_content = tmp;
-            }
-            
-            if (!new_content)
-                return (1);
-            
-            char *tmp = ft_strjoin(new_content, content + i);
-            free(new_content);
-            if (!tmp)
-                return (1);
-            
-            free(token_word->content);
-            token_word->content = tmp;
-            
-            content = token_word->content;
-            i = 0;
-        }
-        else
-            i++;
-    }
-    return (0);
+	i = 0;
+	start = 0;
+	content = token_word->content;
+	while (content[i])
+	{
+		if (content[i] == '$' && content[i + 1] && content[i + 1] != ' ')
+		{
+			start = ++i;
+			if (content[i] == '$')
+			{
+				env_value = ft_itoa(shell->pid);
+				if (!env_value)
+					return (1);
+				i++;
+			}
+			else if (content[i] == '?')
+			{
+				env_value = ft_itoa(shell->exit_status);
+				if (!env_value)
+					return (1);
+				i++;
+			}
+			else
+			{
+				while (content[i] && (ft_isalnum(content[i]) || content[i] == '_'))
+					i++;
+				env_name = ft_substr(content, start, i - start);
+				if (!env_name)
+					return (1);
+				env_value = get_env_value(shell->env, env_name);
+				if (!env_value)
+				{
+					env_value = ft_strdup("");
+					if (!env_value)
+						return (1);
+				}
+			}
+			new_content = ft_substr(content, 0, start - 1);
+			if (!new_content)
+				return (1);
+			new_content = ft_strjoin(new_content, env_value);
+			if (!new_content)
+				return (1);
+			new_content = ft_strjoin(new_content, content + i);
+			if (!new_content)
+				return (1);
+			token_word->content = new_content;
+			content = token_word->content;
+			i = 0;
+		}
+		i++;
+	}
+	return (0);
 }
-
-// int	expand_env_var(t_token_word *token_word, t_shell *shell)
-// {
-// 	int		i;
-// 	char	*content;
-// 	char	*env_name;
-// 	char	*env_value;
-// 	int		start;
-// 	char	*new_content;
-
-// 	i = 0;
-// 	start = 0;
-// 	content = token_word->content;
-// 	while (content[i])
-// 	{
-// 		if (content[i] == '$' && content[i + 1] && content[i + 1] != ' ')
-// 		{
-// 			start = ++i;
-// 			if (content[i] == '$')
-// 			{
-// 				env_value = ft_itoa(shell->pid);
-// 				if (!env_value)
-// 					return (1);
-// 				i++;
-// 			}
-// 			else if (content[i] == '?')
-// 			{
-// 				env_value = ft_itoa(shell->exit_status);
-// 				if (!env_value)
-// 					return (1);
-// 				i++;
-// 			}
-// 			else
-// 			{
-// 				while (content[i] && (ft_isalnum(content[i]) || content[i] == '_'))
-// 					i++;
-// 				env_name = ft_substr(content, start, i - start);
-// 				if (!env_name)
-// 					return (1);
-// 				env_value = get_env_value(shell->env, env_name);
-// 				if (!env_value)
-// 				{
-// 					env_value = ft_strdup("");
-// 					if (!env_value)
-// 						return (1);
-// 				}
-// 			}
-// 			new_content = ft_substr(content, 0, start - 1);
-// 			if (!new_content)
-// 				return (1);
-// 			new_content = ft_strjoin(new_content, env_value);
-// 			if (!new_content)
-// 				return (1);
-// 			new_content = ft_strjoin(new_content, content + i);
-// 			if (!new_content)
-// 				return (1);
-// 			token_word->content = new_content;
-// 			content = token_word->content;
-// 			i = 0;
-// 		}
-// 		i++;
-// 	}
-// 	return (0);
-// }
 
 int	rebuild_command_arg(t_cmd *cmd)
 {
