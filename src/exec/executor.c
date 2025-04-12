@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/12 11:27:28 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/12 15:43:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,106 +41,6 @@ int	execute_builtin(t_cmd *cmd, t_shell *shell)
 		return (builtin_exit(cmd, shell));
 	return (1);
 }
-
-// int execute_command(t_cmd *cmd, t_shell *shell)
-// {
-//     int     status;
-//     pid_t   pid;
-//     char    **env_array;
-//     int     stdin_backup;
-//     int     stdout_backup;
-
-//     if (!cmd || !cmd->name || !cmd->arg[0])
-//     {
-//         if (cmd && cmd->type_redir)
-//             execute_redirections(cmd, shell);
-//         shell->exit_status = 1;
-//         return (1);
-//     }
-    
-//     if (expand_var(cmd, shell) != 0)
-//     {
-//         shell->exit_status = 1;
-//         return (1);
-//     }
-    
-//     if (is_builtin(cmd->name))
-//     {
-//         if (cmd->type_redir)
-//         {
-//             stdin_backup = dup(STDIN_FILENO);
-//             stdout_backup = dup(STDOUT_FILENO);
-//             if (execute_redirections(cmd, shell) != 0)
-//             {
-//                 shell->exit_status = 1;
-//                 return (1);
-//             }
-//             status = execute_builtin(cmd, shell);
-//             dup2(stdin_backup, STDIN_FILENO);
-//             dup2(stdout_backup, STDOUT_FILENO);
-//             close(stdin_backup);
-//             close(stdout_backup);
-//         }
-//         else
-//             status = execute_builtin(cmd, shell);
-        
-//         shell->exit_status = status;
-//         return (status);
-//     }
-    
-//     pid = fork();
-//     if (pid == -1)
-//     {
-//         perror("fork");
-//         shell->exit_status = 1;
-//         return (1);
-//     }
-    
-//     if (pid == 0)
-//     {
-//         if (cmd->arg[0] == NULL)
-//         {
-//             if (execute_redirections(cmd, shell) != 0)
-//                 exit(1);
-//         }
-        
-//         if (cmd->type_redir && execute_redirections(cmd, shell) != 0)
-//             exit(1);
-            
-//         cmd->path = find_command_path(cmd->name, shell);
-//         if (!cmd->path)
-//         {
-//             ft_putstr_fd(cmd->name, 2);
-//             ft_putstr_fd(": command not found\n", 2);
-//             exit(127);
-//         }
-        
-//         env_array = env_to_array(shell->env);
-//         if (!env_array)
-//             exit(1);
-            
-//         execve(cmd->path, cmd->arg, env_array);
-//         free_array(env_array);
-//         perror("execve");
-//         exit(1);
-//     }
-    
-//     waitpid(pid, &status, 0);
-    
-//     // Gestion des codes de sortie sans les macros système
-//     if ((status & 0x7f) == 0)
-//     {
-//         // Processus terminé normalement, récupère le code de sortie
-//         shell->exit_status = ((status & 0xff00) >> 8);
-//     }
-//     else
-//     {
-//         // Processus terminé par un signal
-//         shell->exit_status = 128 + (status & 0x7f);
-//     }
-    
-//     return (shell->exit_status);
-// }
 
 int	execute_command(t_cmd *cmd, t_shell *shell)
 {

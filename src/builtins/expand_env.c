@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:26:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/12 15:07:15 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -254,6 +254,59 @@ int expand_redir(t_cmd *cmd, t_shell *shell)
 	return (0);
 }
 
+int	preprocess_dollar_quotes(t_token_word **head)
+{
+	t_token_word	*current;
+	t_token_word	*to_free;
+	char			*new_content;
+	int				len;
+
+	current = *head;
+	while (current && current->next)
+	{
+		// Cas 1: Token contenant uniquement "$"
+		if (current->content && current->content[0] == '$' && !current->content[1] 
+			&& current->type == T_NO_QUOTE && current->next 
+			&& (current->next->type == T_D_QUOTE || current->next->type == T_S_QUOTE))
+		{
+			to_free = current;
+			if (current == *head)
+				*head = current->next;
+			else
+			{
+				// Trouver le token précédent pour ajuster les liens
+				t_token_word *prev = *head;
+				while (prev && prev->next != current)
+					prev = prev->next;
+				if (prev)
+					prev->next = current->next;
+			}
+			current = current->next;
+			free(to_free->content);
+			free(to_free);
+		}
+		// Cas 2: Token se terminant par "$"
+		else if (current->content && current->type == T_NO_QUOTE && current->next
+			&& (current->next->type == T_D_QUOTE || current->next->type == T_S_QUOTE))
+		{
+			len = ft_strlen(current->content);
+			if (len > 0 && current->content[len - 1] == '$')
+			{
+				// Supprimer seulement le "$" à la fin du token
+				new_content = ft_substr(current->content, 0, len - 1);
+				if (!new_content)
+					return (1);
+				free(current->content);
+				current->content = new_content;
+			}
+			current = current->next;
+		}
+		else
+			current = current->next;
+	}
+	return (0);
+}
+
 int expand_var(t_cmd *cmd, t_shell *shell)
 {
 	int				i;
@@ -264,6 +317,8 @@ int expand_var(t_cmd *cmd, t_shell *shell)
 	i = 0;
 	while (i < cmd->ac && cmd->list_word[i])
 	{
+		if (preprocess_dollar_quotes(&(cmd->list_word[i])) != 0)
+			return (1);
 		list = cmd->list_word[i];
 		while (list)
 		{
