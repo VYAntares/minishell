@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:21:08 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/12 11:34:45 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,11 +112,31 @@ int	builtin_env(t_shell *shell)
 	return (0);
 }
 
+int	is_number(char *str)
+{
+	int	i;
+
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
 int	builtin_exit(t_cmd *cmd, t_shell *shell)
 {
 	int	exit_code;
 
-	ft_putendl_fd("exit", 1);
+	if (isatty(STDIN_FILENO))
+        ft_putendl_fd("exit", 1);
+
 	if (cmd->arg[1])
 	{
 		// Vérifier que l'argument est un nombre
@@ -148,22 +168,4 @@ int	builtin_exit(t_cmd *cmd, t_shell *shell)
 	free(shell);
 	rl_clear_history();
 	exit(exit_code & 0xFF);
-}
-
-int	is_number(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str[i] == '+' || str[i] == '-')
-		i++;
-	if (!str[i])
-		return (0);
-	while (str[i])
-	{
-		if (!ft_isdigit(str[i]))
-			return (0);
-		i++;
-	}
-	return (1);
 }

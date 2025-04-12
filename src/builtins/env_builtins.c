@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:25:20 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/12 11:28:32 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ int	update_env_variable(t_shell *shell, const char *name, const char *value)
 	current = shell->env;
 	while (current)
 	{
-		if (ft_strncmp(current->name, name, ft_strlen(name)) == 0)
+		if (ft_strncmp(current->name, name, ft_strlen(name) + 1) == 0)
 		{
 			new_value = ft_strdup(value);
 			if (!new_value)
@@ -87,15 +87,16 @@ int	builtin_export(t_cmd *cmd, t_shell *shell)
 				free(value);
 				return (1);
 			}
-			if (!is_valid_identifier(name))
+			// Vérifier si le nom est vide ou invalide
+			if (!*name || !is_valid_identifier(name))
 			{
 				ft_putstr_fd("minishell: export: '", 2);
 				ft_putstr_fd(cmd->arg[i], 2);
 				ft_putendl_fd("': not a valid identifier", 2);
 				free(name);
 				free(value);
-				i++;
 				status = 1;
+				i++;
 				continue;
 			}
 			update_env_variable(shell, name, value);
@@ -220,27 +221,23 @@ int	print_sorted_env(t_shell *shell)
 	return (0);
 }
 
-/**
- * @brief Builtin unset - Supprime des variables de l'environnement
- * 
- * @param cmd Structure de commande
- * @param shell Structure shell
- * @return int 0 pour succès, 1 pour erreur
- */
 int	builtin_unset(t_cmd *cmd, t_shell *shell)
 {
 	int		i;
 	t_env	*current;
 	t_env	*prev;
+	int		status;
 
 	i = 1;
+	status = 0;
 	while (cmd->arg[i])
 	{
 		if (!is_valid_identifier(cmd->arg[i]))
 		{
-			ft_putstr_fd("unset: '", 2);
+			ft_putstr_fd("minishell: unset: '", 2);
 			ft_putstr_fd(cmd->arg[i], 2);
-			ft_putendl_fd("`: not a valid identifier", 2);
+			ft_putendl_fd("': not a valid identifier", 2);
+			status = 1;  // Code d'erreur pour identifiant invalide
 			i++;
 			continue;
 		}
@@ -251,7 +248,9 @@ int	builtin_unset(t_cmd *cmd, t_shell *shell)
 		
 		while (current)
 		{
-			if (ft_strncmp(current->name, cmd->arg[i], ft_strlen(cmd->arg[i])) == 0)
+			// Comparaison exacte de la longueur du nom
+			if (ft_strncmp(current->name, cmd->arg[i], ft_strlen(cmd->arg[i])) == 0 &&
+				ft_strlen(current->name) == ft_strlen(cmd->arg[i]))
 			{
 				// Supprimer la variable
 				if (prev)
@@ -270,5 +269,5 @@ int	builtin_unset(t_cmd *cmd, t_shell *shell)
 		
 		i++;
 	}
-	return (0);
+	return (status);
 }

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 00:19:34 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/12 11:21:10 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,11 +103,27 @@ int	main(int ac, char **av, char **envp)
 					// Parser et exécuter
 					ast = parse_tokens(tokens);
 					
+					// Après avoir exécuté la commande en mode non-interactif
 					if (ast)
 					{
 						launch_heredoc(ast, shell);
 						shell->exit_status = execute_ast(ast, shell);
 						cleanup_heredoc_files(shell->cmd);
+						
+						// Ajoute cette condition pour quitter immédiatement en mode non-interactif
+						if (!is_interactive)
+						{
+							// Nettoyer les ressources
+							if (tokens)
+								free_tokens(tokens);
+							if (ast)
+								free_ast(ast);
+							rl_clear_history();
+							free_env_list(shell->env);
+							
+							// Sortir avec le code d'erreur approprié
+							exit(shell->exit_status);  // Important : utilise exit() pour quitter immédiatement
+						}
 					}
 				}
 			}
@@ -124,7 +140,7 @@ int	main(int ac, char **av, char **envp)
 	free_env_list(shell->env);
 	free(shell);
 	
-	return (0);
+	return (shell->exit_status);
 }
 
 // int	main(int ac, char **av, char **envp)
