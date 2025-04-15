@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/12 15:20:50 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/15 22:28:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,13 @@ static char	*create_temp_file(void)
 	return (temp_file);
 }
 
-int	handle_heredoc(t_file_redir *redir, t_shell *shell)
+int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
 {
 	char	*line;
 	char	*temp_file;
 	char	*expanded_line;
-	char	*delimiter;
 	int		fd;
 
-	delimiter = ft_strdup(redir->content);
 	temp_file = create_temp_file();
 	if (!temp_file)
 		return (1);
@@ -49,20 +47,13 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell)
 		line = readline("> ");
 		if (!line || (ft_strlen(line) == ft_strlen(delimiter)
 				&& ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0))
-		{
 			break ;
-		}
 		expanded_line = expand_env_heredoc(line, shell);
 		if (!expanded_line)
-		{
-			close(fd);
-			unlink(temp_file);
-			return (1);
-		}
+			return (close(fd), unlink(temp_file), 1);
 		ft_putendl_fd(expanded_line, fd);
 	}
-	close(fd);
-	return (0);
+	return (close(fd), 0);
 }
 
 void	chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd)
@@ -112,7 +103,9 @@ void	launch_heredoc(t_ast *ast, t_shell *shell)
 		{
 			if (redir->type_redirection == T_HEREDOC)
 			{
-				if (handle_heredoc(redir, shell) != 0)
+				if (handle_heredoc(redir,
+						shell,
+						ft_strdup(redir->content)) != 0)
 					return ;
 			}
 			redir = redir->next;

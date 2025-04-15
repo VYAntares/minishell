@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 18:49:40 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/15 22:15:09 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 int	is_builtin(char *cmd)
 {
-	return ((!ft_strncmp(cmd, "echo", 4) && ft_strlen(cmd) == 4)
-		|| (!ft_strncmp(cmd, "cd", 2) && ft_strlen(cmd) == 2)
-		|| (!ft_strncmp(cmd, "pwd", 3) && ft_strlen(cmd) == 3)
-		|| (!ft_strncmp(cmd, "export", 6) && ft_strlen(cmd) == 6)
-		|| (!ft_strncmp(cmd, "unset", 5) && ft_strlen(cmd) == 5)
-		|| (!ft_strncmp(cmd, "env", 3) && ft_strlen(cmd) == 3)
-		|| (!ft_strncmp(cmd, "exit", 4) && ft_strlen(cmd) == 4));
+	return ((!ft_strncmp(cmd, "echo", 5))
+		|| (!ft_strncmp(cmd, "cd", 3))
+		|| (!ft_strncmp(cmd, "pwd", 4))
+		|| (!ft_strncmp(cmd, "export", 7))
+		|| (!ft_strncmp(cmd, "unset", 6))
+		|| (!ft_strncmp(cmd, "env", 4))
+		|| (!ft_strncmp(cmd, "exit", 5)));
 }
 
 int	execute_builtin(t_cmd *cmd, t_shell *shell)
@@ -53,6 +53,8 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 	if (!cmd || !cmd->name || !cmd->arg[0])
 		return (execute_redirections(cmd, shell), 1);
 	if (expand_var(cmd, shell) != 0)
+		return (1);
+	if (expand_wildcards(cmd) != 0)
 		return (1);
 	if (is_builtin(cmd->name))
 	{

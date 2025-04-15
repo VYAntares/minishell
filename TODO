@@ -1,0 +1,11 @@
+1.  mettre a la norme, reecrire le code et se lapproprier.
+
+2.  revoir correctement tout les builtins.
+
+3.  fixer les erreur de segmentation fault "> < >> <<"
+
+4.  implementer les wildcards.
+
+5.  renorminetizer si cest le cas
+
+6.  leaks, exit code.

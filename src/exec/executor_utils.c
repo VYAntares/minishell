@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 01:28:58 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 02:19:12 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/15 22:17:37 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,7 +121,8 @@ char	*extract_path(char *path, char *command_name)
 // 		{
 // 			if (path[end + 1] == '\0')
 // 				end++;
-// 			path_name = ft_strjoin(ft_substr(path, start, end - start), slash_name);
+// 			path_name = ft_strjoin(ft_substr
+//						(path, start, end - start), slash_name);
 // 			if (!path_name)
 // 				return (free(slash_name), NULL);
 // 			if (access(path_name, X_OK) == 0)

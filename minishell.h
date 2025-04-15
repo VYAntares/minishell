@@ -6,14 +6,14 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 19:03:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/15 22:34:19 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-# include <stdio.h>       /* Déplacé en premier pour définir FILE */
+# include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
@@ -195,7 +195,7 @@ int			execute_ast(t_ast *ast, t_shell *shell);
 int			execute_command(t_cmd *cmd, t_shell *shell);
 int			execute_pipe(t_ast *left, t_ast *right, t_shell *shell);
 int			execute_redirections(t_cmd *cmd, t_shell *shell);
-int			handle_heredoc(t_file_redir *redir, t_shell *shell);
+int			handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter);
 char		*extract_path(char *path, char *command_name);
 char		*find_command_path(char *name, t_shell *shell);
 char		**env_to_array(t_env *env);
@@ -206,6 +206,7 @@ int			expand_env_vars(t_token *tokens, t_shell *shell);
 int			expand_env_var(t_token_word *token_word, t_shell *shell);
 int			expand_var_in_string(t_token_word *token_word, t_shell *shell);
 int			rebuild_token_value(t_token *token);
+int 		rebuild_command_arg(t_cmd *cmd);
 
 /* Fonctions builtin */
 int			is_builtin(char *cmd);
@@ -246,5 +247,11 @@ void		debug_print_tokens(t_token *tokens);
 int			add_node_back_word(t_token_word **list, t_token_word *new);
 t_token		*find_last_priority_operator(t_token *tokens);
 t_ast_type	get_ast_type(t_token *token);
+
+int		match_wildcard(const char *pattern, const char *str);
+char	**expand_wildcard(const char *pattern);
+int		expand_wildcard_in_word_list(t_token_word **list);
+int		rebuild_redirection_content(t_file_redir *redir);
+int		expand_wildcards(t_cmd *cmd);
 
 #endif
