@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/12 11:27:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/15 19:03:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,7 @@ typedef struct s_file_redir
 	int					type_redirection;
 	char				*content;
 	t_token_word		*word_parts;
+	int					is_ambiguous;
 	struct s_file_redir	*next;
 }	t_file_redir;
 

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 18:31:26 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/15 19:03:34 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,39 +120,102 @@ int	rebuild_redirection(t_cmd *cmd)
 	return (0);
 }
 
+// int expand_redir(t_cmd *cmd, t_shell *shell)
+// {
+// 	t_file_redir	*redir;
+// 	t_token_word	*current;
+
+// 	redir = cmd->type_redir;
+// 	while (redir)
+// 	{
+// 		current = redir->word_parts;
+// 		while (current)
+// 		{
+// 			if (current->type != T_S_QUOTE
+// 				&& redir->type_redirection != T_HEREDOC)
+// 			{
+// 				if (expand_env_var(current, shell) != 0)
+// 					return (1);
+// 			}
+// 			current = current->next;
+// 		}
+// 		redir = redir->next;
+// 	}
+// 	if (cmd->type_redir->type_redirection != T_HEREDOC)
+// 	{
+// 		if (rebuild_redirection(cmd) != 0)
+// 			return (1);
+// 	}
+// 	return (0);
+// }
+
+
+
+
 int expand_redir(t_cmd *cmd, t_shell *shell)
 {
-	t_file_redir	*redir;
-	t_token_word	*current;
+    t_file_redir    *redir;
+    t_token_word    *current;
+    int             contains_dollar;
+    char            *original_content;
 
-	redir = cmd->type_redir;
-	while (redir)
-	{
-		current = redir->word_parts;
-		while (current)
-		{
-			if (current->type != T_S_QUOTE
-				&& redir->type_redirection != T_HEREDOC)
-			{
-				if (expand_env_var(current, shell) != 0)
-					return (1);
-			}
-			current = current->next;
-		}
-		redir = redir->next;
-	}
-	if (cmd->type_redir->type_redirection != T_HEREDOC)
-	{
-		if (rebuild_redirection(cmd) != 0)
-			return (1);
-	}
-	return (0);
+    redir = cmd->type_redir;
+    while (redir)
+    {
+        redir->is_ambiguous = 0;  // Initialiser à non-ambigu
+        
+        if (redir->type_redirection == T_HEREDOC)
+        {
+            redir = redir->next;
+            continue;
+        }
+        
+        current = redir->word_parts;
+        while (current)
+        {
+            contains_dollar = ft_strchr(current->content, '$') != NULL;
+            
+            if (current->type == T_NO_QUOTE && contains_dollar)
+            {
+                original_content = ft_strdup(current->content);
+                if (!original_content)
+                    return (1);
+                
+                if (expand_env_var(current, shell) != 0)
+                {
+                    free(original_content);
+                    return (1);
+                }
+                
+                // Vérifier si l'expansion a généré des espaces
+                if (ft_strchr(current->content, ' ') || ft_strchr(current->content, '\t'))
+                {
+                    redir->is_ambiguous = 1;
+                }
+                
+                free(original_content);
+            }
+            else if (current->type != T_S_QUOTE)
+            {
+                if (expand_env_var(current, shell) != 0)
+                    return (1);
+            }
+            
+            current = current->next;
+        }
+        
+        redir = redir->next;
+    }
+    
+    // Rebuild uniquement si aucune redirection n'est ambiguë
+    if (!cmd->type_redir->is_ambiguous && cmd->type_redir->type_redirection != T_HEREDOC)
+    {
+        if (rebuild_redirection(cmd) != 0)
+            return (1);
+    }
+    
+    return (0);
 }
-
-
-
-
-
 
 
 
