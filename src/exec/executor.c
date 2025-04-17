@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/17 15:07:27 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/17 15:08:44 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int	handle_builtin(t_cmd *cmd, t_shell *shell)
 void	handle_command(t_cmd *cmd, t_shell *shell)
 {
 	char	**env_array;
-	
+
 	if (cmd->arg[0] == NULL)
 	{
 		if (execute_redirections(cmd, shell) != 0)
@@ -108,7 +108,6 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), 1);
-	// printf("OK\n");
 	if (pid == 0)
 		handle_command(cmd, shell);
 	waitpid(pid, &status, 0);

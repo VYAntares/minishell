@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/17 14:27:59 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/17 15:30:09 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,6 +125,34 @@ int	execute_redirections(t_cmd *cmd, t_shell *shell)
 	return (0);
 }
 
+void	execute_left_command_in_pipe(int pipefd[2],
+									t_ast *left,
+									t_shell *shell)
+{
+	close(pipefd[0]);
+	dup2(pipefd[1], STDOUT_FILENO);
+	close(pipefd[1]);
+	exit(execute_ast(left, shell));
+}
+
+int	handle_right_process_fork_error(int pipefd[2], int pid1)
+{
+	close(pipefd[0]);
+	close(pipefd[1]);
+	waitpid(pid1, NULL, 0);
+	return (perror("fork"), 1);
+}
+
+void	execute_right_command_in_pipe(int pipefd[2],
+									t_ast *right,
+									t_shell *shell)
+{
+	close(pipefd[1]);
+	dup2(pipefd[0], STDIN_FILENO);
+	close(pipefd[0]);
+	exit(execute_ast(right, shell));
+}
+
 int	execute_pipe(t_ast *left, t_ast *right, t_shell *shell)
 {
 	int		pipefd[2];
@@ -139,27 +167,12 @@ int	execute_pipe(t_ast *left, t_ast *right, t_shell *shell)
 	if (pid1 == -1)
 		return (perror("fork"), close(pipefd[0]), close(pipefd[1]), 1);
 	if (pid1 == 0)
-	{
-		close(pipefd[0]);
-		dup2(pipefd[1], STDOUT_FILENO);
-		close(pipefd[1]);
-		exit(execute_ast(left, shell));
-	}
+		execute_left_command_in_pipe(pipefd, left, shell);
 	pid2 = fork();
 	if (pid2 == -1)
-	{
-		close(pipefd[0]);
-		close(pipefd[1]);
-		waitpid(pid1, NULL, 0);
-		return (perror("fork"), 1);
-	}
+		return (handle_right_process_fork_error(pipefd, pid1));
 	if (pid2 == 0)
-	{
-		close(pipefd[1]);
-		dup2(pipefd[0], STDIN_FILENO);
-		close(pipefd[0]);
-		exit(execute_ast(right, shell));
-	}
+		execute_right_command_in_pipe(pipefd, right, shell);
 	close(pipefd[0]);
 	close(pipefd[1]);
 	waitpid(pid1, &status1, 0);
