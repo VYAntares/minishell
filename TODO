@@ -4,8 +4,10 @@
 
 3.  fixer les erreur de segmentation fault "> < >> <<"
 
-4.  implementer les wildcards.
+4.  fixer les signaux CTRL+C CTRL+D
 
-5.  renorminetizer si cest le cas
+5.  implementer les wildcards.
 
-6.  leaks, exit code.
+6.  renorminetizer si cest le cas
+
+7.  leaks, exit code.

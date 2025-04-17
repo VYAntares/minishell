@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/16 01:21:20 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/17 14:00:18 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 	expanded_line = NULL;
 	while (line[i])
 	{
-		if (line[i] == '$' && line[i + 1])
+		if (line[i] == '$' && line[i + 1] && line[i + 1] != ' ')
 		{
 			start = ++i;
 			if (line[i] == '$')

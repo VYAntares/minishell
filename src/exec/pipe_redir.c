@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 22:12:40 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/17 14:27:59 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,8 @@ int	execute_redirections(t_cmd *cmd, t_shell *shell)
 				t_token_word *word = redir->word_parts;
 				while (word)
 				{
-					if (word->type == T_NO_QUOTE && ft_strchr(word->content, '$'))
+					if (word->type == T_NO_QUOTE
+						&& ft_strchr(word->content, '$'))
 					{
 						ft_putstr_fd("minishell: ", 2);
 						ft_putstr_fd(word->content, 2);
@@ -116,9 +117,7 @@ int	execute_redirections(t_cmd *cmd, t_shell *shell)
 			if (fd == -1)
 				return (perror(redir->content), 1);
 			if (redir == last_output)
-			{
 				dup2(fd, STDOUT_FILENO);
-			}
 			close(fd);
 		}
 		redir = redir->next;

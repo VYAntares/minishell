@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 22:15:09 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/17 15:07:27 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,13 +42,60 @@ int	execute_builtin(t_cmd *cmd, t_shell *shell)
 	return (1);
 }
 
+int	handle_builtin(t_cmd *cmd, t_shell *shell)
+{
+	int	stdin_backup;
+	int	stdout_backup;
+	int	status;
+
+	if (cmd->type_redir)
+	{
+		stdin_backup = dup(STDIN_FILENO);
+		stdout_backup = dup(STDOUT_FILENO);
+		if (execute_redirections(cmd, shell) != 0)
+			return (1);
+		status = execute_builtin(cmd, shell);
+		dup2(stdin_backup, STDIN_FILENO);
+		dup2(stdout_backup, STDOUT_FILENO);
+		close(stdin_backup);
+		close(stdout_backup);
+		return (status);
+	}
+	else
+		return (execute_builtin(cmd, shell));
+}
+
+void	handle_command(t_cmd *cmd, t_shell *shell)
+{
+	char	**env_array;
+	
+	if (cmd->arg[0] == NULL)
+	{
+		if (execute_redirections(cmd, shell) != 0)
+			exit(1);
+	}
+	if (cmd->type_redir && execute_redirections(cmd, shell) != 0)
+		exit(1);
+	cmd->path = find_command_path(cmd->name, shell);
+	if (!cmd->path)
+	{
+		ft_putstr_fd(cmd->name, 2);
+		ft_putstr_fd(": command not found\n", 2);
+		exit(127);
+	}
+	env_array = env_to_array(shell->env);
+	if (!env_array)
+		exit(1);
+	execve(cmd->path, cmd->arg, env_array);
+	free_array(env_array);
+	perror("execve");
+	exit(1);
+}
+
 int	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	int		status;
 	pid_t	pid;
-	char	**env_array;
-	int		stdin_backup;
-	int		stdout_backup;
 
 	if (!cmd || !cmd->name || !cmd->arg[0])
 		return (execute_redirections(cmd, shell), 1);
@@ -57,51 +104,13 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 	if (expand_wildcards(cmd) != 0)
 		return (1);
 	if (is_builtin(cmd->name))
-	{
-		if (cmd->type_redir)
-		{
-			stdin_backup = dup(STDIN_FILENO);
-			stdout_backup = dup(STDOUT_FILENO);
-			if (execute_redirections(cmd, shell) != 0)
-				return (1);
-			status = execute_builtin(cmd, shell);
-			dup2(stdin_backup, STDIN_FILENO);
-			dup2(stdout_backup, STDOUT_FILENO);
-			close(stdin_backup);
-			close(stdout_backup);
-			return (status);
-		}
-		else
-			return (execute_builtin(cmd, shell));
-	}
+		return (handle_builtin(cmd, shell));
 	pid = fork();
 	if (pid == -1)
 		return (perror("fork"), 1);
 	// printf("OK\n");
 	if (pid == 0)
-	{
-		if (cmd->arg[0] == NULL)
-		{
-			if (execute_redirections(cmd, shell) != 0)
-				exit(1);
-		}
-		if (cmd->type_redir && execute_redirections(cmd, shell) != 0)
-			exit(1);
-		cmd->path = find_command_path(cmd->name, shell);
-		if (!cmd->path)
-		{
-			ft_putstr_fd(cmd->name, 2);
-			ft_putstr_fd(": command not found\n", 2);
-			exit(127);
-		}
-		env_array = env_to_array(shell->env);
-		if (!env_array)
-			exit(1);
-		execve(cmd->path, cmd->arg, env_array);
-		free_array(env_array);
-		perror("execve");
-		exit(1);
-	}
+		handle_command(cmd, shell);
 	waitpid(pid, &status, 0);
 	if ((status & 0x7f) == 0)
 		return ((status & 0xff00) >> 8);
