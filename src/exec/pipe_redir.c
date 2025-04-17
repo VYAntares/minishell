@@ -6,11 +6,31 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/17 15:30:09 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/17 22:30:01 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
+int	ambiguous_error(t_file_redir *redir)
+{
+	t_token_word *word;
+	word = redir->word_parts;
+
+	while (word)
+	{
+		if (word->type == T_NO_QUOTE && ft_strchr(word->content, '$'))
+		{
+			ft_putstr_fd("minishell: ", 2);
+			ft_putstr_fd(word->content, 2);
+			ft_putendl_fd(": ambiguous redirect", 2);
+			return (1);
+		}
+		word = word->next;
+	}
+	ft_putendl_fd("minishell: ambiguous redirect", 2);
+	return (1);
+}
 
 int	only_redirection(t_cmd *cmd)
 {
@@ -20,6 +40,8 @@ int	only_redirection(t_cmd *cmd)
 	redir = cmd->type_redir;
 	while (redir)
 	{
+		if (redir->is_ambiguous)
+			return (ambiguous_error(redir));
 		if (redir->type_redirection == T_REDIR_IN
 			|| redir->type_redirection == T_HEREDOC)
 		{
@@ -39,89 +61,97 @@ int	only_redirection(t_cmd *cmd)
 	return (0);
 }
 
-int	execute_redirections(t_cmd *cmd, t_shell *shell)
+int	find_lasts_redirection(t_file_redir *redir,
+								t_file_redir **last_input,
+								t_file_redir **last_output)
 {
-	t_file_redir	*redir;
-	t_file_redir	*last_input;
-	t_file_redir	*last_output;
-	int				fd;
-
-	last_input = NULL;
-	last_output = NULL;
-	if (!cmd->arg[0] && cmd->type_redir)
-		return (only_redirection(cmd));
-	if (expand_redir(cmd, shell) != 0)
-		return (1);
-	redir = cmd->type_redir;
 	while (redir)
 	{
 		if (redir->type_redirection == T_REDIR_IN
 			|| redir->type_redirection == T_HEREDOC)
-		{
-			if (redir->type_redirection == T_REDIR_IN)
-			{
-				fd = open(redir->content, O_RDONLY);
-				if (fd == -1)
-					return (perror(redir->content), 1);
-				close(fd);
-			}
-			last_input = redir;
-		}
+			*last_input = redir;
 		else if (redir->type_redirection == T_REDIR_OUT
 			|| redir->type_redirection == T_APPEND)
-			last_output = redir;
+			*last_output = redir;
 		redir = redir->next;
 	}
-	redir = cmd->type_redir;
-	if (last_input)
-	{
-		if (last_input->type_redirection == T_REDIR_IN
-			|| last_input->type_redirection == T_HEREDOC)
-		{
-			fd = open(last_input->content, O_RDONLY);
-			if (fd == -1)
-				return (perror(last_input->content), 1);
-			dup2(fd, STDIN_FILENO);
-			close(fd);
-		}
-	}
-	redir = cmd->type_redir;
+	return (0);
+}
+
+int	process_outpout_redirection(t_file_redir *redir, t_file_redir **last_output)
+{
+	int	fd;
+
+	if (redir->is_ambiguous)
+		return (ambiguous_error(redir));
+	if (redir->type_redirection == T_REDIR_OUT)
+		fd = open(redir->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+		fd = open(redir->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (fd == -1)
+		return (perror(redir->content), 1);
+	if (redir == *last_output)
+		dup2(fd, STDOUT_FILENO);
+	close(fd);
+	return (0);
+}
+
+int	process_input_redirection(t_file_redir *redir, t_file_redir **last_input)
+{
+    int fd;
+    
+    if (redir->is_ambiguous)
+        return (ambiguous_error(redir));
+    fd = open(redir->content, O_RDONLY);
+    if (fd == -1)
+        return (perror(redir->content), 1);
+    if (redir == *last_input)
+        dup2(fd, STDIN_FILENO);
+    close(fd);
+    return (0);
+}
+
+
+int	process_all_redirections(t_file_redir *redir,
+							t_file_redir **last_input,
+							t_file_redir **last_output)
+{	
 	while (redir)
 	{
 		if ((redir->type_redirection == T_REDIR_OUT
 				|| redir->type_redirection == T_APPEND))
 		{
-			/* Vérifier si la redirection est ambiguë avant de l'ouvrir */
-			if (redir->is_ambiguous)
-			{
-				t_token_word *word = redir->word_parts;
-				while (word)
-				{
-					if (word->type == T_NO_QUOTE
-						&& ft_strchr(word->content, '$'))
-					{
-						ft_putstr_fd("minishell: ", 2);
-						ft_putstr_fd(word->content, 2);
-						ft_putendl_fd(": ambiguous redirect", 2);
-						return (1);
-					}
-					word = word->next;
-				}
-				ft_putendl_fd("minishell: ambiguous redirect", 2);
+			if (process_outpout_redirection(redir, last_output) != 0)
 				return (1);
-			}
-			if (redir->type_redirection == T_REDIR_OUT)
-				fd = open(redir->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			else
-				fd = open(redir->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (fd == -1)
-				return (perror(redir->content), 1);
-			if (redir == last_output)
-				dup2(fd, STDOUT_FILENO);
-			close(fd);
+		}
+		else
+		{
+			if (process_input_redirection(redir, last_input) != 0)
+				return (1);
 		}
 		redir = redir->next;
 	}
+	return (0);
+}
+
+int	execute_redirections(t_cmd *cmd, t_shell *shell)
+{
+	t_file_redir	*redir;
+	t_file_redir	*last_input;
+	t_file_redir	*last_output;
+
+	last_input = NULL;
+	last_output = NULL;
+	if (expand_redir(cmd, shell) != 0)
+		return (1);
+	if (!cmd->arg[0] && cmd->type_redir)
+		return (only_redirection(cmd));
+	redir = cmd->type_redir;
+	if (find_lasts_redirection(redir, &last_input, &last_output))
+		return (1);
+	redir = cmd->type_redir;
+	if (process_all_redirections(redir, &last_input, &last_output) != 0)
+		return (1);
 	return (0);
 }
 
