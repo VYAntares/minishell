@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/18 14:25:53 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/18 16:03:01 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,51 +207,6 @@ int	expand_redir(t_cmd *cmd, t_shell *shell)
 	return (0);
 }
 
-// int	expand_redir(t_cmd *cmd, t_shell *shell)
-// {
-// 	t_file_redir	*redir;
-// 	t_token_word	*current;
-// 	int				contains_dollar;
-
-// 	redir = cmd->type_redir;
-// 	while (redir)
-// 	{
-// 		redir->is_ambiguous = 0;
-// 		if (redir->type_redirection == T_HEREDOC)
-// 		{
-// 			redir = redir->next;
-// 			continue ;
-// 		}
-// 		current = redir->word_parts;
-// 		while (current)
-// 		{
-// 			contains_dollar = ft_strchr(current->content, '$') != NULL;
-// 			if (current->type == T_NO_QUOTE && contains_dollar)
-// 			{
-// 				if (expand_env_var(current, shell) != 0)
-// 					return (1);
-// 				if (ft_strchr(current->content, ' ')
-// 					|| ft_strchr(current->content, '\t'))
-// 					redir->is_ambiguous = 1;
-// 			}
-// 			else if (current->type != T_S_QUOTE)
-// 			{
-// 				if (expand_env_var(current, shell) != 0)
-// 					return (1);
-// 			}
-// 			current = current->next;
-// 		}
-// 		redir = redir->next;
-// 	}
-// 	if (!cmd->type_redir->is_ambiguous
-// 		&& cmd->type_redir->type_redirection != T_HEREDOC)
-// 	{
-// 		if (rebuild_redirection(cmd) != 0)
-// 			return (1);
-// 	}
-// 	return (0);
-// }
-
 int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
 	int		i;
@@ -277,60 +232,67 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 	return (0);
 }
 
-int	preprocess_dollar_quotes(t_token_word **head)
+int	process_dollar(t_token_word	*current)
 {
-	t_token_word	*current;
-	t_token_word	*prev;
-	t_token_word	*to_free;
 	char			*new_content;
 	int				len;
 	int				dollar_count;
 	int				i;
 
-	current = *head;
-	prev = NULL;
+	len = ft_strlen(current->content);
+	if (len > 0 && current->content[len - 1] == '$')
+	{
+		dollar_count = 0;
+		i = len - 1;
+		while (i >= 0 && current->content[i] == '$')
+		{
+			dollar_count++;
+			i--;
+		}
+		if (dollar_count % 2 != 0)
+		{
+			new_content = ft_substr(current->content, 0, len - 1);
+			if (!new_content)
+				return (1);
+			free(current->content);
+			current->content = new_content;
+		}
+	}
+	return (0);
+}
+
+int	prepro_dol_redir(t_token_word *word_parts)
+{
+	t_token_word	*current;
+
+	current = word_parts;
 	while (current && current->next)
 	{
 		if (current->content && current->type == T_NO_QUOTE && current->next 
 			&& (current->next->type == T_D_QUOTE || current->next->type == T_S_QUOTE))
 		{
-			// Cas simple: Token "$" isolé
-			if (current->content[0] == '$' && !current->content[1])
-			{
-				to_free = current;
-				if (prev)
-					prev->next = current->next;
-				else
-					*head = current->next;
-				current = current->next;
-				free(to_free->content);
-				free(to_free);
-				continue ;
-			}
-			// Vérifier si se termine par "$"
-			len = ft_strlen(current->content);
-			if (len > 0 && current->content[len - 1] == '$')
-			{
-				// Compter les $ consécutifs à la fin
-				dollar_count = 0;
-				i = len - 1;
-				while (i >= 0 && current->content[i] == '$')
-				{
-					dollar_count++;
-					i--;
-				}
-				// Si nombre impair, retirer le dernier
-				if (dollar_count % 2 != 0)
-				{
-					new_content = ft_substr(current->content, 0, len - 1);
-					if (!new_content)
-						return (1);
-					free(current->content);
-					current->content = new_content;
-				}
-			}
+			if (process_dollar(current) != 0)
+			return (1);
 		}
-		prev = current;
+		current = current->next;
+	}
+	return (0);
+}
+
+int	preprocess_dollar_quotes(t_token_word **head)
+{
+	t_token_word	*current;
+
+	current = *head;
+	while (current && current->next)
+	{
+	
+		if (current->content && current->type == T_NO_QUOTE && current->next 
+			&& (current->next->type == T_D_QUOTE || current->next->type == T_S_QUOTE))
+		{
+			if (process_dollar(current) != 0)
+			return (1);
+		}
 		current = current->next;
 	}
 	return (0);
@@ -492,6 +454,8 @@ int	expand_var(t_cmd *cmd, t_shell *shell)
 	if (!cmd || !cmd->list_word)
 		return (0);
 	i = 0;
+	if (cmd->type_redir && prepro_dol_redir(cmd->type_redir->word_parts) != 0)
+			return (1);
 	while (i < cmd->ac && cmd->list_word[i])
 	{
 		if (preprocess_dollar_quotes(&(cmd->list_word[i])) != 0)
