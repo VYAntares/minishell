@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/18 13:44:34 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/18 14:25:53 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ char	*expand_line(char *line, char *env_value, int start, int i)
 		return (NULL);
 	return (expanded_line);
 }
+
 char	*launch_expansion(char *line, t_shell *shell, int *i, int *start)
 {
 	char	*env_value;
@@ -118,20 +119,19 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 	return (expanded_line);
 }
 
-
 int	rebuild_redirection(t_cmd *cmd)
 {
 	char			*new_content;
 	t_file_redir	*redir;
 	t_token_word	*current;
 
-	new_content = ft_strdup("");
 	redir = cmd->type_redir;
-	current = redir->word_parts;
-	if (!new_content)
-		return (1);
 	while (redir)
 	{
+		new_content = ft_strdup("");
+		if (!new_content)
+			return (1);
+		current = redir->word_parts;
 		while (current)
 		{
 			new_content = ft_strjoin(new_content, current->content);
@@ -139,8 +139,50 @@ int	rebuild_redirection(t_cmd *cmd)
 				return (1);
 			current = current->next;
 		}
-		cmd->type_redir->content = new_content;
+		redir->content = ft_strdup(new_content);
 		redir = redir->next;
+		free(new_content);
+	}
+	return (0);
+}
+
+int	expand_redir_name(t_token_word *current, t_shell *shell, t_file_redir *redir)
+{
+	int	contains_dollar;
+	
+	contains_dollar = ft_strchr(current->content, '$') != NULL;
+	if (current->type == T_NO_QUOTE && contains_dollar)
+	{
+		if (expand_env_var(current, shell) != 0)
+			return (1);
+		if (ft_strchr(current->content, ' ')
+			|| ft_strchr(current->content, '\t'))
+			redir->is_ambiguous = 1;
+	}
+	else if (current->type != T_S_QUOTE)
+	{
+		if (expand_env_var(current, shell) != 0)
+			return (1);
+	}
+	return (0);
+}
+
+int	launch_redir_expansion(t_shell *shell, t_file_redir *redir)
+{
+	t_token_word	*current;
+	
+	redir->is_ambiguous = 0;
+	if (redir->type_redirection == T_HEREDOC)
+	{
+		redir = redir->next;
+		return (0);
+	}
+	current = redir->word_parts;
+	while (current)
+	{
+		if (expand_redir_name(current, shell, redir) != 0)
+			return (1);
+		current = current->next;
 	}
 	return (0);
 }
@@ -148,37 +190,12 @@ int	rebuild_redirection(t_cmd *cmd)
 int	expand_redir(t_cmd *cmd, t_shell *shell)
 {
 	t_file_redir	*redir;
-	t_token_word	*current;
-	int				contains_dollar;
 
 	redir = cmd->type_redir;
 	while (redir)
 	{
-		redir->is_ambiguous = 0;
-		if (redir->type_redirection == T_HEREDOC)
-		{
-			redir = redir->next;
-			continue ;
-		}
-		current = redir->word_parts;
-		while (current)
-		{
-			contains_dollar = ft_strchr(current->content, '$') != NULL;
-			if (current->type == T_NO_QUOTE && contains_dollar)
-			{
-				if (expand_env_var(current, shell) != 0)
-					return (1);
-				if (ft_strchr(current->content, ' ')
-					|| ft_strchr(current->content, '\t'))
-					redir->is_ambiguous = 1;
-			}
-			else if (current->type != T_S_QUOTE)
-			{
-				if (expand_env_var(current, shell) != 0)
-					return (1);
-			}
-			current = current->next;
-		}
+		if (launch_redir_expansion(shell, redir) != 0)
+			return (1);
 		redir = redir->next;
 	}
 	if (!cmd->type_redir->is_ambiguous
@@ -189,6 +206,51 @@ int	expand_redir(t_cmd *cmd, t_shell *shell)
 	}
 	return (0);
 }
+
+// int	expand_redir(t_cmd *cmd, t_shell *shell)
+// {
+// 	t_file_redir	*redir;
+// 	t_token_word	*current;
+// 	int				contains_dollar;
+
+// 	redir = cmd->type_redir;
+// 	while (redir)
+// 	{
+// 		redir->is_ambiguous = 0;
+// 		if (redir->type_redirection == T_HEREDOC)
+// 		{
+// 			redir = redir->next;
+// 			continue ;
+// 		}
+// 		current = redir->word_parts;
+// 		while (current)
+// 		{
+// 			contains_dollar = ft_strchr(current->content, '$') != NULL;
+// 			if (current->type == T_NO_QUOTE && contains_dollar)
+// 			{
+// 				if (expand_env_var(current, shell) != 0)
+// 					return (1);
+// 				if (ft_strchr(current->content, ' ')
+// 					|| ft_strchr(current->content, '\t'))
+// 					redir->is_ambiguous = 1;
+// 			}
+// 			else if (current->type != T_S_QUOTE)
+// 			{
+// 				if (expand_env_var(current, shell) != 0)
+// 					return (1);
+// 			}
+// 			current = current->next;
+// 		}
+// 		redir = redir->next;
+// 	}
+// 	if (!cmd->type_redir->is_ambiguous
+// 		&& cmd->type_redir->type_redirection != T_HEREDOC)
+// 	{
+// 		if (rebuild_redirection(cmd) != 0)
+// 			return (1);
+// 	}
+// 	return (0);
+// }
 
 int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
