@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/18 13:40:05 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/18 13:44:34 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ char	*expand_line(char *line, char *env_value, int start, int i)
 		return (NULL);
 	return (expanded_line);
 }
-char	*launch_expansion_heredoc(char *line, t_shell *shell, int *i, int *start)
+char	*launch_expansion(char *line, t_shell *shell, int *i, int *start)
 {
 	char	*env_value;
 	char	*expanded_line;
@@ -104,7 +104,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 		if (line[i] == '$' && line[i + 1] && line[i + 1] != ' ')
 		{
 			start = ++i;
-			expanded_line = launch_expansion_heredoc(line, shell, &i, &start);
+			expanded_line = launch_expansion(line, shell, &i, &start);
 			free(line);
 			line = ft_strdup(expanded_line);
 			if (!line)
@@ -193,10 +193,8 @@ int	expand_redir(t_cmd *cmd, t_shell *shell)
 int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
 	int		i;
-	char	*content;
-	char	*env_name;
-	char	*env_value;
 	int		start;
+	char	*content;
 	char	*new_content;
 
 	i = 0;
@@ -207,44 +205,7 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 		if (content[i] == '$' && content[i + 1] && content[i + 1] != ' ')
 		{
 			start = ++i;
-			if (content[i] == '$')
-			{
-				env_value = ft_itoa(shell->pid);
-				if (!env_value)
-					return (1);
-				i++;
-			}
-			else if (content[i] == '?')
-			{
-				env_value = ft_itoa(shell->exit_status);
-				if (!env_value)
-					return (1);
-				i++;
-			}
-			else
-			{
-				while (content[i] && (ft_isalnum(content[i]) || content[i] == '_'))
-					i++;
-				env_name = ft_substr(content, start, i - start);
-				if (!env_name)
-					return (1);
-				env_value = get_env_value(shell->env, env_name);
-				if (!env_value)
-				{
-					env_value = ft_strdup("");
-					if (!env_value)
-						return (1);
-				}
-			}
-			new_content = ft_substr(content, 0, start - 1);
-			if (!new_content)
-				return (1);
-			new_content = ft_strjoin(new_content, env_value);
-			if (!new_content)
-				return (1);
-			new_content = ft_strjoin(new_content, content + i);
-			if (!new_content)
-				return (1);
+			new_content = launch_expansion(content, shell, &i, &start);
 			token_word->content = new_content;
 			content = token_word->content;
 			i = 0;
