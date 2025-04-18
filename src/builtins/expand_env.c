@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/17 17:00:33 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/18 13:40:05 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,72 @@ char	*get_env_value(t_env *env, const char *name)
 	return (NULL);
 }
 
+char	*get_int_value_of(int env, int *i)
+{
+	char	*env_value;
+	
+	env_value = ft_itoa(env);
+	if (!env_value)
+		return (NULL);
+	(*i)++;
+	return (env_value);
+}
+
+char	*extract_env_value(char	*line, t_shell *shell, int *i, int *start)
+{
+	char	*env_name;
+	char	*env_value;
+	
+	while (line[(*i)] && (ft_isalnum(line[(*i)]) || line[(*i)] == '_'))
+		(*i)++;
+	env_name = ft_substr(line, (*start), (*i) - (*start));
+	if (!env_name)
+		return (NULL);
+	env_value = get_env_value(shell->env, env_name);
+	if (!env_value)
+	{
+		env_value = ft_strdup("");
+		if (!env_value)
+			return (NULL);
+	}
+	return (env_value);
+}
+
+char	*expand_line(char *line, char *env_value, int start, int i)
+{
+	char	*expanded_line;
+	
+	expanded_line = ft_substr(line, 0, start - 1);
+	if (!expanded_line)
+		return (NULL);
+	expanded_line = ft_strjoin(expanded_line, env_value);
+	if (!expanded_line)
+		return (NULL);
+	expanded_line = ft_strjoin(expanded_line, line + i);
+	if (!expanded_line)
+		return (NULL);
+	return (expanded_line);
+}
+char	*launch_expansion_heredoc(char *line, t_shell *shell, int *i, int *start)
+{
+	char	*env_value;
+	char	*expanded_line;
+
+	if (line[*i] == '$')
+		env_value = get_int_value_of(shell->pid, i);
+	else if (line[*i] == '?')
+		env_value = get_int_value_of(shell->exit_status, i);
+	else
+		env_value = extract_env_value(line, shell, i, start);
+	expanded_line = expand_line(line, env_value, *start, *i);
+	if (!expanded_line)
+		return (NULL);
+	return (expanded_line);
+}
+
 char	*expand_env_heredoc(char *line, t_shell *shell)
 {
 	char	*expanded_line;
-	char	*env_name;
-	char	*env_value;
 	int		i;
 	int		start;
 
@@ -43,44 +104,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 		if (line[i] == '$' && line[i + 1] && line[i + 1] != ' ')
 		{
 			start = ++i;
-			if (line[i] == '$')
-			{
-				env_value = ft_itoa(shell->pid);
-				if (!env_value)
-					return (NULL);
-				i++;
-			}
-			else if (line[i] == '?')
-			{
-				env_value = ft_itoa(shell->exit_status);
-				if (!env_value)
-					return (NULL);
-				i++;
-			}
-			else
-			{
-				while (line[i] && (ft_isalnum(line[i]) || line[i] == '_'))
-					i++;
-				env_name = ft_substr(line, start, i - start);
-				if (!env_name)
-					return (NULL);
-				env_value = get_env_value(shell->env, env_name);
-				if (!env_value)
-				{
-					env_value = ft_strdup("");
-					if (!env_value)
-						return (NULL);
-				}
-			}
-			expanded_line = ft_substr(line, 0, start - 1);
-			if (!expanded_line)
-				return (NULL);
-			expanded_line = ft_strjoin(expanded_line, env_value);
-			if (!expanded_line)
-				return (NULL);
-			expanded_line = ft_strjoin(expanded_line, line + i);
-			if (!expanded_line)
-				return (NULL);
+			expanded_line = launch_expansion_heredoc(line, shell, &i, &start);
 			free(line);
 			line = ft_strdup(expanded_line);
 			if (!line)
@@ -93,6 +117,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 		return (line);
 	return (expanded_line);
 }
+
 
 int	rebuild_redirection(t_cmd *cmd)
 {

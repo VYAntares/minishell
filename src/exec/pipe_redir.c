@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/17 22:30:01 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/18 11:20:35 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 
 int	ambiguous_error(t_file_redir *redir)
 {
-	t_token_word *word;
-	word = redir->word_parts;
+	t_token_word	*word;
 
+	word = redir->word_parts;
 	while (word)
 	{
 		if (word->type == T_NO_QUOTE && ft_strchr(word->content, '$'))
@@ -62,8 +62,8 @@ int	only_redirection(t_cmd *cmd)
 }
 
 int	find_lasts_redirection(t_file_redir *redir,
-								t_file_redir **last_input,
-								t_file_redir **last_output)
+							t_file_redir **last_input,
+							t_file_redir **last_output)
 {
 	while (redir)
 	{
@@ -78,7 +78,8 @@ int	find_lasts_redirection(t_file_redir *redir,
 	return (0);
 }
 
-int	process_outpout_redirection(t_file_redir *redir, t_file_redir **last_output)
+int	process_outpout_redirection(t_file_redir *redir,
+								t_file_redir **last_output)
 {
 	int	fd;
 
@@ -98,24 +99,23 @@ int	process_outpout_redirection(t_file_redir *redir, t_file_redir **last_output)
 
 int	process_input_redirection(t_file_redir *redir, t_file_redir **last_input)
 {
-    int fd;
-    
-    if (redir->is_ambiguous)
-        return (ambiguous_error(redir));
-    fd = open(redir->content, O_RDONLY);
-    if (fd == -1)
-        return (perror(redir->content), 1);
-    if (redir == *last_input)
-        dup2(fd, STDIN_FILENO);
-    close(fd);
-    return (0);
-}
+	int	fd;
 
+	if (redir->is_ambiguous)
+		return (ambiguous_error(redir));
+	fd = open(redir->content, O_RDONLY);
+	if (fd == -1)
+		return (perror(redir->content), 1);
+	if (redir == *last_input)
+		dup2(fd, STDIN_FILENO);
+	close(fd);
+	return (0);
+}
 
 int	process_all_redirections(t_file_redir *redir,
 							t_file_redir **last_input,
 							t_file_redir **last_output)
-{	
+{
 	while (redir)
 	{
 		if ((redir->type_redirection == T_REDIR_OUT
