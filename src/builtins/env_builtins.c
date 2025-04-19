@@ -6,11 +6,29 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/19 18:17:40 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/19 18:51:11 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
+
+int	is_valid_identifier(const char *id)
+{
+	int	i;
+
+	if (!id || !*id)
+		return (0);
+	if (!ft_isalpha(id[0]) && id[0] != '_')
+		return (0);
+	i = 1;
+	while (id[i])
+	{
+		if (!ft_isalnum(id[i]) && id[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 int	update_env_variable(t_shell *shell, const char *name, const char *value)
 {
@@ -42,7 +60,6 @@ int	add_env_variable(t_shell *shell, const char *name, const char *value)
 	new_env = malloc(sizeof(t_env));
 	if (!new_env)
 		return (1);
-	
 	new_env->name = ft_strdup(name);
 	if (!new_env->name)
 		return (free(new_env), 1);
@@ -62,12 +79,48 @@ int	add_env_variable(t_shell *shell, const char *name, const char *value)
 	return (0);
 }
 
+// Gère le cas d'une variable avec une valeur (contenant '=')
+int	handle_export_with_value(char *arg, t_shell *shell, int *status)
+{
+	char	*equals_pos;
+	char	*name;
+	char	*value;
+
+	equals_pos = ft_strchr(arg, '=');
+	name = ft_substr(arg, 0, equals_pos - arg);
+	value = ft_strdup(equals_pos + 1);
+	if (!name || !value)
+		return (free(name), free(value), 1);
+	if (!*name || !is_valid_identifier(name))
+	{
+		ft_putstr_fd("minishell: export: '", 2);
+		ft_putstr_fd(arg, 2);
+		ft_putendl_fd("': not a valid identifier", 2);
+		*status = 1;
+		return (free(name), free(value), 0);
+	}
+	update_env_variable(shell, name, value);
+	return (free(name), free(value), 0);
+}
+
+// Gère le cas d'une variable déclarée sans valeur
+int	handle_export_declaration(char *arg, int *status)
+{
+	if (!is_valid_identifier(arg))
+	{
+		ft_putstr_fd("minishell: export: '", 2);
+		ft_putstr_fd(arg, 2);
+		ft_putendl_fd("': not a valid identifier", 2);
+		*status = 1;
+	}
+	return (0);
+}
+
+// Fonction principale export refactorisée
 int	builtin_export(t_cmd *cmd, t_shell *shell)
 {
 	int		i;
 	char	*equals_pos;
-	char	*name;
-	char	*value;
 	int		status;
 
 	if (!cmd->arg[1])
@@ -79,63 +132,17 @@ int	builtin_export(t_cmd *cmd, t_shell *shell)
 		equals_pos = ft_strchr(cmd->arg[i], '=');
 		if (equals_pos)
 		{
-			name = ft_substr(cmd->arg[i], 0, equals_pos - cmd->arg[i]);
-			value = ft_strdup(equals_pos + 1);
-			if (!name || !value)
-			{
-				free(name);
-				free(value);
+			if (handle_export_with_value(cmd->arg[i], shell, &status))
 				return (1);
-			}
-			// Vérifier si le nom est vide ou invalide
-			if (!*name || !is_valid_identifier(name))
-			{
-				ft_putstr_fd("minishell: export: '", 2);
-				ft_putstr_fd(cmd->arg[i], 2);
-				ft_putendl_fd("': not a valid identifier", 2);
-				free(name);
-				free(value);
-				status = 1;
-				i++;
-				continue;
-			}
-			update_env_variable(shell, name, value);
-			free(name);
-			free(value);
 		}
 		else
-		{
-			if (!is_valid_identifier(cmd->arg[i]))
-			{
-				ft_putstr_fd("minishell: export: '", 2);
-				ft_putstr_fd(cmd->arg[i], 2);
-				ft_putendl_fd("': not a valid identifier", 2);
-				status = 1;
-			}
-		}
+			handle_export_declaration(cmd->arg[i], &status);
 		i++;
 	}
 	return (status);
 }
 
-int	is_valid_identifier(const char *id)
-{
-	int	i;
-
-	if (!id || !*id)
-		return (0);
-	if (!ft_isalpha(id[0]) && id[0] != '_')
-		return (0);
-	i = 1;
-	while (id[i])
-	{
-		if (!ft_isalnum(id[i]) && id[i] != '_')
-			return (0);
-		i++;
-	}
-	return (1);
-}
-void create_and_fill_env(char **env_array, t_shell *shell)
+void	create_and_fill_env(char **env_array, t_shell *shell)
 {
 	int		i;
 	t_env	*current;
@@ -155,7 +162,7 @@ void create_and_fill_env(char **env_array, t_shell *shell)
 	env_array[i] = NULL;
 }
 
-void display_array(char **env_array)
+void	display_array(char **env_array)
 {
 	char	*equals_pos;
 	int		i;
@@ -185,14 +192,16 @@ void	bubble_sort(char **env_array)
 	int		i;
 	int		j;
 	char	*temp;
-	
+
 	i = 0;
 	while (env_array[i])
 	{
 		j = i + 1;
 		while (env_array[j])
 		{
-			if (ft_strncmp(env_array[i], env_array[j], ft_strlen(env_array[j])) > 0)
+			if (ft_strncmp(env_array[i],
+					env_array[j],
+					ft_strlen(env_array[j])) > 0)
 			{
 				temp = env_array[i];
 				env_array[i] = env_array[j];
@@ -226,11 +235,35 @@ int	print_sorted_env(t_shell *shell)
 	return (0);
 }
 
+void	delete_line_env(t_shell *shell, t_cmd *cmd, int i)
+{
+	t_env	*current;
+	t_env	*prev;
+
+	current = shell->env;
+	prev = NULL;
+	while (current)
+	{
+		if (ft_strncmp(current->name, cmd->arg[i], ft_strlen(cmd->arg[i]))
+			== 0 && ft_strlen(current->name) == ft_strlen(cmd->arg[i]))
+		{
+			if (prev)
+				prev->next = current->next;
+			else
+				shell->env = current->next;
+			free(current->name);
+			free(current->value);
+			free(current);
+			return ;
+		}
+		prev = current;
+		current = current->next;
+	}
+}
+
 int	builtin_unset(t_cmd *cmd, t_shell *shell)
 {
 	int		i;
-	t_env	*current;
-	t_env	*prev;
 	int		status;
 
 	i = 1;
@@ -242,36 +275,11 @@ int	builtin_unset(t_cmd *cmd, t_shell *shell)
 			ft_putstr_fd("minishell: unset: '", 2);
 			ft_putstr_fd(cmd->arg[i], 2);
 			ft_putendl_fd("': not a valid identifier", 2);
-			status = 1;  // Code d'erreur pour identifiant invalide
+			status = 1;
 			i++;
-			continue;
+			continue ;
 		}
-		
-		// Chercher la variable
-		current = shell->env;
-		prev = NULL;
-		
-		while (current)
-		{
-			// Comparaison exacte de la longueur du nom
-			if (ft_strncmp(current->name, cmd->arg[i], ft_strlen(cmd->arg[i])) == 0 &&
-				ft_strlen(current->name) == ft_strlen(cmd->arg[i]))
-			{
-				// Supprimer la variable
-				if (prev)
-					prev->next = current->next;
-				else
-					shell->env = current->next;
-				
-				free(current->name);
-				free(current->value);
-				free(current);
-				break;
-			}
-			prev = current;
-			current = current->next;
-		}
-		
+		delete_line_env(shell, cmd, i);
 		i++;
 	}
 	return (status);
