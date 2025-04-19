@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/19 15:58:47 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/19 16:51:07 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -451,8 +451,6 @@ int rebuild_command_arg(t_cmd *cmd)
 	replace_args_and_free(new_args, cmd, k, new_ac);
 	return (0);
 }
-
-
 
 /*
  * Version modifiée de expand_var qui utilise la fonction rebuild_command_arg améliorée
