@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/19 16:51:07 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/19 16:58:24 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ char	*get_env_value(t_env *env, const char *name)
 char	*get_int_value_of(int env, int *i)
 {
 	char	*env_value;
-	
+
 	env_value = ft_itoa(env);
 	if (!env_value)
 		return (NULL);
@@ -42,7 +42,7 @@ char	*extract_env_value(char	*line, t_shell *shell, int *i, int *start)
 {
 	char	*env_name;
 	char	*env_value;
-	
+
 	while (line[(*i)] && (ft_isalnum(line[(*i)]) || line[(*i)] == '_'))
 		(*i)++;
 	env_name = ft_substr(line, (*start), (*i) - (*start));
@@ -61,7 +61,7 @@ char	*extract_env_value(char	*line, t_shell *shell, int *i, int *start)
 char	*expand_line(char *line, char *env_value, int start, int i)
 {
 	char	*expanded_line;
-	
+
 	expanded_line = ft_substr(line, 0, start - 1);
 	if (!expanded_line)
 		return (NULL);
@@ -146,10 +146,12 @@ int	rebuild_redirection(t_cmd *cmd)
 	return (0);
 }
 
-int	expand_redir_name(t_token_word *current, t_shell *shell, t_file_redir *redir)
+int	expand_redir_name(t_token_word *current,
+					t_shell *shell,
+					t_file_redir *redir)
 {
 	int	contains_dollar;
-	
+
 	contains_dollar = ft_strchr(current->content, '$') != NULL;
 	if (current->type == T_NO_QUOTE && contains_dollar)
 	{
@@ -170,7 +172,7 @@ int	expand_redir_name(t_token_word *current, t_shell *shell, t_file_redir *redir
 int	launch_redir_expansion(t_shell *shell, t_file_redir *redir)
 {
 	t_token_word	*current;
-	
+
 	redir->is_ambiguous = 0;
 	if (redir->type_redirection == T_HEREDOC)
 	{
@@ -268,11 +270,12 @@ int	prepro_dol_redir(t_token_word *word_parts)
 	current = word_parts;
 	while (current && current->next)
 	{
-		if (current->content && current->type == T_NO_QUOTE && current->next 
-			&& (current->next->type == T_D_QUOTE || current->next->type == T_S_QUOTE))
+		if (current->content && current->type == T_NO_QUOTE && current->next
+			&& (current->next->type == T_D_QUOTE
+				|| current->next->type == T_S_QUOTE))
 		{
 			if (process_dollar(current) != 0)
-			return (1);
+				return (1);
 		}
 		current = current->next;
 	}
@@ -286,12 +289,12 @@ int	preprocess_dollar_quotes(t_token_word **head)
 	current = *head;
 	while (current && current->next)
 	{
-	
-		if (current->content && current->type == T_NO_QUOTE && current->next 
-			&& (current->next->type == T_D_QUOTE || current->next->type == T_S_QUOTE))
+		if (current->content && current->type == T_NO_QUOTE && current->next
+			&& (current->next->type == T_D_QUOTE
+				|| current->next->type == T_S_QUOTE))
 		{
 			if (process_dollar(current) != 0)
-			return (1);
+				return (1);
 		}
 		current = current->next;
 	}
@@ -304,7 +307,7 @@ int	should_we_split(t_token_word *list_word)
 	int				has_quote;
 	int				will_split;
 	t_token_word	*word;
-	
+
 	has_quote = 0;
 	will_split = 0;
 	word = list_word;
@@ -328,7 +331,7 @@ int	count_arg_after_split(t_token_word *list_word)
 	char			*tmp;
 	char			**split_words;
 	int				j;
-	
+
 	tmp = ft_strdup("");
 	word = list_word;
 	while (word)
@@ -351,7 +354,7 @@ char	*rebuild_word(t_token_word *list_word)
 	char			*tmp;
 	char			*new_tmp;
 	t_token_word	*word;
-	
+
 	tmp = ft_strdup("");
 	word = list_word;
 	while (word)
@@ -369,7 +372,7 @@ void	fill_new_args(t_token_word *list_word, int *k, char **new_args)
 	int		j;
 	char	*tmp;
 	char	**split_words;
-	
+
 	j = 0;
 	if (should_we_split(list_word) == 0)
 	{
@@ -419,20 +422,16 @@ void	replace_args_and_free(char **new_args, t_cmd *cmd, int k, int new_ac)
 	}
 }
 
-/* 
- * Fonction pour reconstruire les arguments de la commande après expansion
- * Cette fonction remplace rebuild_command_arg et gère correctement 
- * les espaces dans les variables selon qu'elles sont entre guillemets ou non
- */
-int rebuild_command_arg(t_cmd *cmd)
+int	rebuild_command_arg(t_cmd *cmd)
 {
 	int				i;
 	int				k;
 	int				new_ac;
-	char			**new_args = NULL;
-	
+	char			**new_args;
+
 	i = 0;
 	new_ac = 0;
+	new_args = NULL;
 	while (i < cmd->ac)
 	{
 		if (should_we_split(cmd->list_word[i]) == 0)
@@ -452,9 +451,6 @@ int rebuild_command_arg(t_cmd *cmd)
 	return (0);
 }
 
-/*
- * Version modifiée de expand_var qui utilise la fonction rebuild_command_arg améliorée
- */
 int	expand_var(t_cmd *cmd, t_shell *shell)
 {
 	t_token_word	*list;
@@ -464,7 +460,7 @@ int	expand_var(t_cmd *cmd, t_shell *shell)
 		return (0);
 	i = 0;
 	if (cmd->type_redir && prepro_dol_redir(cmd->type_redir->word_parts) != 0)
-			return (1);
+		return (1);
 	while (i < cmd->ac && cmd->list_word[i])
 	{
 		if (preprocess_dollar_quotes(&(cmd->list_word[i])) != 0)

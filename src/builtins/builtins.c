@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/12 11:34:45 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/19 17:56:58 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,12 @@ int	builtin_pwd(void)
 int	builtin_env(t_shell *shell)
 {
 	t_env	*current;
-
+	
+	if (shell->cmd->ac > 1)
+    {
+        ft_putstr_fd("env: too many arguments\n", 2);
+        return (127);
+    }
 	current = shell->env;
 	while (current)
 	{
