@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 14:33:43 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/21 14:35:24 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	update_repertory(char *path, t_shell *shell)
 		return (1);
 	}
 	new_pwd = getcwd(cwd, PATH_MAX);
-	if (new_pwd) 
+	if (new_pwd)
 	{
 		update_env_variable(shell, "PWD", new_pwd);
 		if (old_pwd)
@@ -103,10 +103,10 @@ int	builtin_env(t_shell *shell)
 	t_env	*current;
 
 	if (shell->cmd->ac > 1)
-    {
-        ft_putstr_fd("env: too many arguments\n", 2);
-        return (127);
-    }
+	{
+		ft_putstr_fd("env: too many arguments\n", 2);
+		return (127);
+	}
 	current = shell->env;
 	while (current)
 	{
@@ -150,7 +150,7 @@ int	builtin_exit(t_cmd *cmd, t_shell *shell)
 
 	exit_code = 0;
 	if (isatty(STDIN_FILENO))
-        ft_putendl_fd("exit", 1);
+		ft_putendl_fd("exit", 1);
 	if (cmd->arg[1])
 	{
 		if (!is_number(cmd->arg[1]))
