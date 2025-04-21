@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 19:04:34 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/05 02:30:11 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/21 15:53:02 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ t_shell	*init_shell(char **envp)
 {
 	t_shell		*shell;
 	t_env		*env;
+	int			shell_lvl;
 
 	shell = malloc(sizeof(t_shell));
 	if (!shell)
@@ -91,5 +92,7 @@ t_shell	*init_shell(char **envp)
 	shell->history = NULL;
 	shell->pid = getpid();
 	shell->exit_status = 0;
+	shell_lvl = ft_atoi(get_env_value(env, "SHLVL"));
+	update_env_variable(shell, "SHLVL", ft_itoa(shell_lvl + 1));
 	return (shell);
 }
