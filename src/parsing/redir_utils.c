@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:45:45 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 12:45:47 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/21 14:24:51 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,8 @@ t_file_redir	*create_redir(t_token *current)
 
 	if (!current || !current->next)
 	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `newline'\n", 2);
+		ft_putstr_fd
+		("minishell: syntax error near unexpected token `newline'\n", 2);
 		return (NULL);
 	}
 	redir = malloc(sizeof(t_file_redir));
