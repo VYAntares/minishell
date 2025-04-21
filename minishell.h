@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 22:34:19 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/21 14:20:47 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,5 +253,7 @@ char	**expand_wildcard(const char *pattern);
 int		expand_wildcard_in_word_list(t_token_word **list);
 int		rebuild_redirection_content(t_file_redir *redir);
 int		expand_wildcards(t_cmd *cmd);
+
+
 
 #endif
