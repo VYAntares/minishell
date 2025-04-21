@@ -1,13 +1,5 @@
-1.  mettre a la norme, reecrire le code et se lapproprier.
+1. separer les fonctions en plusieurs fichier
 
-2.  revoir correctement tout les builtins.
+2. checker les erreur mstest
 
-3.  fixer les erreur de segmentation fault "> < >> <<"
-
-4.  fixer les signaux CTRL+C CTRL+D
-
-5.  implementer les wildcards.
-
-6.  renorminetizer si cest le cas
-
-7.  leaks, exit code.
+3. sucer les wildcard (pour luca) master les wildcard (pour endrit)

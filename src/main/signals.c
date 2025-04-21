@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/20 20:18:39 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 15:27:28 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/21 16:31:42 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 void	handle_sigint(int sig)
 {
 	(void)sig;
-	
 	write(1, "\n", 1);
 	g_sigint_received = 1;
 	rl_on_new_line();
@@ -42,11 +41,9 @@ int	setup_signals(void)
 	sa.sa_handler = handle_sigint;
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 		return (perror("Error sigaction"), -1);
-	
 	sa.sa_handler = SIG_IGN;
 	if (sigaction(SIGQUIT, &sa, NULL) == -1)
 		return (perror("Error sigaction"), -1);
-	
 	return (0);
 }
 
@@ -61,16 +58,12 @@ int	setup_signals_for_commands(void)
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	
-	// En mode commande, on ignore SIGINT pour que le shell parent n'interfère pas
 	sa.sa_handler = SIG_IGN;
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 		return (perror("Error sigaction"), -1);
-	
 	sa.sa_handler = SIG_IGN;
 	if (sigaction(SIGQUIT, &sa, NULL) == -1)
 		return (perror("Error sigaction"), -1);
-	
 	return (0);
 }
 
