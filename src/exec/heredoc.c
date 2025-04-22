@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 22:28:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/22 21:13:15 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,23 @@ t_cmd	*get_chained_commands(t_ast *ast)
 	return (first_cmd);
 }
 
+char	*purify_quote(t_file_redir	*redir)
+{
+	t_token_word 	*parts;
+	char			*delimiter;
+
+	delimiter = ft_strdup("");
+	parts = redir->word_parts;
+	while (parts)
+	{
+		delimiter = ft_strjoin(delimiter, parts->content);
+		if (!delimiter)
+			return (NULL);
+		parts = parts->next;
+	}
+	return (delimiter);
+}
+
 void	launch_heredoc(t_ast *ast, t_shell *shell)
 {
 	t_file_redir	*redir;
@@ -105,7 +122,7 @@ void	launch_heredoc(t_ast *ast, t_shell *shell)
 			{
 				if (handle_heredoc(redir,
 						shell,
-						ft_strdup(redir->content)) != 0)
+						purify_quote(redir)) != 0)
 					return ;
 			}
 			redir = redir->next;

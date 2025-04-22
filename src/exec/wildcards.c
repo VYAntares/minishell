@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 14:58:49 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/22 23:48:32 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -490,73 +490,48 @@ int	rebuild_command_arg_wildcard(t_cmd *cmd)
 	return (0);
 }
 
-/*
-** Version améliorée de la fonction expand_wildcards
-** Gère correctement la séparation des fichiers dans l'expansion
-*/
-int	expand_wildcards(t_cmd *cmd)
+int	has_wildcard_in_word(t_token_word *word_parts)
 {
+	t_token_word	*word;
+	
+	word = word_parts;
+	while (word)
+	{
+		if (word->type == T_NO_QUOTE && ft_strchr(word->content, '*'))
+			return (1);
+		word = word->next;
+	}
+	return (0);
+}
+
+int	has_wildcard_in_cmd(t_cmd *cmd)
+{
+	int				has_wildcard;
 	int				i;
 	t_file_redir	*redir;
-	int				has_wildcard;
-	int				expanded_something;
 
-	if (!cmd || !cmd->list_word)
-		return (0);
-    
-	has_wildcard = 0;
-	expanded_something = 0;
-	
-	// Vérifier s'il y a des wildcards à expandre dans les arguments
-	for (i = 0; i < cmd->ac && cmd->list_word[i]; i++)
+	i = 0;
+	while (i < cmd->ac && cmd->list_word[i])
 	{
-		t_token_word *word = cmd->list_word[i];
-		while (word)
-		{
-			if (word->type == T_NO_QUOTE && ft_strchr(word->content, '*'))
-			{
-				has_wildcard = 1;
-				break;
-			}
-			word = word->next;
-		}
+		has_wildcard = has_wildcard_in_word(cmd->list_word[i]);
 		if (has_wildcard)
-			break;
+			break ;
+		i++;
 	}
-    
-	// Vérifier aussi les redirections pour les wildcards
 	if (!has_wildcard && cmd->type_redir)
 	{
 		redir = cmd->type_redir;
 		while (redir && !has_wildcard)
-		{
-			t_token_word *word = redir->word_parts;
-			while (word)
-			{
-				if (word->type == T_NO_QUOTE && ft_strchr(word->content, '*'))
-				{
-					has_wildcard = 1;
-					break;
-				}
-				word = word->next;
-			}
-			redir = redir->next;
-		}
+			has_wildcard = has_wildcard_in_word(redir->word_parts);
+		redir = redir->next;
 	}
-    
-	// Si pas de wildcard, rien à faire
-	if (!has_wildcard)
-		return (0);
-    
-	// Étendre les wildcards dans les arguments
-	for (i = 0; i < cmd->ac && cmd->list_word[i]; i++)
-	{
-		if (expand_wildcard_in_word_list(&(cmd->list_word[i])) != 0)
-			return (1);
-		expanded_something = 1;
-	}
+	return (has_wildcard);
+}
+
+int	expand_wildcard_in_redir(t_cmd *cmd, int expanded_something)
+{
+	t_file_redir	*redir;
 	
-	// Étendre les wildcards dans les redirections
 	redir = cmd->type_redir;
 	while (redir)
 	{
@@ -564,19 +539,36 @@ int	expand_wildcards(t_cmd *cmd)
 		{
 			if (expand_wildcard_in_word_list(&(redir->word_parts)) != 0)
 				return (1);
-				
-			// Reconstruire le contenu de la redirection après expansion
 			if (rebuild_redirection_content(redir) != 0)
 				return (1);
-			
 			expanded_something = 1;
 		}
 		redir = redir->next;
 	}
-	
-	// Reconstruire les arguments après expansion seulement si nécessaire
 	if (expanded_something)
 		return (rebuild_command_arg_wildcard(cmd));
-	
+	return (1);
+}
+
+int	expand_wildcards(t_cmd *cmd)
+{
+	int				i;
+	int				expanded_something;
+
+	if (!cmd || !cmd->list_word)
+		return (0);
+	if (!has_wildcard_in_cmd(cmd))
+		return (0);
+	expanded_something = 0;
+	i = 0;
+	while (i < cmd->ac && cmd->list_word[i])
+	{
+		if (expand_wildcard_in_word_list(&(cmd->list_word[i])) != 0)
+			return (1);
+		expanded_something = 1;
+		i++;
+	}
+	if (expand_wildcard_in_redir(cmd, expanded_something))
+		return (1);
 	return (0);
 }
