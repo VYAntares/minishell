@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/22 23:48:32 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/23 21:01:21 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,6 @@ int	match_wildcard(const char *pattern, const char *str)
 }
 
 /*
-** Fonction de comparaison pour qsort
-*/
-static int	compare_strings(const void *a, const void *b)
-{
-	return (ft_strncmp(*(const char **)a, *(const char **)b, ft_strlen(*(const char **)b)));
-}
-
-/*
 ** Fonction pour développer un motif de wildcard en liste de fichiers correspondants
 */
 char	**expand_wildcard(const char *pattern)
@@ -54,6 +46,7 @@ char	**expand_wildcard(const char *pattern)
 	DIR				*dir;
 	struct dirent	*entry;
 	char			**files;
+	char			**new_files;
 	int				count;
 	int				capacity;
 
@@ -64,23 +57,24 @@ char	**expand_wildcard(const char *pattern)
 		return (NULL);
 	dir = opendir(".");
 	if (!dir)
-	{
-		free(files);
-		return (NULL);
-	}
-	while ((entry = readdir(dir)) != NULL)
+		return (free(files), NULL);
+	entry = readdir(dir);
+	while (entry)
 	{
 		// Ignorer fichiers cachés sauf si spécifiquement demandés
 		if (entry->d_name[0] == '.' && pattern[0] != '.')
+		{
+			entry = readdir(dir);
 			continue;
+		}
 		if (match_wildcard(pattern, entry->d_name))
 		{
 			// Redimensionner le tableau si nécessaire
 			if (count >= capacity)
 			{
 				capacity *= 2;
-				char **temp = realloc(files, capacity * sizeof(char *));
-				if (!temp)
+				new_files = malloc(capacity * sizeof(char *));
+				if (!new_files)
 				{
 					for (int i = 0; i < count; i++)
 						free(files[i]);
@@ -88,7 +82,11 @@ char	**expand_wildcard(const char *pattern)
 					closedir(dir);
 					return (NULL);
 				}
-				files = temp;
+				// Copie manuelle des pointeurs existants
+				for (int i = 0; i < count; i++)
+					new_files[i] = files[i];
+				free(files);
+				files = new_files;
 			}
 			files[count] = ft_strdup(entry->d_name);
 			if (!files[count])
@@ -101,6 +99,7 @@ char	**expand_wildcard(const char *pattern)
 			}
 			count++;
 		}
+		entry = readdir(dir);
 	}
 	closedir(dir);
 	// Si aucun match, retourner le motif original
@@ -117,18 +116,22 @@ char	**expand_wildcard(const char *pattern)
 	else
 	{
 		// Ajuster le tableau final et le terminer par NULL
-		char **temp = realloc(files, (count + 1) * sizeof(char *));
-		if (!temp)
+		new_files = malloc((count + 1) * sizeof(char *));
+		if (!new_files)
 		{
 			for (int i = 0; i < count; i++)
 				free(files[i]);
 			free(files);
 			return (NULL);
 		}
-		files = temp;
+		// Copie manuelle des pointeurs existants
+		for (int i = 0; i < count; i++)
+			new_files[i] = files[i];
+		free(files);
+		files = new_files;
 		files[count] = NULL;
 		// Trier les résultats alphabétiquement
-		qsort(files, count, sizeof(char *), compare_strings);
+		bubble_sort(files);
 	}
 	return (files);
 }
@@ -145,10 +148,7 @@ t_token_word	*create_new_token_word(const char *content, t_type_word type)
 		return (NULL);
 	new_word->content = ft_strdup(content);
 	if (!new_word->content)
-	{
-		free(new_word);
-		return (NULL);
-	}
+		return (free(new_word), NULL);
 	new_word->type = type;
 	new_word->next = NULL;
 	return (new_word);
@@ -180,37 +180,26 @@ char	*build_composite_pattern(t_token_word *list)
 {
 	t_token_word	*current;
 	char			*pattern;
-	char			*tmp;
 	int				has_wildcard;
 
 	if (!list)
 		return (NULL);
-
 	pattern = ft_strdup("");
 	if (!pattern)
 		return (NULL);
-
 	has_wildcard = 0;
 	current = list;
 	while (current)
 	{
-		tmp = pattern;
-		pattern = ft_strjoin(tmp, current->content);
-		free(tmp);
+		pattern = ft_strjoin(pattern, current->content);
 		if (!pattern)
 			return (NULL);
-
 		if (ft_strchr(current->content, '*'))
 			has_wildcard = 1;
 		current = current->next;
 	}
-
 	if (!has_wildcard)
-	{
-		free(pattern);
-		return (NULL);
-	}
-
+		return (free(pattern), NULL);
 	return (pattern);
 }
 
@@ -229,20 +218,14 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 
 	if (!list || !*list)
 		return (0);
-
-	// Construire un motif composite pour gérer les cas comme "Mak"*
 	composite_pattern = build_composite_pattern(*list);
-
-	// Si pas de motif composite (pas de wildcard), pas besoin d'expansion
 	if (!composite_pattern)
 		return (0);
-
 	// Étendre le motif composite
 	expanded = expand_wildcard(composite_pattern);
 	free(composite_pattern);
 	if (!expanded)
 		return (1);
-
 	// Créer une nouvelle liste de tokens avec les résultats de l'expansion
 	new_list = NULL;
 	tail = NULL;
@@ -257,14 +240,12 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 			free_token_word_list(new_list);
 			return (1);
 		}
-
 		if (!new_list)
 			new_list = new_word;
 		else
 			tail->next = new_word;
 		tail = new_word;
 	}
-
 	// Si l'expansion n'a rien trouvé, garder la liste originale
 	if (!expanded[0])
 	{
@@ -273,13 +254,11 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 		free(expanded);
 		return (0);
 	}
-
 	// Libérer la liste originale et le tableau d'expansion
 	for (i = 0; expanded[i]; i++)
 		free(expanded[i]);
 	free(expanded);
 	free_token_word_list(*list);
-
 	// Mettre à jour le pointeur de liste
 	*list = new_list;
 	return (0);
@@ -357,11 +336,9 @@ char	*rebuild_token_word_for_wildcard(t_token_word *word_list)
 
 	if (!word_list)
 		return (ft_strdup(""));
-
 	result = ft_strdup(word_list->content);
 	if (!result)
 		return (NULL);
-
 	current = word_list->next;
 	while (current)
 	{
@@ -372,7 +349,6 @@ char	*rebuild_token_word_for_wildcard(t_token_word *word_list)
 			return (NULL);
 		current = current->next;
 	}
-
 	return (result);
 }
 
@@ -550,7 +526,7 @@ int	expand_wildcard_in_redir(t_cmd *cmd, int expanded_something)
 	return (1);
 }
 
-int	expand_wildcards(t_cmd *cmd)
+int	launch_expand_wildcards(t_cmd *cmd)
 {
 	int				i;
 	int				expanded_something;

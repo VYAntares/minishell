@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 16:33:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/23 00:03:13 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 		return (execute_redirections(cmd, shell), 1);
 	if (expand_var(cmd, shell) != 0)
 		return (1);
-	if (expand_wildcards(cmd) != 0)
+	if (launch_expand_wildcards(cmd) != 0)
 		return (1);
 	if (is_builtin(cmd->name))
 		return (handle_builtin(cmd, shell));
