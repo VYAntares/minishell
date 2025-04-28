@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 14:45:19 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 16:27:10 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,8 +159,6 @@ char	**expand_wildcard(const char *wildcard_str)
 	return (files);
 }
 
-
-
 /*
 ** Fonction pour créer un nouveau token_word
 */
@@ -228,6 +226,35 @@ char	*build_composite_wildcard_str(t_token_word *list)
 	return (wildcard_str);
 }
 
+t_token_word	*expanded_wildcard_list(char **expanded)
+{
+	t_token_word	*new_word;
+	t_token_word	*tail;
+	t_token_word	*head;
+	int				i;
+	
+	i = 0;
+	tail = NULL;
+	head = NULL;
+	while (expanded[i])
+	{
+		new_word = create_new_token_word(expanded[i++], T_NO_QUOTE);
+		if (!new_word)
+		{
+			i = 0;
+			while (expanded[i])
+				free(expanded[i++]);
+			return (free(expanded), free_token_word_list(head), NULL);
+		}
+		if (!head)
+			head = new_word;
+		else
+			tail->next = new_word;
+		tail = new_word;
+	}
+	return (head);
+}
+
 /*
 ** Fonction pour étendre les wildcards dans une liste de token_word
 ** Version modifiée pour gérer correctement les espaces entre les fichiers
@@ -236,59 +263,25 @@ char	*build_composite_wildcard_str(t_token_word *list)
 int	expand_wildcard_in_word_list(t_token_word **list)
 {
 	t_token_word	*new_list;
-	t_token_word	*tail;
 	char			**expanded;
 	char			*composite_wildcard_str;
 	int				i;
-
+	
 	if (!list || !*list)
 		return (0);
 	composite_wildcard_str = build_composite_wildcard_str(*list);
 	if (!composite_wildcard_str)
 		return (0);
-	// Étendre le motif composite
 	expanded = expand_wildcard(composite_wildcard_str);
 	free(composite_wildcard_str);
 	if (!expanded)
 		return (1);
-	// Créer une nouvelle liste de tokens avec les résultats de l'expansion
-	new_list = NULL;
-	tail = NULL;
-	for (i = 0; expanded[i]; i++)
-	{
-		t_token_word *new_word = create_new_token_word(expanded[i], T_NO_QUOTE);
-		if (!new_word)
-		{
-			for (int j = 0; expanded[j]; j++)
-				free(expanded[j]);
-			free(expanded);
-			free_token_word_list(new_list);
-			return (1);
-		}
-		if (!new_list)
-			new_list = new_word;
-		else
-			tail->next = new_word;
-		tail = new_word;
-	}
-	// Si l'expansion n'a rien trouvé, garder la liste originale
-	if (!expanded[0])
-	{
-		int j = 0;
-		while (expanded[j])
-		{
-			free(expanded[j]);
-			j++;
-		}
-		free(expanded);
-		return (0);
-	}
-	// Libérer la liste originale et le tableau d'expansion
-	for (i = 0; expanded[i]; i++)
-		free(expanded[i]);
+	new_list = expanded_wildcard_list(expanded);
+	i = 0;
+	while (expanded[i])
+    	free(expanded[i++]);
 	free(expanded);
 	free_token_word_list(*list);
-	// Mettre à jour le pointeur de liste
 	*list = new_list;
 	return (0);
 }
@@ -302,6 +295,7 @@ int	rebuild_redirection_content(t_file_redir *redir)
 	char			*new_content;
 	t_token_word	*word;
 	int				file_count;
+	char			*tmp;
 
 	if (!redir || !redir->word_parts)
 		return (0);
@@ -335,7 +329,7 @@ int	rebuild_redirection_content(t_file_redir *redir)
 		word = redir->word_parts;
 		while (word)
 		{
-			char *tmp = ft_strjoin(new_content, word->content);
+			tmp = ft_strjoin(new_content, word->content);
 			free(new_content);
 			if (!tmp)
 				return (1);
@@ -495,29 +489,22 @@ int	rebuild_command_arg_wildcard(t_cmd *cmd)
 	return (0);
 }
 
-
-
-
-
-
-
-
-
-
-
-
 int	has_wildcard_in_word(t_token_word *word_parts)
 {
 	t_token_word	*word;
+	int				flag;
 	
+	flag = 0;
 	word = word_parts;
 	while (word)
 	{
+		if (word->type != T_NO_QUOTE && ft_strchr(word->content, '*'))
+			return (0);
 		if (word->type == T_NO_QUOTE && ft_strchr(word->content, '*'))
-			return (1);
+			flag = 1;
 		word = word->next;
 	}
-	return (0);
+	return (flag);
 }
 
 int	has_wildcard_in_cmd(t_cmd *cmd)
