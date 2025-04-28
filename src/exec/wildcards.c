@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 17:07:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 18:05:43 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -293,6 +293,7 @@ int	ambiguous_multiple_file_detected(t_file_redir *redir)
 	ft_putendl_fd(": ambiguous redirect", 2);
 	return (1);	
 }
+
 char	*redirection_content(t_file_redir *redir)
 {
 	char			*new_content;
@@ -370,24 +371,14 @@ char	*rebuild_token_word_for_wildcard(t_token_word *word_list)
 	return (result);
 }
 
-/*
-** Fonction pour reconstruire les arguments de commande après expansion wildcard
-** Cette version est spécifiquement optimisée pour les wildcards
-*/
-int	rebuild_command_arg_wildcard(t_cmd *cmd)
+int	count_arg_after_expansion(t_cmd *cmd)
 {
-	int				i;
-	int				new_ac;
-	char			**new_args;
-	t_token_word	**new_list_word;
-	int				arg_index;
-
-	if (!cmd || !cmd->list_word)
-		return (0);
-
-	// Compter le nombre de token_word après expansion
+	int	i;
+	int	new_ac;
+	
+	i = 0;
 	new_ac = 0;
-	for (i = 0; i < cmd->ac; i++)
+	while (i < cmd->ac)
 	{
 		t_token_word *current = cmd->list_word[i];
 		while (current)
@@ -395,92 +386,103 @@ int	rebuild_command_arg_wildcard(t_cmd *cmd)
 			new_ac++;
 			current = current->next;
 		}
+		i++;
 	}
+	return (new_ac);
+}
 
-	// Allouer le nouveau tableau d'arguments et de token_word
+int	allocate_array_arg(char ***new_args,
+						int new_ac)
+{
+	*new_args = malloc(sizeof(char *) * (new_ac + 1));
+	if (!*new_args)
+	{
+		if (*new_args)
+			free(*new_args);
+		return (1);
+	}
+	return (0);
+}
+
+int	free_arrays_args(char **new_args, int arg_index)
+{
+	int	j;
+	
+	j = 0;
+	while (j < arg_index)
+	{
+		free(new_args[j]);
+		j++;
+	}
+	free(new_args);
+	return (1);
+}
+
+char	**create_new_args_array(t_cmd *cmd, int new_ac)
+{
+	int				i;
+	int				arg_index;
+	char			**new_args;
+	t_token_word	*current;
+	
+	i = 0;
+	arg_index = 0;
 	new_args = malloc(sizeof(char *) * (new_ac + 1));
-	new_list_word = malloc(sizeof(t_token_word *) * (new_ac + 1));
-	if (!new_args || !new_list_word)
+	if (!new_args)
 	{
 		if (new_args)
 			free(new_args);
-		if (new_list_word)
-			free(new_list_word);
-		return (1);
+		return (NULL);
 	}
-
-	// Remplir les nouveaux tableaux
-	arg_index = 0;
-	for (i = 0; i < cmd->ac; i++)
+	while (i < cmd->ac)
 	{
-		t_token_word *current = cmd->list_word[i];
+		current = cmd->list_word[i++];
 		while (current)
 		{
-			// Créer un nouveau token_word pour chaque argument
-			t_token_word *new_token = create_new_token_word(current->content, current->type);
-			if (!new_token)
-			{
-				// Nettoyer en cas d'erreur
-				for (int j = 0; j < arg_index; j++)
-				{
-					free(new_args[j]);
-					free_token_word_list(new_list_word[j]);
-				}
-				free(new_args);
-				free(new_list_word);
-				return (1);
-			}
-
-			// Ajouter au tableau
-			new_list_word[arg_index] = new_token;
 			new_args[arg_index] = ft_strdup(current->content);
-			if (!new_args[arg_index])
-			{
-				// Nettoyer en cas d'erreur
-				free_token_word_list(new_token);
-				for (int j = 0; j < arg_index; j++)
-				{
-					free(new_args[j]);
-					free_token_word_list(new_list_word[j]);
-				}
-				free(new_args);
-				free(new_list_word);
-				return (1);
-			}
-
 			arg_index++;
 			current = current->next;
 		}
 	}
+	return (new_args[arg_index] = NULL, new_args);
+}
 
-	// Terminer les tableaux par NULL
-	new_args[arg_index] = NULL;
-	new_list_word[arg_index] = NULL;
-
-	// Libérer les anciens tableaux
-	for (i = 0; i < cmd->ac; i++)
+void	update_command(t_cmd *cmd, char **new_args, int new_ac)
+{
+	int	i;
+	
+	i = 0;
+	while (i < cmd->ac)
 	{
 		if (cmd->arg && cmd->arg[i])
-			free(cmd->arg[i]);
+			free(cmd->arg[i++]);
 	}
 	if (cmd->arg)
 		free(cmd->arg);
-	
-	// Ne pas libérer cmd->list_word car les tokens sont déjà réutilisés ou libérés
-
-	// Mettre à jour la commande
 	cmd->arg = new_args;
-	cmd->list_word = new_list_word;
 	cmd->ac = new_ac;
-
-	// Mettre à jour le nom de la commande
 	if (cmd->name)
 		free(cmd->name);
 	if (cmd->ac > 0)
 		cmd->name = ft_strdup(cmd->arg[0]);
 	else
 		cmd->name = ft_strdup("");
+}
 
+/*
+** Fonction pour reconstruire les arguments de commande après expansion wildcard
+** Cette version est spécifiquement optimisée pour les wildcards
+*/
+int	rebuild_command_arg_wildcard(t_cmd *cmd)
+{
+	int				new_ac;
+	char			**new_args;
+
+	if (!cmd || !cmd->list_word)
+		return (0);
+	new_ac = count_arg_after_expansion(cmd);
+	new_args = create_new_args_array(cmd, new_ac);
+	update_command(cmd, new_args, new_ac);
 	return (0);
 }
 
