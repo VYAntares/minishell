@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/23 21:01:21 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 14:45:19 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,124 +17,149 @@
 ** Fonction pour comparer si une chaîne correspond à un motif de wildcard
 ** Cette fonction gère récursivement les '*' qui peuvent correspondre à zéro ou plusieurs caractères
 */
-int	match_wildcard(const char *pattern, const char *str)
+int	match_wildcard(const char *wildcard_str, const char *str)
 {
-	// Si on est à la fin des deux chaînes, c'est un match
-	if (*pattern == '\0' && *str == '\0')
+	if (*wildcard_str == '\0' && *str == '\0')
 		return (1);
-
-	// Si on rencontre '*', on a deux choix:
-	// 1. Sauter '*' (si la séquence est vide)
-	// 2. Utiliser '*' pour correspondre au caractère courant et continuer
-	if (*pattern == '*')
-		return (match_wildcard(pattern + 1, str) || 
-			   (*str != '\0' && match_wildcard(pattern, str + 1)));
-
-	// Pour tout autre caractère, vérifier s'ils sont identiques
-	if (*pattern == *str)
-		return (match_wildcard(pattern + 1, str + 1));
-
-	// Pas de correspondance
+	if (*wildcard_str == '*')
+		return (match_wildcard(wildcard_str + 1, str)
+				|| (*str != '\0' && match_wildcard(wildcard_str, str + 1)));
+	if (*wildcard_str == *str)
+		return (match_wildcard(wildcard_str + 1, str + 1));
 	return (0);
+}
+
+char	**realloc_capacity(char **files, int *capacity, int count, DIR *dir)
+{
+	char	**new_files;
+	int		i;
+
+	i = 0;
+	*capacity *= 2;
+	new_files = malloc(*capacity * sizeof(char *));
+	if (!new_files)
+	{
+		i = 0;
+		while (i < count)
+			free(files[i++]);
+		free(files);
+		closedir(dir);
+		return (NULL);
+	}
+	i = 0;
+	while (i < count)
+	{
+		new_files[i] = files[i];
+		i++;
+	}
+	free(files);
+	return (new_files);
+}
+
+void	free_files(char **files, int count, DIR *dir)
+{
+	int	i;
+	
+	i = 0;
+	while (i < count)
+	{
+		free(files[i]);
+		i++;
+	}
+	free(files);
+	closedir(dir);
+}
+
+char	**no_match_wildcard(const char *wildcard_str, char **files)
+{	
+	files[0] = ft_strdup(wildcard_str);
+	if (!files[0])
+		return (free(files), NULL);
+	files[1] = NULL;
+	return (files);
+}
+
+char	**match_wildcard_array(char **files, int count)
+{
+	char	**new_files;
+	int		i;
+	
+	new_files = malloc((count + 1) * sizeof(char *));
+	if (!new_files)
+	{
+		i = 0;
+		while (i < count)
+			free(files[i++]);
+		free(files);
+		return (NULL);
+	}
+	i = 0;
+	while (i < count)
+	{
+		new_files[i] = files[i];
+		i++;
+	}
+	free(files);
+	files = new_files;
+	files[count] = NULL;
+	bubble_sort(files);
+	return (files);
+}
+
+char **fill_wildcard_array(DIR *dir, const char *wildcard_str, char **files, int *count)
+{
+	struct dirent	*entry;
+	int				capacity;
+	
+	capacity = 10;
+	entry = readdir(dir);
+	while (entry)
+	{
+		if (entry->d_name[0] == '.' && wildcard_str[0] != '.')
+		{
+			entry = readdir(dir);
+			continue ;
+		}
+		if (match_wildcard(wildcard_str, entry->d_name))
+		{
+			if (*count >= capacity)
+				files = realloc_capacity(files, &capacity, *count, dir);
+			files[*count] = ft_strdup(entry->d_name);
+			if (!files[*count])
+				return (free_files(files, *count, dir), NULL);
+			(*count)++;
+		}
+		entry = readdir(dir);
+	}
+	return (files);
 }
 
 /*
 ** Fonction pour développer un motif de wildcard en liste de fichiers correspondants
 */
-char	**expand_wildcard(const char *pattern)
+char	**expand_wildcard(const char *wildcard_str)
 {
 	DIR				*dir;
-	struct dirent	*entry;
 	char			**files;
-	char			**new_files;
 	int				count;
-	int				capacity;
 
 	count = 0;
-	capacity = 10;
-	files = malloc(capacity * sizeof(char *));
+	files = malloc(10 * sizeof(char *));
 	if (!files)
 		return (NULL);
 	dir = opendir(".");
 	if (!dir)
-		return (free(files), NULL);
-	entry = readdir(dir);
-	while (entry)
-	{
-		// Ignorer fichiers cachés sauf si spécifiquement demandés
-		if (entry->d_name[0] == '.' && pattern[0] != '.')
-		{
-			entry = readdir(dir);
-			continue;
-		}
-		if (match_wildcard(pattern, entry->d_name))
-		{
-			// Redimensionner le tableau si nécessaire
-			if (count >= capacity)
-			{
-				capacity *= 2;
-				new_files = malloc(capacity * sizeof(char *));
-				if (!new_files)
-				{
-					for (int i = 0; i < count; i++)
-						free(files[i]);
-					free(files);
-					closedir(dir);
-					return (NULL);
-				}
-				// Copie manuelle des pointeurs existants
-				for (int i = 0; i < count; i++)
-					new_files[i] = files[i];
-				free(files);
-				files = new_files;
-			}
-			files[count] = ft_strdup(entry->d_name);
-			if (!files[count])
-			{
-				for (int i = 0; i < count; i++)
-					free(files[i]);
-				free(files);
-				closedir(dir);
-				return (NULL);
-			}
-			count++;
-		}
-		entry = readdir(dir);
-	}
+		return (NULL);
+	files = fill_wildcard_array(dir, wildcard_str, files, &count);
 	closedir(dir);
-	// Si aucun match, retourner le motif original
 	if (count == 0)
-	{
-		files[0] = ft_strdup(pattern);
-		if (!files[0])
-		{
-			free(files);
-			return (NULL);
-		}
-		files[1] = NULL;
-	}
+		files = no_match_wildcard(wildcard_str, files);
 	else
-	{
-		// Ajuster le tableau final et le terminer par NULL
-		new_files = malloc((count + 1) * sizeof(char *));
-		if (!new_files)
-		{
-			for (int i = 0; i < count; i++)
-				free(files[i]);
-			free(files);
-			return (NULL);
-		}
-		// Copie manuelle des pointeurs existants
-		for (int i = 0; i < count; i++)
-			new_files[i] = files[i];
-		free(files);
-		files = new_files;
-		files[count] = NULL;
-		// Trier les résultats alphabétiquement
-		bubble_sort(files);
-	}
+		files = match_wildcard_array(files, count);
 	return (files);
 }
+
+
 
 /*
 ** Fonction pour créer un nouveau token_word
@@ -176,31 +201,31 @@ void	free_token_word_list(t_token_word *list)
 ** Fonction pour construire un motif composite à partir d'une liste de token_word
 ** Cela permet de gérer les cas comme "Mak"* où le wildcard est adjacent à un token quoté
 */
-char	*build_composite_pattern(t_token_word *list)
+char	*build_composite_wildcard_str(t_token_word *list)
 {
 	t_token_word	*current;
-	char			*pattern;
+	char			*wildcard_str;
 	int				has_wildcard;
 
 	if (!list)
 		return (NULL);
-	pattern = ft_strdup("");
-	if (!pattern)
+	wildcard_str = ft_strdup("");
+	if (!wildcard_str)
 		return (NULL);
 	has_wildcard = 0;
 	current = list;
 	while (current)
 	{
-		pattern = ft_strjoin(pattern, current->content);
-		if (!pattern)
+		wildcard_str = ft_strjoin(wildcard_str, current->content);
+		if (!wildcard_str)
 			return (NULL);
 		if (ft_strchr(current->content, '*'))
 			has_wildcard = 1;
 		current = current->next;
 	}
 	if (!has_wildcard)
-		return (free(pattern), NULL);
-	return (pattern);
+		return (free(wildcard_str), NULL);
+	return (wildcard_str);
 }
 
 /*
@@ -213,17 +238,17 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	t_token_word	*new_list;
 	t_token_word	*tail;
 	char			**expanded;
-	char			*composite_pattern;
+	char			*composite_wildcard_str;
 	int				i;
 
 	if (!list || !*list)
 		return (0);
-	composite_pattern = build_composite_pattern(*list);
-	if (!composite_pattern)
+	composite_wildcard_str = build_composite_wildcard_str(*list);
+	if (!composite_wildcard_str)
 		return (0);
 	// Étendre le motif composite
-	expanded = expand_wildcard(composite_pattern);
-	free(composite_pattern);
+	expanded = expand_wildcard(composite_wildcard_str);
+	free(composite_wildcard_str);
 	if (!expanded)
 		return (1);
 	// Créer une nouvelle liste de tokens avec les résultats de l'expansion
@@ -249,8 +274,12 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	// Si l'expansion n'a rien trouvé, garder la liste originale
 	if (!expanded[0])
 	{
-		for (int j = 0; expanded[j]; j++)
+		int j = 0;
+		while (expanded[j])
+		{
 			free(expanded[j]);
+			j++;
+		}
 		free(expanded);
 		return (0);
 	}
@@ -465,6 +494,17 @@ int	rebuild_command_arg_wildcard(t_cmd *cmd)
 
 	return (0);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 int	has_wildcard_in_word(t_token_word *word_parts)
 {
