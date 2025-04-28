@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 18:05:43 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 18:12:57 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 /*
 ** Fonction pour comparer si une chaîne correspond à un motif de wildcard
-** Cette fonction gère récursivement les '*' qui peuvent correspondre à zéro ou plusieurs caractères
+** Cette fonction gère récursivement les '*' qui peuvent correspondre à zéro
+** ou plusieurs caractères
 */
 int	match_wildcard(const char *wildcard_str, const char *str)
 {
@@ -23,7 +24,7 @@ int	match_wildcard(const char *wildcard_str, const char *str)
 		return (1);
 	if (*wildcard_str == '*')
 		return (match_wildcard(wildcard_str + 1, str)
-				|| (*str != '\0' && match_wildcard(wildcard_str, str + 1)));
+			|| (*str != '\0' && match_wildcard(wildcard_str, str + 1)));
 	if (*wildcard_str == *str)
 		return (match_wildcard(wildcard_str + 1, str + 1));
 	return (0);
@@ -59,7 +60,7 @@ char	**realloc_capacity(char **files, int *capacity, int count, DIR *dir)
 void	free_files(char **files, int count, DIR *dir)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < count)
 	{
@@ -71,7 +72,7 @@ void	free_files(char **files, int count, DIR *dir)
 }
 
 char	**no_match_wildcard(const char *wildcard_str, char **files)
-{	
+{
 	files[0] = ft_strdup(wildcard_str);
 	if (!files[0])
 		return (free(files), NULL);
@@ -83,7 +84,7 @@ char	**match_wildcard_array(char **files, int count)
 {
 	char	**new_files;
 	int		i;
-	
+
 	new_files = malloc((count + 1) * sizeof(char *));
 	if (!new_files)
 	{
@@ -106,11 +107,12 @@ char	**match_wildcard_array(char **files, int count)
 	return (files);
 }
 
-char **fill_wildcard_array(DIR *dir, const char *wildcard_str, char **files, int *count)
+char	**fill_wildcard_array(DIR *dir, const char *wildcard_str,
+								char **files, int *count)
 {
 	struct dirent	*entry;
 	int				capacity;
-	
+
 	capacity = 10;
 	entry = readdir(dir);
 	while (entry)
@@ -135,7 +137,8 @@ char **fill_wildcard_array(DIR *dir, const char *wildcard_str, char **files, int
 }
 
 /*
-** Fonction pour développer un motif de wildcard en liste de fichiers correspondants
+** Fonction pour développer un motif de wildcard en liste
+** de fichiers correspondants
 */
 char	**expand_wildcard(const char *wildcard_str)
 {
@@ -197,7 +200,8 @@ void	free_token_word_list(t_token_word *list)
 
 /*
 ** Fonction pour construire un motif composite à partir d'une liste de token_word
-** Cela permet de gérer les cas comme "Mak"* où le wildcard est adjacent à un token quoté
+** Cela permet de gérer les cas comme "Mak"* où le wildcard est adjacent
+** à un token quoté
 */
 char	*build_composite_wildcard_str(t_token_word *list)
 {
@@ -232,7 +236,7 @@ t_token_word	*expanded_wildcard_list(char **expanded)
 	t_token_word	*tail;
 	t_token_word	*head;
 	int				i;
-	
+
 	i = 0;
 	tail = NULL;
 	head = NULL;
@@ -266,7 +270,7 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	char			**expanded;
 	char			*composite_wildcard_str;
 	int				i;
-	
+
 	if (!list || !*list)
 		return (0);
 	composite_wildcard_str = build_composite_wildcard_str(*list);
@@ -279,7 +283,7 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	new_list = expanded_wildcard_list(expanded);
 	i = 0;
 	while (expanded[i])
-    	free(expanded[i++]);
+		free(expanded[i++]);
 	free(expanded);
 	free_token_word_list(*list);
 	*list = new_list;
@@ -291,7 +295,7 @@ int	ambiguous_multiple_file_detected(t_file_redir *redir)
 	ft_putstr_fd("miniHell: ", 2);
 	ft_putstr_fd(redir->content, 2);
 	ft_putendl_fd(": ambiguous redirect", 2);
-	return (1);	
+	return (1);
 }
 
 char	*redirection_content(t_file_redir *redir)
@@ -299,7 +303,7 @@ char	*redirection_content(t_file_redir *redir)
 	char			*new_content;
 	char			*tmp;
 	t_token_word	*word;
-	
+
 	new_content = ft_strdup("");
 	if (!new_content)
 		return (NULL);
@@ -315,8 +319,10 @@ char	*redirection_content(t_file_redir *redir)
 	}
 	return (new_content);
 }
+
 /*
-** Fonction pour reconstruire la chaîne de contenu après l'expansion wildcard pour les redirections
+** Fonction pour reconstruire la chaîne de contenu après l'expansion wildcard
+** pour les redirections
 */
 int	rebuild_redirection_content(t_file_redir *redir)
 {
@@ -345,7 +351,8 @@ int	rebuild_redirection_content(t_file_redir *redir)
 }
 
 /*
-** Fonction pour reconstruire le contenu d'un token_word spécifiquement pour les wildcards
+** Fonction pour reconstruire le contenu d'un token_word 
+** spécifiquement pour les wildcards
 */
 char	*rebuild_token_word_for_wildcard(t_token_word *word_list)
 {
@@ -373,14 +380,15 @@ char	*rebuild_token_word_for_wildcard(t_token_word *word_list)
 
 int	count_arg_after_expansion(t_cmd *cmd)
 {
-	int	i;
-	int	new_ac;
-	
+	int				i;
+	int				new_ac;
+	t_token_word	*current;
+
 	i = 0;
 	new_ac = 0;
 	while (i < cmd->ac)
 	{
-		t_token_word *current = cmd->list_word[i];
+		current = cmd->list_word[i];
 		while (current)
 		{
 			new_ac++;
@@ -407,7 +415,7 @@ int	allocate_array_arg(char ***new_args,
 int	free_arrays_args(char **new_args, int arg_index)
 {
 	int	j;
-	
+
 	j = 0;
 	while (j < arg_index)
 	{
@@ -424,7 +432,7 @@ char	**create_new_args_array(t_cmd *cmd, int new_ac)
 	int				arg_index;
 	char			**new_args;
 	t_token_word	*current;
-	
+
 	i = 0;
 	arg_index = 0;
 	new_args = malloc(sizeof(char *) * (new_ac + 1));
@@ -450,7 +458,7 @@ char	**create_new_args_array(t_cmd *cmd, int new_ac)
 void	update_command(t_cmd *cmd, char **new_args, int new_ac)
 {
 	int	i;
-	
+
 	i = 0;
 	while (i < cmd->ac)
 	{
@@ -490,7 +498,7 @@ int	has_wildcard_in_word(t_token_word *word_parts)
 {
 	t_token_word	*word;
 	int				flag;
-	
+
 	flag = 0;
 	word = word_parts;
 	while (word)
@@ -531,7 +539,7 @@ int	has_wildcard_in_cmd(t_cmd *cmd)
 int	expand_wildcard_in_redir(t_cmd *cmd, int expanded_something)
 {
 	t_file_redir	*redir;
-	
+
 	redir = cmd->type_redir;
 	while (redir)
 	{

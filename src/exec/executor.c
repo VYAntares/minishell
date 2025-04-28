@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/23 00:03:13 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 18:14:10 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,7 +132,6 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 		return ((status & 0xff00) >> 8);
 	else if ((status & 0x7f) != 0)
 		return (128 + (status & 0x7f));
-	
 	return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/22 21:13:15 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 18:13:21 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ t_cmd	*get_chained_commands(t_ast *ast)
 
 char	*purify_quote(t_file_redir	*redir)
 {
-	t_token_word 	*parts;
+	t_token_word	*parts;
 	char			*delimiter;
 
 	delimiter = ft_strdup("");
