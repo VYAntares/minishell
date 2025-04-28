@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 16:27:10 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/04/28 17:07:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,7 +286,34 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	return (0);
 }
 
-
+int	ambiguous_multiple_file_detected(t_file_redir *redir)
+{
+	ft_putstr_fd("miniHell: ", 2);
+	ft_putstr_fd(redir->content, 2);
+	ft_putendl_fd(": ambiguous redirect", 2);
+	return (1);	
+}
+char	*redirection_content(t_file_redir *redir)
+{
+	char			*new_content;
+	char			*tmp;
+	t_token_word	*word;
+	
+	new_content = ft_strdup("");
+	if (!new_content)
+		return (NULL);
+	word = redir->word_parts;
+	while (word)
+	{
+		tmp = ft_strjoin(new_content, word->content);
+		free(new_content);
+		if (!tmp)
+			return (NULL);
+		new_content = tmp;
+		word = word->next;
+	}
+	return (new_content);
+}
 /*
 ** Fonction pour reconstruire la chaîne de contenu après l'expansion wildcard pour les redirections
 */
@@ -295,12 +322,9 @@ int	rebuild_redirection_content(t_file_redir *redir)
 	char			*new_content;
 	t_token_word	*word;
 	int				file_count;
-	char			*tmp;
 
 	if (!redir || !redir->word_parts)
 		return (0);
-	
-	// Compter le nombre de token_word pour détecter une expansion multiple
 	file_count = 0;
 	word = redir->word_parts;
 	while (word)
@@ -308,43 +332,14 @@ int	rebuild_redirection_content(t_file_redir *redir)
 		file_count++;
 		word = word->next;
 	}
-	
-	// Si plusieurs fichiers trouvés (expansion wildcard), prendre seulement le premier
 	if (file_count > 1 && redir->type_redirection != T_APPEND)
-	{
-		// Avertir l'utilisateur si plusieurs fichiers ont été trouvés
-		ft_putstr_fd("miniHell: ambiguous redirect - using first match: ", 2);
-		ft_putendl_fd(redir->word_parts->content, 2);
-		
-		// Utiliser seulement le premier fichier trouvé
-		new_content = ft_strdup(redir->word_parts->content);
-	}
+		return (ambiguous_multiple_file_detected(redir));
 	else
-	{
-		// Cas normal: reconstruire le contenu à partir de tous les tokens
-		new_content = ft_strdup("");
-		if (!new_content)
-			return (1);
-		
-		word = redir->word_parts;
-		while (word)
-		{
-			tmp = ft_strjoin(new_content, word->content);
-			free(new_content);
-			if (!tmp)
-				return (1);
-			new_content = tmp;
-			word = word->next;
-		}
-	}
-	
-	// Remplacer l'ancien contenu
+		new_content = redirection_content(redir);
 	if (!new_content)
 		return (1);
-	
 	free(redir->content);
 	redir->content = new_content;
-	
 	return (0);
 }
 
