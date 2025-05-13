@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:40:56 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 22:59:45 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@
 # include <stdbool.h>
 
 # include "libft.h"
-# include "dmb.h"
 
 extern sig_atomic_t	g_sigint_received;
 

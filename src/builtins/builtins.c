@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:41:05 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 23:34:37 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,6 @@ int	builtin_exit(t_cmd *cmd, t_shell *shell)
 	}
 	else
 		exit_code = shell->exit_status;
-
 	dmb_free(shell);
 	rl_clear_history();
 	exit(exit_code & 0xFF);

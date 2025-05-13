@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 19:07:31 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 23:08:00 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,6 @@ void	cleanup_heredoc_files(t_cmd *cmd)
 void	execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
 {
 	add_history(input);
-
 	tokens = tokenize(input);
 	if (tokens && check_syntax_error_parenthesis(tokens))
 	{

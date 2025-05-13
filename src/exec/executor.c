@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:50:39 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 23:36:13 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,23 +100,18 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 
 	if (!cmd || !cmd->name || !cmd->arg[0])
 		return (execute_redirections(cmd, shell), 1);
-	if (expand_var(cmd, shell) != 0)
-		return (1);
-	if (launch_expand_wildcards(cmd) != 0)
+	if (expand_var(cmd, shell) != 0 || launch_expand_wildcards(cmd) != 0)
 		return (1);
 	if (is_builtin(cmd->name))
 		return (handle_builtin(cmd, shell));
-	// Vérifier si nous exécutons un minishell
 	is_minishell = (ft_strncmp(cmd->name, "./minishell", 11) == 0);
-	// Pour minishell imbriqué, configurer les signaux spécialement
 	if (is_minishell)
 		setup_signals_for_commands();
-	// Créer le processus enfant
 	pid = fork();
 	if (pid == -1)
 	{
 		if (is_minishell)
-			setup_signals(); // Restaurer en cas d'erreur
+			setup_signals();
 		return (perror("fork"), dmb_gc(), 1);
 	}
 	if (pid == 0)
@@ -124,42 +119,15 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 		handle_command(cmd, shell);
 		dmb_gc();
 	}
-	// Attendre la fin du processus enfant
 	waitpid(pid, &status, 0);
-	// Si c'était un minishell, restaurer les signaux normaux
 	if (is_minishell)
 		setup_signals();
-	// Traiter le code de retour
 	if ((status & 0x7f) == 0)
 		return ((status & 0xff00) >> 8);
 	else if ((status & 0x7f) != 0)
 		return (128 + (status & 0x7f));
 	return (1);
 }
-
-// int	execute_command(t_cmd *cmd, t_shell *shell)
-// {
-// 	int		status;
-// 	pid_t	pid;
-
-// 	if (!cmd || !cmd->name || !cmd->arg[0])
-// 		return (execute_redirections(cmd, shell), 1);
-// 	if (expand_var(cmd, shell) != 0)
-// 		return (1);
-// 	if (expand_wildcards(cmd) != 0)
-// 		return (1);
-// 	if (is_builtin(cmd->name))
-// 		return (handle_builtin(cmd, shell));
-// 	pid = fork();
-// 	if (pid == -1)
-// 		return (perror("fork"), 1);
-// 	if (pid == 0)
-// 		handle_command(cmd, shell);
-// 	waitpid(pid, &status, 0);
-// 	if ((status & 0x7f) == 0)
-// 		return ((status & 0xff00) >> 8);
-// 	return (1);
-// }
 
 int	execute_subshell(t_ast *sub_shell, t_shell *shell)
 {

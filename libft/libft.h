@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 01:25:48 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:59:03 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 23:17:02 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 # include <string.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include "dmb.h"
 
 // LIBC
 int		ft_isalpha(int c);
@@ -73,5 +72,25 @@ void	ft_lstdelone(t_list *lst, void (*del)(void*));
 void	ft_lstclear(t_list **lst, void (*del)(void*));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
+
+typedef struct s_gc
+{
+	void		*ptr;
+	struct s_gc	*next;
+}	t_gc;
+
+typedef enum GetHead
+{
+	GET = 0,
+	REMOVE
+}	t_get_head;
+
+void	*dmb_malloc(size_t size);
+void	dmb_gc(void);
+void	dmb_free(void *ptr);
+void	dmb_force_free(void *ptr);
+t_gc	*get_head(t_get_head remove);
+t_gc	*get_tail(t_gc *head);
+t_gc	*append_node(void *ptr, t_gc *head);
 
 #endif
