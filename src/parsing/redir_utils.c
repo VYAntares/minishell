@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redir_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:45:45 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:16:39 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int	add_redirection_to_cmd(t_cmd *cmd, t_token *current)
 	if (!cmd->type_redir)
 		cmd->type_redir = new;
 	else
-	{ 
+	{
 		last = cmd->type_redir;
 		while (last->next)
 			last = last->next;

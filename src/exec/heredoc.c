@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 19:10:56 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:21:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,21 +27,12 @@ static char	*create_temp_file(void)
 	return (temp_file);
 }
 
-int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
+int	process_heredoc_lines(int fd, char *delimiter,
+						t_shell *shell, char *temp_file)
 {
 	char	*line;
-	char	*temp_file;
 	char	*expanded_line;
-	int		fd;
 
-	temp_file = create_temp_file();
-	if (!temp_file)
-		return (1);
-	fd = open(temp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1)
-		return (dmb_free(temp_file), 1);
-	dmb_free(redir->content);
-	redir->content = ft_strdup(temp_file);
 	while (1)
 	{
 		line = readline("> ");
@@ -54,11 +45,31 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
 		}
 		expanded_line = expand_env_heredoc(line, shell);
 		if (!expanded_line)
-			return (close(fd), unlink(temp_file), free(line), dmb_free(delimiter), 1);
+			return (unlink(temp_file), free(line), 1);
 		ft_putendl_fd(expanded_line, fd);
 		free(line);
 	}
-	return (close(fd), dmb_free(delimiter), 0);
+	return (0);
+}
+
+int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
+{
+	char	*temp_file;
+	int		fd;
+	int		result;
+
+	temp_file = create_temp_file();
+	if (!temp_file)
+		return (1);
+	fd = open(temp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1)
+		return (dmb_free(temp_file), 1);
+	dmb_free(redir->content);
+	redir->content = ft_strdup(temp_file);
+	result = process_heredoc_lines(fd, delimiter, shell, temp_file);
+	close(fd);
+	dmb_free(delimiter);
+	return (result);
 }
 
 void	chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd)

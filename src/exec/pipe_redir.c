@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_redir.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:59:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:17:14 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ int	only_redirection(t_cmd *cmd)
 	t_file_redir	*redir;
 	int				fd;
 
-	// printf("enter in only_redir\n");
 	redir = cmd->type_redir;
 	while (redir)
 	{

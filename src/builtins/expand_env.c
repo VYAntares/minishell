@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:35:44 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:04:16 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,6 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 int	rebuild_redirection(t_cmd *cmd)
 {
 	char			*new_content;
-	char			*temp;
 	t_file_redir	*redir;
 	t_token_word	*current;
 
@@ -135,15 +134,12 @@ int	rebuild_redirection(t_cmd *cmd)
 		current = redir->word_parts;
 		while (current)
 		{
-			temp = new_content;
 			new_content = ft_strjoin(new_content, current->content);
-			dmb_free(temp);
 			if (!new_content)
 				return (1);
 			current = current->next;
 		}
-		redir->content = ft_strdup(new_content);
-		dmb_free(new_content);
+		redir->content = new_content;
 		redir = redir->next;
 	}
 	return (0);

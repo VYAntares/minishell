@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parenthesis_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:50:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:35:36 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:25:53 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,18 +34,16 @@ int	verify_parenthesis(t_token *tokens)
 	tmp = tokens;
 	while (tmp)
 	{
-		if (tmp->type == T_PARENTH_OPEN)
+		if (tmp->type == T_PARENTH_OPEN && ++i)
 		{
 			if (!good_position_parenth(tmp))
 				return (PARENTH_AFTER_WRONG_TOKEN);
-			i++;
 		}
-		else if (tmp->type == T_PARENTH_CLOSE)
+		else if (tmp->type == T_PARENTH_CLOSE && ++count)
 		{
 			if (i == 0)
 				return (STARTING_WITH_CLOSE_PARENTH);
 			i--;
-			count++;
 		}
 		tmp = tmp->next;
 	}

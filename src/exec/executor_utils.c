@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 01:28:58 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:44:03 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:22:25 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,64 +85,22 @@ char	*extract_path(char *path, char *command_name)
 	end = 0;
 	while (1)
 	{
-		// Chercher le prochain ':' ou la fin de chaîne
 		while (path[end] && path[end] != ':')
 			end++;
-		
-		// Extraire le répertoire
 		directory = ft_substr(path, start, end - start);
 		if (!directory)
 			return (NULL);
-		
-		// Tester si la commande existe dans ce répertoire
 		valid_path = test_path_for_command(directory, command_name);
 		dmb_free(directory);
 		if (valid_path)
 			return (valid_path);
-		
-		// Si on est à la fin de la chaîne, sortir
 		if (!path[end])
-			break;
-		
-		// Passer au prochain répertoire (après le ':')
+			break ;
 		end++;
 		start = end;
 	}
 	return (NULL);
 }
-
-// char	*extract_path(char *path, char *command_name)
-// {
-// 	int		start;
-// 	int		end;
-// 	char	*path_name;
-// 	char	*slash_name;
-
-// 	start = 0;
-// 	end = 0;
-// 	slash_name = ft_strjoin("/", command_name);
-// 	if (!slash_name)
-// 		return (NULL);
-// 	while (path[end])
-// 	{
-// 		if (path[end] == ':' || path[end + 1] == '\0')
-// 		{
-// 			if (path[end + 1] == '\0')
-// 				end++;
-// 			path_name = ft_strjoin(ft_substr
-//						(path, start, end - start), slash_name);
-// 			if (!path_name)
-// 				return (dmb_free(slash_name), NULL);
-// 			if (access(path_name, X_OK) == 0)
-// 				return (dmb_free(slash_name), path_name);
-// 			dmb_free(path_name);
-// 			start = end + 1;
-// 		}
-// 		end++;
-// 	}
-// 	dmb_free(slash_name);
-// 	return (NULL);
-// }
 
 char	*find_command_path(char *name, t_shell *shell)
 {

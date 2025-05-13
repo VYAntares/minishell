@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 23:36:13 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 00:10:35 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,9 +92,22 @@ void	handle_command(t_cmd *cmd, t_shell *shell)
 	exit(1);
 }
 
+int	handle_parent_process(pid_t pid, int is_minishell)
+{
+	int	status;
+
+	waitpid(pid, &status, 0);
+	if (is_minishell)
+		setup_signals();
+	if ((status & 0x7f) == 0)
+		return ((status & 0xff00) >> 8);
+	else if ((status & 0x7f) != 0)
+		return (128 + (status & 0x7f));
+	return (1);
+}
+
 int	execute_command(t_cmd *cmd, t_shell *shell)
 {
-	int		status;
 	pid_t	pid;
 	int		is_minishell;
 
@@ -119,14 +132,7 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 		handle_command(cmd, shell);
 		dmb_gc();
 	}
-	waitpid(pid, &status, 0);
-	if (is_minishell)
-		setup_signals();
-	if ((status & 0x7f) == 0)
-		return ((status & 0xff00) >> 8);
-	else if ((status & 0x7f) != 0)
-		return (128 + (status & 0x7f));
-	return (1);
+	return (handle_parent_process(pid, is_minishell));
 }
 
 int	execute_subshell(t_ast *sub_shell, t_shell *shell)
