@@ -1,33 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   dmb.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/03 17:17:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:41 by eahmeti          ###   ########.fr       */
+/*   Created: 2025/05/13 17:51:00 by eahmeti           #+#    #+#             */
+/*   Updated: 2025/05/13 17:58:35 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#ifndef DMBGC_H
+# define DMBGC_H
 
-char	*ft_strjoin(const char *s1, const char *s2)
+# include <stdlib.h>
+
+typedef struct s_gc
 {
-	char		*res;
-	size_t		i;
-	size_t		j;
+	void		*ptr;
+	struct s_gc	*next;
+}	t_gc;
 
-	i = 0;
-	j = 0;
-	res = (char *)dmb_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
-	if (!res)
-		return (NULL);
-	while (s1[i])
-		res[j++] = s1[i++];
-	i = 0;
-	while (s2[i])
-		res[j++] = s2[i++];
-	res[j] = '\0';
-	return (res);
-}
+typedef enum GetHead
+{
+	GET = 0,
+	REMOVE
+}	t_get_head;
+
+void	*dmb_malloc(size_t size);
+void	dmb_gc(void);
+void	dmb_free(void	*ptr);
+void	dmb_force_free(void	*ptr);
+
+#endif

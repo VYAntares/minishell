@@ -5,11 +5,12 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/20 17:38:28 by lfaure            #+#    #+#             */
-/*   Updated: 2025/05/13 18:06:31 by eahmeti          ###   ########.fr       */
+/*   Created: 2025/05/13 17:49:47 by eahmeti           #+#    #+#             */
+/*   Updated: 2025/05/13 18:02:20 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../minishell.h"
 #include "dmb.h"
 
 static t_gc	*get_head(t_get_head remove)
@@ -20,11 +21,11 @@ static t_gc	*get_head(t_get_head remove)
 		return (head = NULL, NULL);
 	if (!head)
 	{
-		head = malloc(sizeof(t_gc));
+		head = dmb_malloc(sizeof(t_gc));
 		if (!head)
 			return (NULL);
 		head->ptr = NULL;
-		head->next = NULL;
+		head->next /*  */= NULL;
 	}
 	return (head);
 }
@@ -43,7 +44,7 @@ static t_gc	*append_node(void *ptr, t_gc *head)
 	t_gc	*tail;
 	t_gc	*new_node;
 
-	new_node = malloc(sizeof(t_gc));
+	new_node = dmb_malloc(sizeof(t_gc));
 	if (!new_node)
 		return (head);
 	new_node->next = NULL;
@@ -61,7 +62,7 @@ void	*dmb_malloc(size_t size)
 {
 	void	*ptr;
 
-	ptr = malloc(size);
+	ptr = dmb_malloc(size);
 	if (!ptr)
 		return (NULL);
 	append_node(ptr, get_head(GET));
@@ -80,18 +81,18 @@ void	dmb_gc(void)
 	{
 		if (head->ptr)
 		{
-			free(head->ptr);
+			dmb_free(head->ptr);
 			head->ptr = NULL;
 		}
 		next = head->next;
-		free(head);
+		dmb_free(head);
 		head = next;
 	}
 	get_head(REMOVE);
 }
 
-// Will not free pointers allocated without dmb, immune to double free
-void	dmb_free(void	*ptr)
+// Will not dmb_free pointers allocated without dmb, immune to double dmb_free
+void	dmb_free(void *ptr)
 {
 	t_gc	*tail;
 	t_gc	*prev;
@@ -102,10 +103,10 @@ void	dmb_free(void	*ptr)
 	{
 		if (tail->ptr && tail->ptr == ptr)
 		{
-			free(ptr);
+			dmb_free(ptr);
 			tail->ptr = NULL;
 			prev->next = tail->next;
-			free(tail);
+			dmb_free(tail);
 			return ;
 		}
 		prev = tail;
@@ -114,9 +115,9 @@ void	dmb_free(void	*ptr)
 	return ;
 }
 
-// will free ptr even if it doesnt find it in the list.
+// will dmb_free ptr even if it doesnt find it in the list.
 // Useful if you gain ownership from pointers allocated outside of dmb
-// not immune to double free
+// not immune to double dmb_free
 void	dmb_force_free(void	*ptr)
 {
 	t_gc	*tail;
@@ -128,15 +129,15 @@ void	dmb_force_free(void	*ptr)
 	{
 		if (tail->ptr && tail->ptr == ptr)
 		{
-			free(ptr);
+			dmb_free(ptr);
 			tail->ptr = NULL;
 			prev->next = tail->next;
-			free(tail);
+			dmb_free(tail);
 			return ;
 		}
 		prev = tail;
 		tail = tail->next;
 	}
-	free(ptr);
+	dmb_free(ptr);
 	return ;
 }

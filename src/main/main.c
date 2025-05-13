@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:52:30 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:07:45 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	free_shell(t_ast *ast, t_token *tokens, t_shell *shell)
 		free_ast(ast);
 	rl_clear_history();
 	free_env_list(shell->env);
-	free(shell);
+	dmb_free(shell);
 }
 
 void	execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
@@ -58,7 +58,7 @@ int	read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 	}
 	if (*input)
 		execute_line(input, tokens, ast, shell);
-	free(input);
+	dmb_force_free(input);
 	return (0);
 }
 
@@ -76,12 +76,13 @@ int	main(int ac, char **av, char **envp)
 	if (!shell)
 		return (1);
 	if (setup_signals() == -1)
-		return (free_env_list(shell->env), free(shell), 1);
+		return (free_env_list(shell->env), dmb_free(shell), 1);
 	while (1)
 	{
 		if (read_and_execute(tokens, ast, shell))
 			break ;
 	}
 	free_shell(ast, tokens, shell);
+	dmb_gc();
 	return (0);
 }

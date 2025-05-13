@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lstnew_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/06 15:39:36 by eahmeti           #+#    #+#             */
-/*   Updated: 2024/10/13 02:46:37 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:41 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_list	*ft_lstnew(void *content)
 {
 	t_list	*element;
 
-	element = malloc(sizeof(t_list));
+	element = dmb_malloc(sizeof(t_list));
 	if (!element)
 		return (NULL);
 	element->content = content;

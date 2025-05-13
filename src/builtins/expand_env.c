@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:44:04 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 		{
 			start = ++i;
 			expanded_line = launch_expansion(line, shell, &i, &start);
-			free(line);
+			dmb_free(line);
 			line = ft_strdup(expanded_line);
 			if (!line)
 				return (NULL);
@@ -137,13 +137,13 @@ int	rebuild_redirection(t_cmd *cmd)
 		{
 			temp = new_content;
 			new_content = ft_strjoin(new_content, current->content);
-			free(temp);
+			dmb_free(temp);
 			if (!new_content)
 				return (1);
 			current = current->next;
 		}
 		redir->content = ft_strdup(new_content);
-		free(new_content);
+		dmb_free(new_content);
 		redir = redir->next;
 	}
 	return (0);
@@ -259,7 +259,7 @@ int	process_dollar(t_token_word	*current)
 			new_content = ft_substr(current->content, 0, len - 1);
 			if (!new_content)
 				return (1);
-			free(current->content);
+			dmb_free(current->content);
 			current->content = new_content;
 		}
 	}
@@ -346,7 +346,7 @@ int	count_arg_after_split(t_token_word *list_word)
 	j = 0;
 	while (split_words && split_words[j])
 		j++;
-	free(tmp);
+	dmb_free(tmp);
 	if (split_words)
 		free_array(split_words);
 	return (j);
@@ -363,7 +363,7 @@ char	*rebuild_word(t_token_word *list_word)
 	while (word)
 	{
 		new_tmp = ft_strjoin(tmp, word->content);
-		free(tmp);
+		dmb_free(tmp);
 		tmp = new_tmp;
 		word = word->next;
 	}
@@ -392,7 +392,7 @@ void	fill_new_args(t_token_word *list_word, int *k, char **new_args)
 			new_args[(*k)++] = ft_strdup(split_words[j]);
 			j++;
 		}
-		free(tmp);
+		dmb_free(tmp);
 		if (split_words)
 			free_array(split_words);
 	}
@@ -410,7 +410,7 @@ void	replace_args_and_free(char **new_args, t_cmd *cmd, int k, int new_ac)
 	if (cmd->ac > 0)
 	{
 		if (cmd->name)
-			free(cmd->name);
+			dmb_free(cmd->name);
 		cmd->name = ft_strdup(cmd->arg[0]);
 	}
 	if (tmp_args)
@@ -418,10 +418,10 @@ void	replace_args_and_free(char **new_args, t_cmd *cmd, int k, int new_ac)
 		i = 0;
 		while (tmp_args[i])
 		{
-			free(tmp_args[i]);
+			dmb_free(tmp_args[i]);
 			i++;
 		}
-		free(tmp_args);
+		dmb_free(tmp_args);
 	}
 }
 
@@ -443,7 +443,7 @@ int	rebuild_command_arg(t_cmd *cmd)
 			new_ac += count_arg_after_split(cmd->list_word[i]);
 		i++;
 	}
-	new_args = malloc(sizeof(char *) * (new_ac + 1));
+	new_args = dmb_malloc(sizeof(char *) * (new_ac + 1));
 	if (!new_args)
 		return (1);
 	k = 0;

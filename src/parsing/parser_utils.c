@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:35:03 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:09:00 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ t_ast	*init_ast_node(t_ast_type type)
 {
 	t_ast		*node;
 
-	node = malloc(sizeof(t_ast));
+	node = dmb_malloc(sizeof(t_ast));
 	if (!node)
 		return (NULL);
 	node->type = type;
@@ -34,13 +34,13 @@ t_token	*init_new_token(t_token *tmp, t_token *prev)
 
 	if (!tmp)
 		return (NULL);
-	new_token = malloc(sizeof(t_token));
+	new_token = dmb_malloc(sizeof(t_token));
 	if (!new_token)
 		return (NULL);
 	new_token->type = tmp->type;
 	new_token->value = ft_strdup(tmp->value);
 	if (!new_token->value)
-		return (free(new_token), NULL);
+		return (dmb_free(new_token), NULL);
 	new_token->type_word = tmp->type_word;
 	new_token->next = NULL;
 	new_token->prev = prev;

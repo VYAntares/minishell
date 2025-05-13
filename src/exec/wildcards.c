@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   wildcards.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/15 20:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 18:12:57 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,13 @@ char	**realloc_capacity(char **files, int *capacity, int count, DIR *dir)
 
 	i = 0;
 	*capacity *= 2;
-	new_files = malloc(*capacity * sizeof(char *));
+	new_files = dmb_malloc(*capacity * sizeof(char *));
 	if (!new_files)
 	{
 		i = 0;
 		while (i < count)
-			free(files[i++]);
-		free(files);
+			dmb_free(files[i++]);
+		dmb_free(files);
 		closedir(dir);
 		return (NULL);
 	}
@@ -53,7 +53,7 @@ char	**realloc_capacity(char **files, int *capacity, int count, DIR *dir)
 		new_files[i] = files[i];
 		i++;
 	}
-	free(files);
+	dmb_free(files);
 	return (new_files);
 }
 
@@ -64,10 +64,10 @@ void	free_files(char **files, int count, DIR *dir)
 	i = 0;
 	while (i < count)
 	{
-		free(files[i]);
+		dmb_free(files[i]);
 		i++;
 	}
-	free(files);
+	dmb_free(files);
 	closedir(dir);
 }
 
@@ -75,7 +75,7 @@ char	**no_match_wildcard(const char *wildcard_str, char **files)
 {
 	files[0] = ft_strdup(wildcard_str);
 	if (!files[0])
-		return (free(files), NULL);
+		return (dmb_free(files), NULL);
 	files[1] = NULL;
 	return (files);
 }
@@ -85,13 +85,13 @@ char	**match_wildcard_array(char **files, int count)
 	char	**new_files;
 	int		i;
 
-	new_files = malloc((count + 1) * sizeof(char *));
+	new_files = dmb_malloc((count + 1) * sizeof(char *));
 	if (!new_files)
 	{
 		i = 0;
 		while (i < count)
-			free(files[i++]);
-		free(files);
+			dmb_free(files[i++]);
+		dmb_free(files);
 		return (NULL);
 	}
 	i = 0;
@@ -100,7 +100,7 @@ char	**match_wildcard_array(char **files, int count)
 		new_files[i] = files[i];
 		i++;
 	}
-	free(files);
+	dmb_free(files);
 	files = new_files;
 	files[count] = NULL;
 	bubble_sort(files);
@@ -147,7 +147,7 @@ char	**expand_wildcard(const char *wildcard_str)
 	int				count;
 
 	count = 0;
-	files = malloc(10 * sizeof(char *));
+	files = dmb_malloc(10 * sizeof(char *));
 	if (!files)
 		return (NULL);
 	dir = opendir(".");
@@ -169,12 +169,12 @@ t_token_word	*create_new_token_word(const char *content, t_type_word type)
 {
 	t_token_word	*new_word;
 
-	new_word = malloc(sizeof(t_token_word));
+	new_word = dmb_malloc(sizeof(t_token_word));
 	if (!new_word)
 		return (NULL);
 	new_word->content = ft_strdup(content);
 	if (!new_word->content)
-		return (free(new_word), NULL);
+		return (dmb_free(new_word), NULL);
 	new_word->type = type;
 	new_word->next = NULL;
 	return (new_word);
@@ -192,8 +192,8 @@ void	free_token_word_list(t_token_word *list)
 	while (current)
 	{
 		next = current->next;
-		free(current->content);
-		free(current);
+		dmb_free(current->content);
+		dmb_free(current);
 		current = next;
 	}
 }
@@ -226,7 +226,7 @@ char	*build_composite_wildcard_str(t_token_word *list)
 		current = current->next;
 	}
 	if (!has_wildcard)
-		return (free(wildcard_str), NULL);
+		return (dmb_free(wildcard_str), NULL);
 	return (wildcard_str);
 }
 
@@ -247,8 +247,8 @@ t_token_word	*expanded_wildcard_list(char **expanded)
 		{
 			i = 0;
 			while (expanded[i])
-				free(expanded[i++]);
-			return (free(expanded), free_token_word_list(head), NULL);
+				dmb_free(expanded[i++]);
+			return (dmb_free(expanded), free_token_word_list(head), NULL);
 		}
 		if (!head)
 			head = new_word;
@@ -277,14 +277,14 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	if (!composite_wildcard_str)
 		return (0);
 	expanded = expand_wildcard(composite_wildcard_str);
-	free(composite_wildcard_str);
+	dmb_free(composite_wildcard_str);
 	if (!expanded)
 		return (1);
 	new_list = expanded_wildcard_list(expanded);
 	i = 0;
 	while (expanded[i])
-		free(expanded[i++]);
-	free(expanded);
+		dmb_free(expanded[i++]);
+	dmb_free(expanded);
 	free_token_word_list(*list);
 	*list = new_list;
 	return (0);
@@ -311,7 +311,7 @@ char	*redirection_content(t_file_redir *redir)
 	while (word)
 	{
 		tmp = ft_strjoin(new_content, word->content);
-		free(new_content);
+		dmb_free(new_content);
 		if (!tmp)
 			return (NULL);
 		new_content = tmp;
@@ -345,7 +345,7 @@ int	rebuild_redirection_content(t_file_redir *redir)
 		new_content = redirection_content(redir);
 	if (!new_content)
 		return (1);
-	free(redir->content);
+	dmb_free(redir->content);
 	redir->content = new_content;
 	return (0);
 }
@@ -370,7 +370,7 @@ char	*rebuild_token_word_for_wildcard(t_token_word *word_list)
 	{
 		tmp = result;
 		result = ft_strjoin(tmp, current->content);
-		free(tmp);
+		dmb_free(tmp);
 		if (!result)
 			return (NULL);
 		current = current->next;
@@ -402,11 +402,11 @@ int	count_arg_after_expansion(t_cmd *cmd)
 int	allocate_array_arg(char ***new_args,
 						int new_ac)
 {
-	*new_args = malloc(sizeof(char *) * (new_ac + 1));
+	*new_args = dmb_malloc(sizeof(char *) * (new_ac + 1));
 	if (!*new_args)
 	{
 		if (*new_args)
-			free(*new_args);
+			dmb_free(*new_args);
 		return (1);
 	}
 	return (0);
@@ -419,10 +419,10 @@ int	free_arrays_args(char **new_args, int arg_index)
 	j = 0;
 	while (j < arg_index)
 	{
-		free(new_args[j]);
+		dmb_free(new_args[j]);
 		j++;
 	}
-	free(new_args);
+	dmb_free(new_args);
 	return (1);
 }
 
@@ -435,11 +435,11 @@ char	**create_new_args_array(t_cmd *cmd, int new_ac)
 
 	i = 0;
 	arg_index = 0;
-	new_args = malloc(sizeof(char *) * (new_ac + 1));
+	new_args = dmb_malloc(sizeof(char *) * (new_ac + 1));
 	if (!new_args)
 	{
 		if (new_args)
-			free(new_args);
+			dmb_free(new_args);
 		return (NULL);
 	}
 	while (i < cmd->ac)
@@ -463,14 +463,14 @@ void	update_command(t_cmd *cmd, char **new_args, int new_ac)
 	while (i < cmd->ac)
 	{
 		if (cmd->arg && cmd->arg[i])
-			free(cmd->arg[i++]);
+			dmb_free(cmd->arg[i++]);
 	}
 	if (cmd->arg)
-		free(cmd->arg);
+		dmb_free(cmd->arg);
 	cmd->arg = new_args;
 	cmd->ac = new_ac;
 	if (cmd->name)
-		free(cmd->name);
+		dmb_free(cmd->name);
 	if (cmd->ac > 0)
 		cmd->name = ft_strdup(cmd->arg[0]);
 	else

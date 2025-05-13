@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 14:35:24 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int	update_repertory(char *path, t_shell *shell)
 		ft_putstr_fd(path, 2);
 		ft_putstr_fd(": ", 2);
 		ft_putendl_fd(strerror(errno), 2);
-		free(old_pwd);
+		dmb_free(old_pwd);
 		return (1);
 	}
 	new_pwd = getcwd(cwd, PATH_MAX);
@@ -62,7 +62,7 @@ int	update_repertory(char *path, t_shell *shell)
 		if (old_pwd)
 			update_env_variable(shell, "OLDPWD", old_pwd);
 	}
-	return (free(old_pwd), 0);
+	return (dmb_free(old_pwd), 0);
 }
 
 int	builtin_cd(t_cmd *cmd, t_shell *shell)
@@ -168,7 +168,7 @@ int	builtin_exit(t_cmd *cmd, t_shell *shell)
 	if (shell->cmd)
 		free_cmd(shell->cmd);
 	free_env_list(shell->env);
-	free(shell);
+	dmb_free(shell);
 	rl_clear_history();
 	exit(exit_code & 0xFF);
 }

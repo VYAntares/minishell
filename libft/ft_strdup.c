@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdup.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/03 14:44:44 by eahmeti           #+#    #+#             */
-/*   Updated: 2024/10/07 00:10:27 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:41 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ char	*ft_strdup(const char *s1)
 	char		*dup;
 	size_t		i;
 
-	dup = malloc(sizeof(char) * (ft_strlen(s1) + 1));
+	dup = dmb_malloc(sizeof(char) * (ft_strlen(s1) + 1));
 	if (!dup)
 		return (NULL);
 	i = 0;

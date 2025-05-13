@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_split.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/04 04:48:08 by eahmeti           #+#    #+#             */
-/*   Updated: 2024/10/07 00:10:18 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,10 @@ static void	ft_freelist(char **list, int word_i)
 	i = 0;
 	while (i < word_i)
 	{
-		free(list[i]);
+		dmb_free(list[i]);
 		i++;
 	}
-	free(list);
+	dmb_free(list);
 }
 
 static size_t	ft_countword(char const *s, char c)
@@ -52,7 +52,7 @@ static char	*ft_strndup(const char *s, size_t n)
 	size_t	i;
 
 	i = 0;
-	word = (char *)malloc((n + 1) * sizeof(char));
+	word = (char *)dmb_malloc((n + 1) * sizeof(char));
 	if (!word)
 		return (NULL);
 	while (i < n)
@@ -71,7 +71,7 @@ char	**ft_split(char const *s, char c)
 	int			start;
 	int			word_i;
 
-	list = malloc((ft_countword(s, c) + 1) * sizeof(char *));
+	list = dmb_malloc((ft_countword(s, c) + 1) * sizeof(char *));
 	if (!list)
 		return (NULL);
 	i = 0;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   word_quote_token.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 22:37:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 00:53:14 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_token_word	*define_word_quote_type(t_token_word **list, char *content,
 	t_token_word	*new_word;
 	char			quote_type;
 
-	new_word = malloc(sizeof(t_token_word));
+	new_word = dmb_malloc(sizeof(t_token_word));
 	if (!new_word)
 		return (NULL);
 	quote_type = content[*i];
@@ -42,7 +42,7 @@ t_token_word	*define_word_no_quote(t_token_word **list, char *content,
 {
 	t_token_word	*new_word;
 
-	new_word = malloc(sizeof(t_token_word));
+	new_word = dmb_malloc(sizeof(t_token_word));
 	if (!new_word)
 		return (NULL);
 	*start = *i;
@@ -68,7 +68,7 @@ void	analyze_quote_content(t_token_word **list, t_token *new,
 	start = 0;
 	while (content[i])
 	{
-		new_word = malloc(sizeof(t_token_word));
+		new_word = dmb_malloc(sizeof(t_token_word));
 		if (!new_word)
 			return ;
 		new_word->next = NULL;
@@ -104,7 +104,7 @@ char	*create_content_word(char *input, int *i)
 	}
 	content = ft_substr(input, start, *i - start);
 	if (!content)
-		return (free(content), NULL);
+		return (dmb_free(content), NULL);
 	return (content);
 }
 
@@ -118,14 +118,14 @@ int	add_word_token(t_token **list, int *i, char *input)
 	content = create_content_word(input, i);
 	if (!content)
 		return (0);
-	new = malloc(sizeof(t_token));
+	new = dmb_malloc(sizeof(t_token));
 	if (!new)
 		return (0);
 	new->type = T_WORD;
 	new->value = content;
 	new->type_word = NULL;
 	if (!add_node_back(list, new))
-		return (free(new->value), free(new), 0);
+		return (dmb_free(new->value), dmb_free(new), 0);
 	analyze_quote_content(&list_word, new, content);
 	return (1);
 }

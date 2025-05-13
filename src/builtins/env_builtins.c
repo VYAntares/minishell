@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_builtins.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 15:50:04 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ int	update_env_variable(t_shell *shell, const char *name, const char *value)
 			new_value = ft_strdup(value);
 			if (!new_value)
 				return (1);
-			free(current->value);
+			dmb_free(current->value);
 			current->value = new_value;
 			return (0);
 		}
@@ -57,15 +57,15 @@ int	add_env_variable(t_shell *shell, const char *name, const char *value)
 	t_env	*new_env;
 	t_env	*current;
 
-	new_env = malloc(sizeof(t_env));
+	new_env = dmb_malloc(sizeof(t_env));
 	if (!new_env)
 		return (1);
 	new_env->name = ft_strdup(name);
 	if (!new_env->name)
-		return (free(new_env), 1);
+		return (dmb_free(new_env), 1);
 	new_env->value = ft_strdup(value);
 	if (!new_env->value)
-		return (free(new_env->name), free(new_env), 1);
+		return (dmb_free(new_env->name), dmb_free(new_env), 1);
 	new_env->next = NULL;
 	if (!shell->env)
 		shell->env = new_env;
@@ -90,17 +90,17 @@ int	handle_export_with_value(char *arg, t_shell *shell, int *status)
 	name = ft_substr(arg, 0, equals_pos - arg);
 	value = ft_strdup(equals_pos + 1);
 	if (!name || !value)
-		return (free(name), free(value), 1);
+		return (dmb_free(name), dmb_free(value), 1);
 	if (!*name || !is_valid_identifier(name))
 	{
 		ft_putstr_fd("minishell: export: '", 2);
 		ft_putstr_fd(arg, 2);
 		ft_putendl_fd("': not a valid identifier", 2);
 		*status = 1;
-		return (free(name), free(value), 0);
+		return (dmb_free(name), dmb_free(value), 0);
 	}
 	update_env_variable(shell, name, value);
-	return (free(name), free(value), 0);
+	return (dmb_free(name), dmb_free(value), 0);
 }
 
 // Gère le cas d'une variable déclarée sans valeur
@@ -154,7 +154,7 @@ void	create_and_fill_env(char **env_array, t_shell *shell)
 	{
 		env_array[i] = ft_strjoin(current->name, "=");
 		tmp = ft_strjoin(env_array[i], current->value);
-		free(env_array[i]);
+		dmb_free(env_array[i]);
 		env_array[i] = tmp;
 		i++;
 		current = current->next;
@@ -226,7 +226,7 @@ int	print_sorted_env(t_shell *shell)
 		count++;
 		current = current->next;
 	}
-	env_array = malloc(sizeof(char *) * (count + 1));
+	env_array = dmb_malloc(sizeof(char *) * (count + 1));
 	if (!env_array)
 		return (1);
 	create_and_fill_env(env_array, shell);
@@ -251,9 +251,9 @@ void	delete_line_env(t_shell *shell, t_cmd *cmd, int i)
 				prev->next = current->next;
 			else
 				shell->env = current->next;
-			free(current->name);
-			free(current->value);
-			free(current);
+			dmb_free(current->name);
+			dmb_free(current->value);
+			dmb_free(current);
 			return ;
 		}
 		prev = current;

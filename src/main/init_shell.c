@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   init_shell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 19:04:34 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 15:53:02 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,19 +18,19 @@ t_env	*create_env_node(const char *env_str)
 	char		*equals_pos;
 	int			name_len;
 
-	node = malloc(sizeof(t_env));
+	node = dmb_malloc(sizeof(t_env));
 	if (!node)
 		return (NULL);
 	equals_pos = ft_strchr(env_str, '=');
 	if (!equals_pos)
-		return (free(node), NULL);
+		return (dmb_free(node), NULL);
 	name_len = equals_pos - env_str;
 	node->name = ft_substr(env_str, 0, name_len);
 	if (!name_len)
-		return (free(node), NULL);
+		return (dmb_free(node), NULL);
 	node->value = ft_strdup(equals_pos + 1);
 	if (!node->value)
-		return (free(node->name), free(node), NULL);
+		return (dmb_free(node->name), dmb_free(node), NULL);
 	node->next = NULL;
 	return (node);
 }
@@ -39,15 +39,15 @@ void	*create_minimal_env(char *name, char *value)
 {
 	t_env	*node;
 
-	node = malloc(sizeof(t_env));
+	node = dmb_malloc(sizeof(t_env));
 	if (!node)
 		return (NULL);
 	node->name = ft_strdup(name);
 	if (!node->name)
-		return (free(node), NULL);
+		return (dmb_free(node), NULL);
 	node->value = ft_strdup(value);
 	if (!node->value)
-		return (free(node->name), free(node), NULL);
+		return (dmb_free(node->name), dmb_free(node), NULL);
 	node->next = NULL;
 	return (node);
 }
@@ -69,11 +69,11 @@ t_env	*init_minimal_env(void)
 		return (NULL);
 	path_node = create_minimal_env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
 	if (!path_node)
-		return (free(head), NULL);
+		return (dmb_free(head), NULL);
 	head->next = path_node;
 	shlvl_node = create_minimal_env("SHLVL", "1");
 	if (!shlvl_node)
-		return (free(head), free(shlvl_node), NULL);
+		return (dmb_free(head), dmb_free(shlvl_node), NULL);
 	path_node->next = shlvl_node;
 	return (head);
 }
@@ -111,12 +111,12 @@ t_shell	*init_shell(char **envp)
 	int			shell_lvl;
 	char		*shell_lvl_str;
 
-	shell = malloc(sizeof(t_shell));
+	shell = dmb_malloc(sizeof(t_shell));
 	if (!shell)
-		return (free(shell), NULL);
+		return (dmb_free(shell), NULL);
 	env = init_env(envp);
 	if (!env)
-		return (free(shell), NULL);
+		return (dmb_free(shell), NULL);
 	shell->env = env;
 	shell->cmd = NULL;
 	shell->history = NULL;
@@ -125,6 +125,6 @@ t_shell	*init_shell(char **envp)
 	shell_lvl = ft_atoi(get_env_value(env, "SHLVL"));
 	shell_lvl_str = ft_itoa(shell_lvl + 1);
 	update_env_variable(shell, "SHLVL", shell_lvl_str);
-	free(shell_lvl_str);
+	dmb_free(shell_lvl_str);
 	return (shell);
 }

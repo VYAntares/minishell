@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cmd_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:49:49 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 00:39:40 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	init_cmd(t_cmd *cmd, t_token *tokens)
 	cmd->list_word = NULL;
 	cmd->next = NULL;
 	cmd->arg = NULL;
-	cmd->arg = malloc(sizeof(char *) * (cmd->ac + 1));
+	cmd->arg = dmb_malloc(sizeof(char *) * (cmd->ac + 1));
 	if (!cmd->arg)
 		return (0);
 	return (1);
@@ -75,7 +75,7 @@ void	track_word_tokens(t_cmd *cmd, t_token *tokens)
 
 	i = 0;
 	current = tokens;
-	cmd->list_word = malloc(sizeof(t_token_word) * (cmd->ac + 1));
+	cmd->list_word = dmb_malloc(sizeof(t_token_word) * (cmd->ac + 1));
 	if (!cmd->list_word)
 		return ;
 	while (current && i < cmd->ac)
@@ -101,9 +101,9 @@ t_cmd	*create_command(t_token *tokens)
 
 	if (!tokens)
 		return (NULL);
-	cmd = malloc(sizeof(t_cmd));
+	cmd = dmb_malloc(sizeof(t_cmd));
 	if (!init_cmd(cmd, tokens) || !cmd)
-		return (free(cmd), NULL);
+		return (dmb_free(cmd), NULL);
 	i = 0;
 	current = tokens;
 	while (current && i < cmd->ac)

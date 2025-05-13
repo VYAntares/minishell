@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:10:02 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:09:41 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,6 @@ t_ast	*parse_tokens(t_token *tokens)
 	else
 		ast = parse_parenthesis(tokens);
 	if (!ast)
-		return (free(ast), NULL);
+		return (dmb_free(ast), NULL);
 	return (ast);
 }

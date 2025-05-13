@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 01:28:58 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/15 22:17:37 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ char	*assemble_array(char *name, char *value)
 		return (NULL);
 	tmp2 = ft_strjoin(tmp1, value);
 	if (!tmp2)
-		return (free(tmp1), NULL);
-	free(tmp1);
+		return (dmb_free(tmp1), NULL);
+	dmb_free(tmp1);
 	return (tmp2);
 }
 
@@ -41,7 +41,7 @@ char	**env_to_array(t_env *env)
 		count++;
 		current = current->next;
 	}
-	array = malloc(sizeof(char *) * (count + 1));
+	array = dmb_malloc(sizeof(char *) * (count + 1));
 	if (!array)
 		return (NULL);
 	i = 0;
@@ -65,12 +65,12 @@ char	*test_path_for_command(char *directory, char *command_name)
 	if (!slash_name)
 		return (NULL);
 	full_path = ft_strjoin(directory, slash_name);
-	free(slash_name);
+	dmb_free(slash_name);
 	if (!full_path)
 		return (NULL);
 	if (access(full_path, X_OK) == 0)
 		return (full_path);
-	free(full_path);
+	dmb_free(full_path);
 	return (NULL);
 }
 
@@ -93,7 +93,7 @@ char	*extract_path(char *path, char *command_name)
 			if (!directory)
 				return (NULL);
 			valid_path = test_path_for_command(directory, command_name);
-			free(directory);
+			dmb_free(directory);
 			if (valid_path)
 				return (valid_path);
 			start = end + 1;
@@ -124,15 +124,15 @@ char	*extract_path(char *path, char *command_name)
 // 			path_name = ft_strjoin(ft_substr
 //						(path, start, end - start), slash_name);
 // 			if (!path_name)
-// 				return (free(slash_name), NULL);
+// 				return (dmb_free(slash_name), NULL);
 // 			if (access(path_name, X_OK) == 0)
-// 				return (free(slash_name), path_name);
-// 			free(path_name);
+// 				return (dmb_free(slash_name), path_name);
+// 			dmb_free(path_name);
 // 			start = end + 1;
 // 		}
 // 		end++;
 // 	}
-// 	free(slash_name);
+// 	dmb_free(slash_name);
 // 	return (NULL);
 // }
 

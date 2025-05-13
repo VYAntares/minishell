@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   operator_token.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 22:39:11 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/02/19 23:48:33 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int	add_operator_token(t_token **list, int *i, char *input)
 {
 	t_token	*new;
 
-	new = malloc(sizeof(t_token));
+	new = dmb_malloc(sizeof(t_token));
 	if (!new)
 		return (0);
 	new->prev = NULL;
@@ -115,8 +115,8 @@ int	add_operator_token(t_token **list, int *i, char *input)
 		&& !(handle_double_redir(new, i, input))
 		&& !(handle_single_operator(new, i, input))
 		&& !(handle_wild_and_parenthesis(new, i, input)))
-		return (free(new->value), free(new), 0);
+		return (dmb_free(new->value), dmb_free(new), 0);
 	if (!new->value || !add_node_back(list, new))
-		return (free(new->value), free(new), 0);
+		return (dmb_free(new->value), dmb_free(new), 0);
 	return (1);
 }

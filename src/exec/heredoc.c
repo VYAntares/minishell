@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 18:13:21 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:27:46 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ static char	*create_temp_file(void)
 	if (!num_str)
 		return (NULL);
 	temp_file = ft_strjoin("/tmp/minishell_heredoc_", num_str);
-	free(num_str);
+	dmb_free(num_str);
 	return (temp_file);
 }
 
@@ -39,21 +39,26 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
 		return (1);
 	fd = open(temp_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
-		return (free(temp_file), 1);
-	free(redir->content);
+		return (dmb_free(temp_file), 1);
+	dmb_free(redir->content);
 	redir->content = ft_strdup(temp_file);
 	while (1)
 	{
 		line = readline("> ");
 		if (!line || (ft_strlen(line) == ft_strlen(delimiter)
 				&& ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0))
+		{
+			if (line)
+				dmb_force_free(line);
 			break ;
+		}
 		expanded_line = expand_env_heredoc(line, shell);
 		if (!expanded_line)
-			return (close(fd), unlink(temp_file), 1);
+			return (close(fd), unlink(temp_file), dmb_free(line), dmb_free(delimiter), 1);
 		ft_putendl_fd(expanded_line, fd);
+		dmb_force_free(line);
 	}
-	return (close(fd), 0);
+	return (close(fd), dmb_free(delimiter), 0);
 }
 
 void	chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redir_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:45:45 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 14:24:51 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,13 @@ t_file_redir	*create_redir(t_token *current)
 		("minishell: syntax error near unexpected token `newline'\n", 2);
 		return (NULL);
 	}
-	redir = malloc(sizeof(t_file_redir));
+	redir = dmb_malloc(sizeof(t_file_redir));
 	if (!redir)
 		return (NULL);
 	redir->type_redirection = current->type;
 	redir->content = ft_strdup(current->next->value);
 	if (!redir->content)
-		return (free(redir), NULL);
+		return (dmb_free(redir), NULL);
 	redir->word_parts = current->next->type_word;
 	redir->is_ambiguous = 0;
 	redir->next = NULL;

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:38:50 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:45:52 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:59:17 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,10 +23,10 @@ void	free_tokens(t_token *tokens)
 		next = current->next;
 		if (current->value)
 		{
-			free(current->value);
+			dmb_free(current->value);
 			current->value = NULL;
 		}
-		free(current);
+		dmb_free(current);
 		current = next;
 	}
 }
@@ -42,7 +42,7 @@ void	free_ast(t_ast *node)
 		free_cmd(node->cmd);
 		node->cmd = NULL;
 	}
-	free(node);
+	dmb_free(node);
 }
 
 void	free_word_parts(t_token_word *word_parts)
@@ -55,8 +55,8 @@ void	free_word_parts(t_token_word *word_parts)
 	{
 		next = current->next;
 		if (current->content)
-			free(current->content);
-		free(current);
+			dmb_free(current->content);
+		dmb_free(current);
 		current = next;
 	}
 }
@@ -69,12 +69,12 @@ void	free_cmd(t_cmd *cmd)
 		return ;
 	if (cmd->name)
 	{
-		free(cmd->name);
+		dmb_free(cmd->name);
 		cmd->name = NULL;
 	}
 	if (cmd->path)
 	{
-		free(cmd->path);
+		dmb_free(cmd->path);
 		cmd->path = NULL;
 	}
 	if (cmd->arg)
@@ -82,10 +82,10 @@ void	free_cmd(t_cmd *cmd)
 		i = 0;
 		while (cmd->arg[i])
 		{
-			free(cmd->arg[i]);
+			dmb_free(cmd->arg[i]);
 			i++;
 		}
-		free(cmd->arg);
+		dmb_free(cmd->arg);
 		cmd->arg = NULL;
 	}
 	if (cmd->type_redir)
@@ -97,15 +97,15 @@ void	free_cmd(t_cmd *cmd)
 		{
 			next = current->next;
 			if (current->content)
-				free(current->content);
+				dmb_free(current->content);
 			if (current->word_parts)
 				free_word_parts(current->word_parts);
-			free(current);
+			dmb_free(current);
 			current = next;
 		}
 		cmd->type_redir = NULL;
 	}
-	free(cmd);
+	dmb_free(cmd);
 }
 
 void	free_array(char **array)
@@ -117,10 +117,10 @@ void	free_array(char **array)
 		return ;
 	while (array[i])
 	{
-		free(array[i]);
+		dmb_free(array[i]);
 		i++;
 	}
-	free(array);
+	dmb_free(array);
 }
 
 void	cleanup_heredoc_files(t_cmd *cmd)
@@ -151,9 +151,10 @@ void	free_env_list(t_env *head)
 	while (current)
 	{
 		next = current->next;
-		free(current->name);
-		free(current->value);
-		free(current);
+		dmb_free(current->name);
+		dmb_free(current->value);
+		dmb_free(current);
 		current = next;
 	}
 }
+
