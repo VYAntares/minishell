@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/28 18:14:10 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:35:45 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,6 @@ void	handle_command(t_cmd *cmd, t_shell *shell)
 	if (!env_array)
 		exit(1);
 	execve(cmd->path, cmd->arg, env_array);
-	free_array(env_array);
 	perror("execve");
 	exit(1);
 }

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:07:45 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:34:45 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,29 @@
 
 sig_atomic_t	g_sigint_received;
 
-void	free_shell(t_ast *ast, t_token *tokens, t_shell *shell)
+void	cleanup_heredoc_files(t_cmd *cmd)
 {
-	if (tokens)
-		free_tokens(tokens);
-	if (ast)
-		free_ast(ast);
-	rl_clear_history();
-	free_env_list(shell->env);
-	dmb_free(shell);
+	t_file_redir	*redir;
+	t_cmd			*current;
+
+	redir = cmd->type_redir;
+	current = cmd;
+	while (current)
+	{
+		while (redir)
+		{
+			if (redir->type_redirection == T_HEREDOC)
+				unlink(redir->content);
+			redir = redir->next;
+		}
+		current = current->next;
+	}
 }
 
 void	execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
 {
 	add_history(input);
-	if (tokens)
-		free_tokens(tokens);
-	if (ast)
-		free_ast(ast);
+
 	tokens = tokenize(input);
 	if (tokens && check_syntax_error_parenthesis(tokens))
 	{
@@ -76,13 +81,13 @@ int	main(int ac, char **av, char **envp)
 	if (!shell)
 		return (1);
 	if (setup_signals() == -1)
-		return (free_env_list(shell->env), dmb_free(shell), 1);
+		return (dmb_free(shell), 1);
 	while (1)
 	{
 		if (read_and_execute(tokens, ast, shell))
 			break ;
 	}
-	free_shell(ast, tokens, shell);
+	rl_clear_history();
 	dmb_gc();
 	return (0);
 }

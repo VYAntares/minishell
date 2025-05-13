@@ -1,9 +1,0 @@
-42.code-workspace
-dmb.h
-file.txt
-libft
-Makefile
-minishell
-minishell.h
-obj
-src

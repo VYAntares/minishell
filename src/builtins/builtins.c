@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:41:05 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,9 +165,7 @@ int	builtin_exit(t_cmd *cmd, t_shell *shell)
 	}
 	else
 		exit_code = shell->exit_status;
-	if (shell->cmd)
-		free_cmd(shell->cmd);
-	free_env_list(shell->env);
+
 	dmb_free(shell);
 	rl_clear_history();
 	exit(exit_code & 0xFF);

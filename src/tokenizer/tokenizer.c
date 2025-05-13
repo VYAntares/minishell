@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 18:37:11 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/21 14:11:57 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:34:58 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ t_token	*tokenize(char *input)
 	while (input[i])
 	{
 		if (!process_token(&tokens, &i, input))
-			return (free_tokens(tokens), NULL);
+			return (NULL);
 	}
 	return (tokens);
 }

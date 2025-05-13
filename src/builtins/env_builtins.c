@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:35:43 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,6 @@ void	display_array(char **env_array)
 		ft_putchar_fd('\n', 1);
 		i++;
 	}
-	free_array(env_array);
 }
 
 void	bubble_sort(char **env_array)

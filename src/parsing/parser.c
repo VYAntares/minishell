@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:10:02 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:32:26 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,8 @@ t_ast	*add_ast_node(t_token *tokens, t_token *current, t_ast_type type)
 	after_tokens = get_tokens_after(current);
 	node->left = parse_tokens(before_tokens);
 	node->right = parse_tokens(after_tokens);
-	free_tokens(before_tokens);
-	free_tokens(after_tokens);
 	if (!node->right || !node->left)
-		return (free_ast(node), NULL);
+		return (NULL);
 	return (node);
 }
 
@@ -42,14 +40,14 @@ t_ast	*parse_command(t_token *tokens)
 		return (NULL);
 	cmd_node->cmd = create_command(tokens);
 	if (!cmd_node->cmd)
-		return (free_ast(cmd_node), NULL);
+		return (NULL);
 	current = tokens;
 	while (current)
 	{
 		if (is_redirection(current->type))
 		{
 			if (!add_redirection_to_cmd(cmd_node->cmd, current))
-				return (free_ast(cmd_node), NULL);
+				return (NULL);
 			current = current->next->next;
 			continue ;
 		}
@@ -110,11 +108,10 @@ t_ast	*parse_parenthesis(t_token *tokens)
 	node = parse_tokens(content);
 	node = init_ast_node(AST_SUB_SHELL);
 	if (!node)
-		return (free_tokens(content), NULL);
+		return (NULL);
 	node->sub_shell = parse_tokens(content);
 	if (!node->sub_shell)
-		return (free_tokens(content), free_ast(node), NULL);
-	free_tokens(content);
+		return (NULL);
 	return (node);
 }
 

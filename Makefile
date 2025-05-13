@@ -40,7 +40,7 @@ TOKENIZER_SRCS = tokenizer.c operator_token.c word_quote_token.c
 BUILTINS_SRCS = builtins.c env_builtins.c expand_env.c
 EXEC_SRCS = executor.c heredoc.c pipe_redir.c executor_utils.c wildcards.c
 PIPE_SRCS =
-FREE_SRCS = free_parsing.c dmb.c
+FREE_SRCS = dmb.c
 
 # Concatenate all sources
 SRCS = $(addprefix $(MAIN_DIR), $(MAIN_SRCS)) \

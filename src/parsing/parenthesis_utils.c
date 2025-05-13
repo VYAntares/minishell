@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parenthesis_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:50:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:08:39 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:35:36 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,9 +134,9 @@ t_token	*extract_parenthesis_content(t_token *start)
 	{
 		new_token = init_new_token(current, tail);
 		if (!new_token)
-			return (free_tokens(new_list), NULL);
+			return (NULL);
 		if (!add_node_back(&new_list, new_token))
-			return (free_tokens(new_list), NULL);
+			return (NULL);
 		tail = new_token;
 		current = current->next;
 	}

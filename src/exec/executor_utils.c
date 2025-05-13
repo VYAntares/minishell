@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 01:28:58 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:44:03 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ char	**env_to_array(t_env *env)
 	{
 		array[i] = assemble_array(current->name, current->value);
 		if (!array[i++])
-			return (free_array(array), NULL);
+			return (NULL);
 		current = current->next;
 	}
 	return (array[i] = NULL, array);
@@ -83,22 +83,30 @@ char	*extract_path(char *path, char *command_name)
 
 	start = 0;
 	end = 0;
-	while (path[end])
+	while (1)
 	{
-		if (path[end] == ':' || path[end + 1] == '\0')
-		{
-			if (path[end + 1] == '\0')
-				end++;
-			directory = ft_substr(path, start, end - start);
-			if (!directory)
-				return (NULL);
-			valid_path = test_path_for_command(directory, command_name);
-			dmb_free(directory);
-			if (valid_path)
-				return (valid_path);
-			start = end + 1;
-		}
+		// Chercher le prochain ':' ou la fin de chaîne
+		while (path[end] && path[end] != ':')
+			end++;
+		
+		// Extraire le répertoire
+		directory = ft_substr(path, start, end - start);
+		if (!directory)
+			return (NULL);
+		
+		// Tester si la commande existe dans ce répertoire
+		valid_path = test_path_for_command(directory, command_name);
+		dmb_free(directory);
+		if (valid_path)
+			return (valid_path);
+		
+		// Si on est à la fin de la chaîne, sortir
+		if (!path[end])
+			break;
+		
+		// Passer au prochain répertoire (après le ':')
 		end++;
+		start = end;
 	}
 	return (NULL);
 }

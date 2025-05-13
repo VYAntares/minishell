@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:35:03 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:31:47 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ t_token	*get_tokens_after(t_token *current)
 	{
 		new = init_new_token(tmp, tail);
 		if (!new)
-			return (free_tokens(new_list), NULL);
+			return (NULL);
 		if (!new_list)
 			new_list = new;
 		if (tail)
@@ -106,7 +106,7 @@ t_token	*get_tokens_before(t_token *tokens, t_token *current)
 	{
 		new = init_new_token(tmp, tail);
 		if (!new)
-			return (free_tokens(new_list), NULL);
+			return (NULL);
 		if (!new_list)
 			new_list = new;
 		if (tail)

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:49:49 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:35:35 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ t_cmd	*create_command(t_token *tokens)
 		if (is_command_argument(current->type))
 		{
 			if (!add_command_arg(cmd, current, i++))
-				return (free_cmd(cmd), NULL);
+				return (NULL);
 		}
 		current = current->next;
 	}

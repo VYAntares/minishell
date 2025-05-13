@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:51:21 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:40:56 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,7 @@ int			builtin_export(t_cmd *cmd, t_shell *shell);
 int			builtin_unset(t_cmd *cmd, t_shell *shell);
 int			builtin_env(t_shell *shell);
 int			builtin_exit(t_cmd *cmd, t_shell *shell);
+void		cleanup_heredoc_files(t_cmd *cmd);
 
 /* Fonctions auxiliaires pour les builtins */
 int			update_env_variable(t_shell *shell, const char *name,
@@ -224,13 +225,6 @@ int			add_env_variable(t_shell *shell, const char *name,
 int			is_valid_identifier(const char *id);
 int			print_sorted_env(t_shell *shell);
 int			is_number(char *str);
-
-/* Fonctions de libération de mémoire */
-void		free_tokens(t_token *tokens);
-void		free_ast(t_ast *node);
-void		free_cmd(t_cmd *cmd);
-void		free_env_list(t_env *head);
-void		free_array(char **array);
 
 int			expand_var(t_cmd *cmd, t_shell *shell);
 char		*expand_env_heredoc(char *line, t_shell *shell);

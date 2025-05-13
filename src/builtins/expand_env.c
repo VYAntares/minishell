@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:35:44 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -347,8 +347,6 @@ int	count_arg_after_split(t_token_word *list_word)
 	while (split_words && split_words[j])
 		j++;
 	dmb_free(tmp);
-	if (split_words)
-		free_array(split_words);
 	return (j);
 }
 
@@ -393,8 +391,6 @@ void	fill_new_args(t_token_word *list_word, int *k, char **new_args)
 			j++;
 		}
 		dmb_free(tmp);
-		if (split_words)
-			free_array(split_words);
 	}
 }
 
