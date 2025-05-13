@@ -12,22 +12,6 @@
 
 #include "../../minishell.h"
 
-void	free_env_list(t_env *head)
-{
-	t_env		*current;
-	t_env		*next;
-
-	current = head;
-	while (current)
-	{
-		next = current->next;
-		free(current->name);
-		free(current->value);
-		free(current);
-		current = next;
-	}
-}
-
 t_env	*create_env_node(const char *env_str)
 {
 	t_env		*node;
@@ -51,9 +35,47 @@ t_env	*create_env_node(const char *env_str)
 	return (node);
 }
 
+void	*create_minimal_env(char *name, char *value)
+{
+	t_env	*node;
+
+	node = malloc(sizeof(t_env));
+	if (!node)
+		return (NULL);
+	node->name = ft_strdup(name);
+	if (!node->name)
+		return (free(node), NULL);
+	node->value = ft_strdup(value);
+	if (!node->value)
+		return (free(node->name), free(node), NULL);
+	node->next = NULL;
+	return (node);
+}
+
 t_env	*init_minimal_env(void)
 {
-	
+	t_env	*head;
+	t_env	*path_node;
+	t_env	*shlvl_node;
+	char	cwd[PATH_MAX];
+	char	*pwd_value;
+
+	if (getcwd(cwd, PATH_MAX))
+		pwd_value = ft_strdup(cwd);
+	else
+		pwd_value = ft_strdup("/");
+	head = create_minimal_env("PWD", pwd_value);
+	if (!head)
+		return (NULL);
+	path_node = create_minimal_env("PATH", "/usr/bin:/bin:/usr/sbin:/sbin");
+	if (!path_node)
+		return (free(head), NULL);
+	head->next = path_node;
+	shlvl_node = create_minimal_env("SHLVL", "1");
+	if (!shlvl_node)
+		return (free(head), free(shlvl_node), NULL);
+	path_node->next = shlvl_node;
+	return (head);
 }
 
 t_env	*init_env(char **envp)
@@ -64,7 +86,7 @@ t_env	*init_env(char **envp)
 	int			i;
 
 	if (!envp || !envp[0])
-		return (init_minimal_env())
+		return (init_minimal_env());
 	head = create_env_node(envp[0]);
 	if (!head)
 		return (NULL);

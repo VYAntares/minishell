@@ -37,11 +37,6 @@ extern sig_atomic_t	g_sigint_received;
 # define UNMATCHING_PARENTH -2
 # define PARENTH_AFTER_WRONG_TOKEN -3
 
-// extern const char *TREE_VERTICAL;
-// extern const char *TREE_BRANCH;
-// extern const char *TREE_CORNER;
-// extern const char *TREE_HORIZONTAL;
-
 /* Types de tokens */
 typedef enum e_type
 {

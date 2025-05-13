@@ -122,6 +122,7 @@ char	*expand_env_heredoc(char *line, t_shell *shell)
 int	rebuild_redirection(t_cmd *cmd)
 {
 	char			*new_content;
+	char			*temp;
 	t_file_redir	*redir;
 	t_token_word	*current;
 
@@ -134,14 +135,16 @@ int	rebuild_redirection(t_cmd *cmd)
 		current = redir->word_parts;
 		while (current)
 		{
+			temp = new_content;
 			new_content = ft_strjoin(new_content, current->content);
+			free(temp);
 			if (!new_content)
 				return (1);
 			current = current->next;
 		}
 		redir->content = ft_strdup(new_content);
-		redir = redir->next;
 		free(new_content);
+		redir = redir->next;
 	}
 	return (0);
 }

@@ -46,7 +46,7 @@ t_file_redir	*create_redir(t_token *current)
 	redir->type_redirection = current->type;
 	redir->content = ft_strdup(current->next->value);
 	if (!redir->content)
-		return (NULL);
+		return (free(redir), NULL);
 	redir->word_parts = current->next->type_word;
 	redir->is_ambiguous = 0;
 	redir->next = NULL;
@@ -64,7 +64,7 @@ int	add_redirection_to_cmd(t_cmd *cmd, t_token *current)
 	if (!cmd->type_redir)
 		cmd->type_redir = new;
 	else
-	{
+	{ 
 		last = cmd->type_redir;
 		while (last->next)
 			last = last->next;

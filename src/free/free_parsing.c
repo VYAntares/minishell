@@ -44,7 +44,21 @@ void	free_ast(t_ast *node)
 	}
 	free(node);
 }
+void free_word_parts(t_token_word *word_parts)
+{
+    t_token_word *current;
+    t_token_word *next;
 
+    current = word_parts;
+    while (current)
+    {
+        next = current->next;
+        if (current->content)
+            free(current->content);
+        free(current);
+        current = next;
+    }
+}
 void free_cmd(t_cmd *cmd)
 {
     int i;
@@ -83,7 +97,9 @@ void free_cmd(t_cmd *cmd)
             next = current->next;
             if (current->content)
                 free(current->content);
-            free(current);
+			if (current->word_parts)
+                free_word_parts(current->word_parts);
+			free(current);
             current = next;
         }
         cmd->type_redir = NULL;
@@ -121,5 +137,21 @@ void	cleanup_heredoc_files(t_cmd *cmd)
 			redir = redir->next;
 		}
 		current = current->next;
+	}
+}
+
+void	free_env_list(t_env *head)
+{
+	t_env		*current;
+	t_env		*next;
+
+	current = head;
+	while (current)
+	{
+		next = current->next;
+		free(current->name);
+		free(current->value);
+		free(current);
+		current = next;
 	}
 }
