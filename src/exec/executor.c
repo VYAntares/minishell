@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:35:45 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 18:50:39 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,10 +117,13 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 	{
 		if (is_minishell)
 			setup_signals(); // Restaurer en cas d'erreur
-		return (perror("fork"), 1);
+		return (perror("fork"), dmb_gc(), 1);
 	}
 	if (pid == 0)
+	{
 		handle_command(cmd, shell);
+		dmb_gc();
+	}
 	// Attendre la fin du processus enfant
 	waitpid(pid, &status, 0);
 	// Si c'était un minishell, restaurer les signaux normaux
@@ -168,11 +171,13 @@ int	execute_subshell(t_ast *sub_shell, t_shell *shell)
 	if (pid == 0)
 	{
 		exit_code = execute_ast(sub_shell, shell);
+		dmb_gc();
 		exit(exit_code);
 	}
 	if (pid < 0)
 	{
 		perror("minishell: fork");
+		dmb_gc();
 		return (1);
 	}
 	else

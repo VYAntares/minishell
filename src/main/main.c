@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:34:45 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 19:07:31 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ int	read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 	}
 	if (*input)
 		execute_line(input, tokens, ast, shell);
-	dmb_force_free(input);
+	free(input);
 	return (0);
 }
 

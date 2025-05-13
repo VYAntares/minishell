@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:27:46 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 19:10:56 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,14 +49,14 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
 				&& ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0))
 		{
 			if (line)
-				dmb_force_free(line);
+				free(line);
 			break ;
 		}
 		expanded_line = expand_env_heredoc(line, shell);
 		if (!expanded_line)
-			return (close(fd), unlink(temp_file), dmb_free(line), dmb_free(delimiter), 1);
+			return (close(fd), unlink(temp_file), free(line), dmb_free(delimiter), 1);
 		ft_putendl_fd(expanded_line, fd);
-		dmb_force_free(line);
+		free(line);
 	}
 	return (close(fd), dmb_free(delimiter), 0);
 }
