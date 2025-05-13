@@ -37,6 +37,7 @@ int	only_redirection(t_cmd *cmd)
 	t_file_redir	*redir;
 	int				fd;
 
+	// printf("enter in only_redir\n");
 	redir = cmd->type_redir;
 	while (redir)
 	{
@@ -144,7 +145,7 @@ int	execute_redirections(t_cmd *cmd, t_shell *shell)
 	last_output = NULL;
 	if (expand_redir(cmd, shell) != 0)
 		return (1);
-	if (!cmd->arg[0] && cmd->type_redir)
+	if (!cmd->name && cmd->type_redir)
 		return (only_redirection(cmd));
 	redir = cmd->type_redir;
 	if (find_lasts_redirection(redir, &last_input, &last_output))

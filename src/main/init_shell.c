@@ -51,6 +51,11 @@ t_env	*create_env_node(const char *env_str)
 	return (node);
 }
 
+t_env	*init_minimal_env(void)
+{
+	
+}
+
 t_env	*init_env(char **envp)
 {
 	t_env		*head;
@@ -58,6 +63,8 @@ t_env	*init_env(char **envp)
 	t_env		*new_node;
 	int			i;
 
+	if (!envp || !envp[0])
+		return (init_minimal_env())
 	head = create_env_node(envp[0]);
 	if (!head)
 		return (NULL);
@@ -80,6 +87,7 @@ t_shell	*init_shell(char **envp)
 	t_shell		*shell;
 	t_env		*env;
 	int			shell_lvl;
+	char		*shell_lvl_str;
 
 	shell = malloc(sizeof(t_shell));
 	if (!shell)
@@ -93,6 +101,8 @@ t_shell	*init_shell(char **envp)
 	shell->pid = getpid();
 	shell->exit_status = 0;
 	shell_lvl = ft_atoi(get_env_value(env, "SHLVL"));
-	update_env_variable(shell, "SHLVL", ft_itoa(shell_lvl + 1));
+	shell_lvl_str = ft_itoa(shell_lvl + 1);
+	update_env_variable(shell, "SHLVL", shell_lvl_str);
+	free(shell_lvl_str);
 	return (shell);
 }

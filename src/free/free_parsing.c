@@ -38,33 +38,58 @@ void	free_ast(t_ast *node)
 	free_ast(node->left);
 	free_ast(node->right);
 	if (node->cmd && node->type != AST_REDIR)
+	{
 		free_cmd(node->cmd);
+		node->cmd = NULL;
+	}
 	free(node);
 }
 
-void	free_cmd(t_cmd *cmd)
+void free_cmd(t_cmd *cmd)
 {
-	int		i;
+    int i;
 
-	if (!cmd)
-		return ;
-	if (cmd->name)
-		free(cmd->name);
-	if (cmd->path)
-		free(cmd->path);
-	if (cmd->arg)
-	{
-		i = 0;
-		while (cmd->arg[i])
-		{
-			free(cmd->arg[i]);
-			i++;
-		}
-		free(cmd->arg);
-	}
-	free(cmd);
+    if (!cmd)
+        return;
+    if (cmd->name)
+    {
+        free(cmd->name);
+        cmd->name = NULL;
+    }
+    if (cmd->path)
+    {
+        free(cmd->path);
+        cmd->path = NULL;
+    }
+    if (cmd->arg)
+    {
+        i = 0;
+        while (cmd->arg[i])
+        {
+            free(cmd->arg[i]);
+            i++;
+        }
+        free(cmd->arg);
+        cmd->arg = NULL;
+    }
+    // Ajout de la libération de type_redir
+    if (cmd->type_redir)
+    {
+        t_file_redir *current = cmd->type_redir;
+        t_file_redir *next;
+        
+        while (current)
+        {
+            next = current->next;
+            if (current->content)
+                free(current->content);
+            free(current);
+            current = next;
+        }
+        cmd->type_redir = NULL;
+    }
+    free(cmd);
 }
-
 void	free_array(char **array)
 {
 	int		i;

@@ -530,8 +530,10 @@ int	has_wildcard_in_cmd(t_cmd *cmd)
 	{
 		redir = cmd->type_redir;
 		while (redir && !has_wildcard)
+		{
 			has_wildcard = has_wildcard_in_word(redir->word_parts);
-		redir = redir->next;
+			redir = redir->next;
+		}
 	}
 	return (has_wildcard);
 }
