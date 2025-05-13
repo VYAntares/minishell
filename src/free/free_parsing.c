@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_parsing.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:38:50 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 02:35:03 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/13 17:45:52 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,68 +44,70 @@ void	free_ast(t_ast *node)
 	}
 	free(node);
 }
-void free_word_parts(t_token_word *word_parts)
-{
-    t_token_word *current;
-    t_token_word *next;
 
-    current = word_parts;
-    while (current)
-    {
-        next = current->next;
-        if (current->content)
-            free(current->content);
-        free(current);
-        current = next;
-    }
+void	free_word_parts(t_token_word *word_parts)
+{
+	t_token_word	*current;
+	t_token_word	*next;
+
+	current = word_parts;
+	while (current)
+	{
+		next = current->next;
+		if (current->content)
+			free(current->content);
+		free(current);
+		current = next;
+	}
 }
-void free_cmd(t_cmd *cmd)
-{
-    int i;
 
-    if (!cmd)
-        return;
-    if (cmd->name)
-    {
-        free(cmd->name);
-        cmd->name = NULL;
-    }
-    if (cmd->path)
-    {
-        free(cmd->path);
-        cmd->path = NULL;
-    }
-    if (cmd->arg)
-    {
-        i = 0;
-        while (cmd->arg[i])
-        {
-            free(cmd->arg[i]);
-            i++;
-        }
-        free(cmd->arg);
-        cmd->arg = NULL;
-    }
-    // Ajout de la libération de type_redir
-    if (cmd->type_redir)
-    {
-        t_file_redir *current = cmd->type_redir;
-        t_file_redir *next;
-        
-        while (current)
-        {
-            next = current->next;
-            if (current->content)
-                free(current->content);
+void	free_cmd(t_cmd *cmd)
+{
+	int	i;
+
+	if (!cmd)
+		return ;
+	if (cmd->name)
+	{
+		free(cmd->name);
+		cmd->name = NULL;
+	}
+	if (cmd->path)
+	{
+		free(cmd->path);
+		cmd->path = NULL;
+	}
+	if (cmd->arg)
+	{
+		i = 0;
+		while (cmd->arg[i])
+		{
+			free(cmd->arg[i]);
+			i++;
+		}
+		free(cmd->arg);
+		cmd->arg = NULL;
+	}
+	if (cmd->type_redir)
+	{
+		t_file_redir *current = cmd->type_redir;
+		t_file_redir *next;
+		
+		while (current)
+		{
+			next = current->next;
+			if (current->content)
+				free(current->content);
 			if (current->word_parts)
-                free_word_parts(current->word_parts);
+				free_word_parts(current->word_parts);
 			free(current);
-            current = next;
-        }
-        cmd->type_redir = NULL;
-    }
-    free(cmd);
+			current = next;
+		}
+		cmd->type_redir = NULL;
+	}
+	free(cmd);
 }
+
 void	free_array(char **array)
 {
 	int		i;
