@@ -1,22 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   wildcardds.c                                       :+:      :+:    :+:   */
+/*   wildcards.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:59:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 03:06:44 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 03:30:04 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-/*
-** Fonction pour construire un motif composite à partir d'une liste de token_word
-** Cela permet de gérer les cas comme "Mak"* où le wildcard est adjacent
-** à un token quoté
-*/
 char	*build_composite_wildcard_str(t_token_word *list)
 {
 	t_token_word	*current;
@@ -73,11 +68,6 @@ t_token_word	*expanded_wildcard_list(char **expanded)
 	return (head);
 }
 
-/*
-** Fonction pour étendre les wildcards dans une liste de token_word
-** Version modifiée pour gérer correctement les espaces entre les fichiers
-** et les tokens adjacents quotés comme "Mak"*
-*/
 int	expand_wildcard_in_word_list(t_token_word **list)
 {
 	t_token_word	*new_list;

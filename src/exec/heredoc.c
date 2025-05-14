@@ -6,13 +6,13 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:19:47 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 03:23:03 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-static char	*create_temp_file(void)
+char	*create_temp_file(void)
 {
 	static int	counter;
 	char		*temp_file;

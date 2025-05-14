@@ -31,6 +31,7 @@ TOKENIZER_DIR = 	$(SRCS_DIR)tokenizer/
 BUILTINS_DIR = 		$(SRCS_DIR)builtins/
 EXEC_DIR = 			$(SRCS_DIR)exec/
 EXPAND_DIR = 		$(SRCS_DIR)expand_env/
+WILDCARDS_DIR = 	$(SRCS_DIR)wildcards/
 
 # Source files
 MAIN_SRCS = 		main.c \
@@ -60,11 +61,14 @@ BUILTINS_SRCS = 	export_utils.c \
 					pwd.c \
 					unset.c
 
-EXEC_SRCS = 		executor.c \
-					heredoc.c \
-					pipe_redir.c \
+EXEC_SRCS = 		execute_command.c \
 					executor_utils.c \
-					wildcards.c
+					executor.c \
+					heredoc_utils.c \
+					heredoc.c \
+					pipe.c \
+					redirection_utils.c \
+					redirections.c
 
 EXPAND_SRCS =		expand_env.c \
 					env_heredoc.c \
@@ -73,6 +77,13 @@ EXPAND_SRCS =		expand_env.c \
 					get_value.c \
 					process_dollar_quote.c
 
+WILDCARDS_SRCS =	expand_wildcards.c \
+					has_wildcards.c \
+					rebuild_args.c \
+					wildcard_redir.c \
+					wildcard_utils.c \
+					wildcards.c 
+
 # Concatenate all sources
 SRCS = $(addprefix $(MAIN_DIR), $(MAIN_SRCS)) \
        $(addprefix $(PARSING_DIR), $(PARSING_SRCS)) \
@@ -80,6 +91,7 @@ SRCS = $(addprefix $(MAIN_DIR), $(MAIN_SRCS)) \
        $(addprefix $(BUILTINS_DIR), $(BUILTINS_SRCS)) \
        $(addprefix $(EXEC_DIR), $(EXEC_SRCS)) \
 	   $(addprefix $(EXPAND_DIR), $(EXPAND_SRCS)) \
+	   $(addprefix $(WILDCARDS_DIR), $(WILDCARDS_SRCS))
 
 # Object files
 OBJS_DIR = obj/
