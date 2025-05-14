@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:10:02 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:32:26 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 02:21:12 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,19 +113,4 @@ t_ast	*parse_parenthesis(t_token *tokens)
 	if (!node->sub_shell)
 		return (NULL);
 	return (node);
-}
-
-t_ast	*parse_tokens(t_token *tokens)
-{
-	t_ast		*ast;
-
-	if (!tokens)
-		return (NULL);
-	if (!verify_parenthesis(tokens))
-		ast = parse_logical_ops(tokens);
-	else
-		ast = parse_parenthesis(tokens);
-	if (!ast)
-		return (dmb_free(ast), NULL);
-	return (ast);
 }

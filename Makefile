@@ -43,7 +43,9 @@ PARSING_SRCS = 		parser.c \
 					redir_utils.c \
 					cmd_utils.c \
 					parenthesis_utils.c \
-					parenthesis_utils2.c
+					parenthesis_synthax.c \
+					parenthesis_operator.c \
+					ast_entry.c
 
 TOKENIZER_SRCS = 	tokenizer.c \
 					operator_token.c \

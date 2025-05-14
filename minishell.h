@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:06:05 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 02:57:06 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 # include <string.h>
 # include <limits.h>
 # include <stdbool.h>
+# include <dirent.h>
+
 
 # include "libft.h"
 

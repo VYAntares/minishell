@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parenthesis_utils2.c                               :+:      :+:    :+:   */
+/*   parenthesis_operator_.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 01:04:45 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/04/11 01:10:52 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 02:24:49 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,23 +23,6 @@ t_ast_type	get_ast_type(t_token *token)
 	if (token->type == T_PIPE)
 		return (AST_PIPE);
 	return (AST_CMD);
-}
-
-int	check_syntax_error_parenthesis(t_token *tokens)
-{
-	int		result;
-
-	result = verify_parenthesis(tokens);
-	if (result == STARTING_WITH_CLOSE_PARENTH)
-		return (ft_putstr_fd
-			("miniHell: syntax error near unexpected token `)'\n", 2), 0);
-	else if (result == UNMATCHING_PARENTH)
-		return (ft_putstr_fd
-			("miniHell: syntax error: unexpected end of file\n", 2), 0);
-	else if (result == PARENTH_AFTER_WRONG_TOKEN)
-		return (ft_putstr_fd
-			("miniHell: syntax error near unexpected token `('\n", 2), 0);
-	return (1);
 }
 
 int	check_if_operator_is_last(t_token *first_op, t_token *second_op)
