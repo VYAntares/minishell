@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 23:41:35 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/14 02:06:05 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,7 @@ void		debug_print_tokens(t_token *tokens);
 int			add_node_back_word(t_token_word **list, t_token_word *new);
 t_token		*find_last_priority_operator(t_token *tokens);
 t_ast_type	get_ast_type(t_token *token);
+int			handle_export_with_value(char *arg, t_shell *shell, int *status);
 
 int			match_wildcard(const char *pattern, const char *str);
 char		**expand_wildcard(const char *pattern);
@@ -247,6 +248,41 @@ int			launch_expand_wildcards(t_cmd *cmd);
 int			setup_signals_for_commands(void);
 void		reset_signals_for_child(void);
 
+int			handle_export_declaration(char *arg, int *status);
+
 void		bubble_sort(char **env_array);
+
+/* expand_env_getters.c */
+char	*get_env_value(t_env *env, const char *name);
+char	*get_int_value_of(int env, int *i);
+char	*extract_env_value(char *line, t_shell *shell, int *i, int *start);
+char	*expand_line(char *line, char *env_value, int start, int i);
+char	*launch_expansion(char *line, t_shell *shell, int *i, int *start);
+
+/* expand_env_heredoc.c */
+char	*expand_env_heredoc(char *line, t_shell *shell);
+int		expand_env_var(t_token_word *token_word, t_shell *shell);
+
+/* expand_redir.c */
+int		rebuild_redirection(t_cmd *cmd);
+int		expand_redir_name(t_token_word *current, t_shell *shell, t_file_redir *redir);
+int		launch_redir_expansion(t_shell *shell, t_file_redir *redir);
+int		expand_redir(t_cmd *cmd, t_shell *shell);
+int		prepro_dol_redir(t_token_word *word_parts);
+
+/* expand_dollar_processing.c */
+int		process_dollar(t_token_word *current);
+int		preprocess_dollar_quotes(t_token_word **head);
+
+/* expand_arg_rebuild.c */
+int		should_we_split(t_token_word *list_word);
+int		count_arg_after_split(t_token_word *list_word);
+char	*rebuild_word(t_token_word *list_word);
+void	fill_new_args(t_token_word *list_word, int *k, char **new_args);
+void	replace_args_and_free(char **new_args, t_cmd *cmd, int k, int new_ac);
+
+/* expand_var_main.c */
+int		rebuild_command_arg(t_cmd *cmd);
+int		expand_var(t_cmd *cmd, t_shell *shell);
 
 #endif

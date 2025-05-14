@@ -24,23 +24,52 @@ LIBFT_INC = -I ./libft
 LIBFT_LIB = -L./libft -lft
 
 # Source files directories
-SRCS_DIR = src/
-MAIN_DIR = $(SRCS_DIR)main/
-PARSING_DIR = $(SRCS_DIR)parsing/
-TOKENIZER_DIR = $(SRCS_DIR)tokenizer/
-BUILTINS_DIR = $(SRCS_DIR)builtins/
-EXEC_DIR = $(SRCS_DIR)exec/
-PIPE_DIR = $(SRCS_DIR)pipe/
-FREE_DIR = $(SRCS_DIR)free/
+SRCS_DIR = 			src/
+MAIN_DIR = 			$(SRCS_DIR)main/
+PARSING_DIR =		$(SRCS_DIR)parsing/
+TOKENIZER_DIR = 	$(SRCS_DIR)tokenizer/
+BUILTINS_DIR = 		$(SRCS_DIR)builtins/
+EXEC_DIR = 			$(SRCS_DIR)exec/
+EXPAND_DIR = 		$(SRCS_DIR)expand_env/
 
 # Source files
-MAIN_SRCS = main.c init_shell.c signals.c debugger.c
-PARSING_SRCS = parser.c parser_utils.c redir_utils.c cmd_utils.c parenthesis_utils.c parenthesis_utils2.c
-TOKENIZER_SRCS = tokenizer.c operator_token.c word_quote_token.c
-BUILTINS_SRCS = builtins.c env_builtins.c expand_env.c
-EXEC_SRCS = executor.c heredoc.c pipe_redir.c executor_utils.c wildcards.c
-PIPE_SRCS =
-FREE_SRCS = 
+MAIN_SRCS = 		main.c \
+					init_shell.c \
+					signals.c \
+					debugger.c
+
+PARSING_SRCS = 		parser.c \
+					parser_utils.c \
+					redir_utils.c \
+					cmd_utils.c \
+					parenthesis_utils.c \
+					parenthesis_utils2.c
+
+TOKENIZER_SRCS = 	tokenizer.c \
+					operator_token.c \
+					word_quote_token.c
+
+BUILTINS_SRCS = 	export_utils.c \
+					cd.c \
+					echo.c \
+					env.c \
+					exit.c \
+					export.c \
+					pwd.c \
+					unset.c
+
+EXEC_SRCS = 		executor.c \
+					heredoc.c \
+					pipe_redir.c \
+					executor_utils.c \
+					wildcards.c
+
+EXPAND_SRCS =		expand_env.c \
+					env_heredoc.c \
+					expand_env_utils.c \
+					expand_redir.c \
+					get_value.c \
+					process_dollar_quote.c
 
 # Concatenate all sources
 SRCS = $(addprefix $(MAIN_DIR), $(MAIN_SRCS)) \
@@ -48,8 +77,7 @@ SRCS = $(addprefix $(MAIN_DIR), $(MAIN_SRCS)) \
        $(addprefix $(TOKENIZER_DIR), $(TOKENIZER_SRCS)) \
        $(addprefix $(BUILTINS_DIR), $(BUILTINS_SRCS)) \
        $(addprefix $(EXEC_DIR), $(EXEC_SRCS)) \
-       $(addprefix $(PIPE_DIR), $(PIPE_SRCS)) \
-       $(addprefix $(FREE_DIR), $(FREE_SRCS))
+	   $(addprefix $(EXPAND_DIR), $(EXPAND_SRCS)) \
 
 # Object files
 OBJS_DIR = obj/
