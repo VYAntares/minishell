@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 03:55:16 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/18 23:14:23 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,11 @@ int				handle_heredoc(t_file_redir *redir,
 					char *delimiter);
 char			*purify_quote(t_file_redir	*redir);
 void			launch_heredoc(t_ast *ast, t_shell *shell);
+
+/* exec/heredoc_sigint.c*/
+void			handle_heredoc_sigint(int sig);
+int				setup_heredoc_signals(void);
+int 			process_sig(int *sig_received, char *line, char *temp_file);
 
 /* exec/heredoc_utils.c */
 void			chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd);

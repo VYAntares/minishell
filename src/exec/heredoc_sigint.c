@@ -1,34 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   signals.c                                          :+:      :+:    :+:   */
+/*   heredoc_sigint.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/20 20:18:39 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 22:41:43 by eahmeti          ###   ########.fr       */
+/*   Created: 2025/05/18 23:06:39 by eahmeti           #+#    #+#             */
+/*   Updated: 2025/05/18 23:29:40 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-void	handle_sigint(int sig)
+void	handle_heredoc_sigint(int sig)
 {
 	(void)sig;
-	write(1, "\n", 1);
 	g_sigint_received = 1;
-	rl_on_new_line();
-	rl_replace_line("", 0);
-	rl_redisplay();
+	printf("\n");
+    rl_replace_line("", 0);
+    rl_on_new_line();
 }
 
-int	setup_signals(void)
+int	setup_heredoc_signals(void)
 {
 	struct sigaction	sa;
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
-	sa.sa_handler = handle_sigint;
+	sa.sa_handler = handle_heredoc_sigint;
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 		return (perror("Error sigaction"), -1);
 	sa.sa_handler = SIG_IGN;
@@ -37,23 +36,17 @@ int	setup_signals(void)
 	return (0);
 }
 
-int	setup_signals_for_commands(void)
+int process_sig(int *sig_received, char *line, char *temp_file)
 {
-	struct sigaction	sa;
-
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sa.sa_handler = SIG_IGN;
-	if (sigaction(SIGINT, &sa, NULL) == -1)
-		return (perror("Error sigaction"), -1);
-	sa.sa_handler = SIG_IGN;
-	if (sigaction(SIGQUIT, &sa, NULL) == -1)
-		return (perror("Error sigaction"), -1);
-	return (0);
-}
-
-void	reset_signals_for_child(void)
-{
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+    if (*sig_received || !line)
+	{
+	    setup_signals();
+		if (*sig_received)
+		{
+			unlink(temp_file);
+			return (0);
+		}
+		return (0);
+	}
+    return (1);
 }

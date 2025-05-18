@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:46:33 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 03:52:39 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/18 22:43:00 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,6 @@ int	ambiguous_multiple_file_detected(t_file_redir *redir)
 	return (1);
 }
 
-/*
-** Fonction pour reconstruire la chaîne de contenu après l'expansion wildcard
-** pour les redirections
-*/
 int	rebuild_redirection_content(t_file_redir *redir)
 {
 	char			*new_content;

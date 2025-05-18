@@ -68,7 +68,8 @@ EXEC_SRCS = 		execute_command.c \
 					heredoc.c \
 					pipe.c \
 					redirection_utils.c \
-					redirections.c
+					redirections.c \
+					heredoc_sigint.c \
 
 EXPAND_SRCS =		expand_env.c \
 					env_heredoc.c \

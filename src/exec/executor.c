@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:17:33 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/18 23:01:01 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 int	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	pid_t	pid;
-	int		is_minishell;
+	int		status;
 
 	if (!cmd || !cmd->name || !cmd->arg[0])
 		return (execute_redirections(cmd, shell), 1);
@@ -23,14 +23,11 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 		return (1);
 	if (is_builtin(cmd->name))
 		return (handle_builtin(cmd, shell));
-	is_minishell = (ft_strncmp(cmd->name, "./minishell", 11) == 0);
-	if (is_minishell)
-		setup_signals_for_commands();
+	setup_signals_for_commands();
 	pid = fork();
 	if (pid == -1)
 	{
-		if (is_minishell)
-			setup_signals();
+		setup_signals();
 		return (perror("fork"), dmb_gc(), 1);
 	}
 	if (pid == 0)
@@ -38,7 +35,9 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 		handle_command(cmd, shell);
 		dmb_gc();
 	}
-	return (handle_parent_process(pid, is_minishell));
+	status = handle_parent_process(pid, 0);
+	setup_signals();
+	return (status);
 }
 
 int	execute_subshell(t_ast *sub_shell, t_shell *shell)

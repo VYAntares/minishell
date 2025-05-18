@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:16:13 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:17:49 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/18 23:02:23 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,8 @@ int	handle_parent_process(pid_t pid, int is_minishell)
 	int	status;
 
 	waitpid(pid, &status, 0);
+	if (((status & 0x7f) != 0) && ((status & 0x7f) == 2))
+		write(STDOUT_FILENO, "\n", 1);
 	if (is_minishell)
 		setup_signals();
 	if ((status & 0x7f) == 0)
