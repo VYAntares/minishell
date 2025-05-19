@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 23:32:27 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/19 23:46:27 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,11 @@ int handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
         
         if (process_heredoc_lines(fd, delimiter, shell) != 0)
         {
-            // close(fd);
+            close(fd);
             exit(1);
         }
         
-        // close(fd);
+        close(fd);
         exit(0);
     }
     else // Processus parent
@@ -120,24 +120,23 @@ int handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
         waitpid(pid, &status, 0);
         
         // Si le processus enfant a été tué par un signal
-        if (WIFSIGNALED(status))
-		{
-			if (WTERMSIG(status) == SIGINT)
-			{
-				g_sigint_received = 1;
-				unlink(temp_file);
-				dmb_free(temp_file);
-				dmb_free(delimiter);
+        // if (WIFSIGNALED(status))
+		// {
+		// 	if (WTERMSIG(status) == SIGINT)
+		// 	{
+		// 		g_sigint_received = 1;
+		// 		unlink(temp_file);
+		// 		dmb_free(temp_file);
+		// 		dmb_free(delimiter);
 				
-				// Restaurer les gestionnaires de signaux
-				setup_signals();
+		// 		// Restaurer les gestionnaires de signaux
+		// 		setup_signals();
 				
-				// Ne pas créer de contenu invalide qui sera utilisé
-				// Laisser redir->content intact, il sera ignoré de toute façon
-				
-				return (1);
-			}
-		}
+		// 		// Ne pas créer de contenu invalide qui sera utilisé
+		// 		// Laisser redir->content intact, il sera ignoré de toute façon
+		// 		return (1);
+		// 	}
+		// }
         
         // Vérifier le code de sortie du processus enfant
         if (WEXITSTATUS(status) != 0)
@@ -146,7 +145,7 @@ int handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
             dmb_free(temp_file);
             dmb_free(delimiter);
             setup_signals(); // Restaurer les signaux
-            return (1);
+            return (130);
         }
         
         // Tout s'est bien passé
@@ -179,44 +178,36 @@ char	*purify_quote(t_file_redir	*redir)
 	return (delimiter);
 }
 
-void launch_heredoc(t_ast *ast, t_shell *shell)
+int launch_heredoc(t_ast *ast, t_shell *shell)
 {
     t_file_redir    *redir;
     t_cmd           *cmd;
-    int             heredoc_interrupted = 0;
+    int             result_heredoc;
 
     g_sigint_received = 0; // Réinitialiser le flag global
     
     shell->cmd = get_chained_commands(ast);
     cmd = shell->cmd;
     
-    while (cmd && !heredoc_interrupted)
+    while (cmd && result_heredoc != 130)
     {
         redir = cmd->type_redir;
-        while (redir && !heredoc_interrupted)
+        while (redir)
         {
             if (redir->type_redirection == T_HEREDOC)
             {
-                if (handle_heredoc(redir, shell, purify_quote(redir)) != 0)
+                result_heredoc = handle_heredoc(redir, shell, purify_quote(redir));
+                if (result_heredoc == 130)
                 {
-                    if (g_sigint_received)
-                    {
-                        heredoc_interrupted = 1;
-                        break;
-                    }
+                    shell->exit_status = 1;
+                    break ;
                 }
             }
             redir = redir->next;
         }
-        if (heredoc_interrupted)
+        if (result_heredoc == 130)
             break;
         cmd = cmd->next;
-    }
-    
-    // Si un heredoc a été interrompu, on doit nettoyer
-    if (heredoc_interrupted)
-    {
-        // Ce flag empêchera l'exécution de la commande
-        g_sigint_received = 1;
-    }
+    }    
+    return (result_heredoc);
 }

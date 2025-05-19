@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 23:33:53 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/19 23:41:55 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,33 +33,33 @@ void	cleanup_heredoc_files(t_cmd *cmd)
 	}
 }
 
-void execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
-{
-    add_history(input);
-    tokens = tokenize(input);
-    if (tokens && check_syntax_error_parenthesis(tokens))
-    {
-        ast = parse_tokens(tokens);
-        if (ast)
-        {
-            launch_heredoc(ast, shell);
+// void execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
+// {
+//     add_history(input);
+//     tokens = tokenize(input);
+//     if (tokens && check_syntax_error_parenthesis(tokens))
+//     {
+//         ast = parse_tokens(tokens);
+//         if (ast)
+//         {
+//             launch_heredoc(ast, shell);
             
-            // Ne pas exécuter la commande si un heredoc a été interrompu
-            if (!g_sigint_received)
-            {
-                shell->exit_status = execute_ast(ast, shell);
-                cleanup_heredoc_files(shell->cmd);
-            }
-            else
-            {
-                // Nettoyer explicitement tous les fichiers temporaires
-                if (shell->cmd)
-                    cleanup_heredoc_files(shell->cmd);
-                g_sigint_received = 0; // Réinitialiser pour le prochain prompt
-            }
-        }
-    }
-}
+//             // Ne pas exécuter la commande si un heredoc a été interrompu
+//             if (!g_sigint_received)
+//             {
+//                 shell->exit_status = execute_ast(ast, shell);
+//                 cleanup_heredoc_files(shell->cmd);
+//             }
+//             else
+//             {
+//                 // Nettoyer explicitement tous les fichiers temporaires
+//                 if (shell->cmd)
+//                     cleanup_heredoc_files(shell->cmd);
+//                 g_sigint_received = 0; // Réinitialiser pour le prochain prompt
+//             }
+//         }
+//     }
+// }
 
 int read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 {
@@ -81,10 +81,10 @@ int read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
             ast = parse_tokens(tokens);
             if (ast)
             {
-                launch_heredoc(ast, shell);
+                int result_heredoc = launch_heredoc(ast, shell);
                 
                 // Ne pas exécuter la commande si un heredoc a été interrompu
-                if (!g_sigint_received)
+                if (result_heredoc != 130)
                 {
                     shell->exit_status = execute_ast(ast, shell);
                     cleanup_heredoc_files(shell->cmd);

@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 23:14:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/19 23:42:01 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,7 +235,7 @@ int				handle_heredoc(t_file_redir *redir,
 					t_shell *shell,
 					char *delimiter);
 char			*purify_quote(t_file_redir	*redir);
-void			launch_heredoc(t_ast *ast, t_shell *shell);
+int				launch_heredoc(t_ast *ast, t_shell *shell);
 
 /* exec/heredoc_sigint.c*/
 void			handle_heredoc_sigint(int sig);
