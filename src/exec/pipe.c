@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:25:48 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:28:52 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/20 00:16:44 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ int	execute_pipe(t_ast *left, t_ast *right, t_shell *shell)
 	close(pipefd[1]);
 	waitpid(pid1, &status1, 0);
 	waitpid(pid2, &status2, 0);
-	if ((status2 & 0x7f) == 0)
-		return ((status2 & 0xff00) >> 8);
+	if (WIFEXITED(status2))
+		return (WEXITSTATUS(status2));
 	return (1);
 }

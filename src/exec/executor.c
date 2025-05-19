@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 23:01:01 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/20 00:11:08 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,10 @@ int	execute_subshell(t_ast *sub_shell, t_shell *shell)
 	else
 	{
 		waitpid(pid, &status, 0);
-		if (status & 0xFF)
-			return (1);
+		if (WIFSIGNALED(status))
+			return (128 + WTERMSIG(status));
 		else
-			return ((status >> 8) & 0xFF);
+			return (WEXITSTATUS(status));
 	}
 }
 

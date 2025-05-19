@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/19 23:42:01 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/20 00:17:28 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,17 +234,19 @@ int				process_heredoc_lines(int fd,
 int				handle_heredoc(t_file_redir *redir,
 					t_shell *shell,
 					char *delimiter);
-char			*purify_quote(t_file_redir	*redir);
+char			*purify_q(t_file_redir	*redir);
 int				launch_heredoc(t_ast *ast, t_shell *shell);
 
 /* exec/heredoc_sigint.c*/
 void			handle_heredoc_sigint(int sig);
 int				setup_heredoc_signals(void);
-int 			process_sig(int *sig_received, char *line, char *temp_file);
+int				process_sig(int *sig_received, char *line, char *temp_file);
 
 /* exec/heredoc_utils.c */
 void			chain_commands(t_ast *ast, t_cmd **first_cmd, t_cmd **last_cmd);
 t_cmd			*get_chained_commands(t_ast *ast);
+int				setup_heredoc_fork(char *temp_file, pid_t *pid);
+int				execute_heredoc_child(int fd, char *delimiter, t_shell *shell);
 
 /* exec/pipe.c */
 void			execute_left_command_in_pipe(int pipefd[2],

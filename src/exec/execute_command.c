@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:16:13 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 23:02:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/20 00:12:10 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,13 +97,13 @@ int	handle_parent_process(pid_t pid, int is_minishell)
 	int	status;
 
 	waitpid(pid, &status, 0);
-	if (((status & 0x7f) != 0) && ((status & 0x7f) == 2))
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 		write(STDOUT_FILENO, "\n", 1);
 	if (is_minishell)
 		setup_signals();
-	if ((status & 0x7f) == 0)
-		return ((status & 0xff00) >> 8);
-	else if ((status & 0x7f) != 0)
-		return (128 + (status & 0x7f));
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	else if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
 	return (1);
 }
