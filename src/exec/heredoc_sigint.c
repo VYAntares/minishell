@@ -12,28 +12,27 @@
 
 #include "../../minishell.h"
 
-void	handle_heredoc_sigint(int sig)
+void handle_heredoc_sigint(int sig)
 {
-	(void)sig;
-	g_sigint_received = 1;
-	printf("\n");
-    rl_replace_line("", 0);
-    rl_on_new_line();
+    (void)sig;
+    // Ctrl+C affiche déjà une nouvelle ligne
+    close(STDIN_FILENO); // Force readline à retourner NULL
+    exit(130); // Code spécial pour SIGINT
 }
 
-int	setup_heredoc_signals(void)
+int setup_heredoc_signals(void)
 {
-	struct sigaction	sa;
+    struct sigaction    sa;
 
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sa.sa_handler = handle_heredoc_sigint;
-	if (sigaction(SIGINT, &sa, NULL) == -1)
-		return (perror("Error sigaction"), -1);
-	sa.sa_handler = SIG_IGN;
-	if (sigaction(SIGQUIT, &sa, NULL) == -1)
-		return (perror("Error sigaction"), -1);
-	return (0);
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = handle_heredoc_sigint;
+    if (sigaction(SIGINT, &sa, NULL) == -1)
+        return (-1);
+    sa.sa_handler = SIG_IGN;
+    if (sigaction(SIGQUIT, &sa, NULL) == -1)
+        return (-1);
+    return (0);
 }
 
 int process_sig(int *sig_received, char *line, char *temp_file)

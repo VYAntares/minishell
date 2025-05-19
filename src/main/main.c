@@ -33,37 +33,67 @@ void	cleanup_heredoc_files(t_cmd *cmd)
 	}
 }
 
-void	execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
+void execute_line(char *input, t_token *tokens, t_ast *ast, t_shell *shell)
 {
-	add_history(input);
-	tokens = tokenize(input);
-	if (tokens && check_syntax_error_parenthesis(tokens))
-	{
-		ast = parse_tokens(tokens);
-		if (ast)
-		{
-			launch_heredoc(ast, shell);
-			shell->exit_status = execute_ast(ast, shell);
-			cleanup_heredoc_files(shell->cmd);
-		}
-	}
+    add_history(input);
+    tokens = tokenize(input);
+    if (tokens && check_syntax_error_parenthesis(tokens))
+    {
+        ast = parse_tokens(tokens);
+        if (ast)
+        {
+            launch_heredoc(ast, shell);
+            
+            // Ne pas exécuter la commande si un heredoc a été interrompu
+            if (!g_sigint_received)
+            {
+                shell->exit_status = execute_ast(ast, shell);
+                cleanup_heredoc_files(shell->cmd);
+            }
+            else
+            {
+                // Nettoyer explicitement tous les fichiers temporaires
+                if (shell->cmd)
+                    cleanup_heredoc_files(shell->cmd);
+                g_sigint_received = 0; // Réinitialiser pour le prochain prompt
+            }
+        }
+    }
 }
 
-int	read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
+int read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 {
-	char	*input;
+    char *input;
 
-	g_sigint_received = 0;
-	input = readline("miniHell$ ");
-	if (!input)
-	{
-		printf("exit\n");
-		return (1);
-	}
-	if (*input)
-		execute_line(input, tokens, ast, shell);
-	free(input);
-	return (0);
+    g_sigint_received = 0;
+    input = readline("miniHell$ ");
+    if (!input)
+    {
+        printf("exit\n");
+        return (1);
+    }
+    if (*input)
+    {
+        add_history(input);
+        tokens = tokenize(input);
+        if (tokens && check_syntax_error_parenthesis(tokens))
+        {
+            ast = parse_tokens(tokens);
+            if (ast)
+            {
+                launch_heredoc(ast, shell);
+                
+                // Ne pas exécuter la commande si un heredoc a été interrompu
+                if (!g_sigint_received)
+                {
+                    shell->exit_status = execute_ast(ast, shell);
+                    cleanup_heredoc_files(shell->cmd);
+                }
+            }
+        }
+    }
+    free(input);
+    return (0);
 }
 
 int	main(int ac, char **av, char **envp)

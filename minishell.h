@@ -230,8 +230,7 @@ char			*find_command_path(char *name, t_shell *shell);
 char			*create_temp_file(void);
 int				process_heredoc_lines(int fd,
 					char *delimiter,
-					t_shell *shell,
-					char *temp_file);
+					t_shell *shell);
 int				handle_heredoc(t_file_redir *redir,
 					t_shell *shell,
 					char *delimiter);
