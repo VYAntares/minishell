@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main.c                                              :+:    :+:           */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/25 21:00:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/06/03 16:17:42 by eahmeti        ########   odam.nl        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ int	read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 	}
 	return (0);
 }
+
 /*
 ** Point d'entree du programme.
 ** Initialise le shell, configure les signaux et lance la boucle
