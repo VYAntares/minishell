@@ -3,15 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:35:03 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:31:47 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:07:26 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Initialise un noeud de l'arbre syntaxique abstrait.
+** Alloue la memoire et met tous les pointeurs a NULL.
+** Retourne le noeud initialise ou NULL en cas d'erreur.
+*/
 t_ast	*init_ast_node(t_ast_type type)
 {
 	t_ast		*node;
@@ -28,6 +33,11 @@ t_ast	*init_ast_node(t_ast_type type)
 	return (node);
 }
 
+/*
+** Cree une copie d'un token pour une nouvelle liste.
+** Duplique le type, la valeur et configure les liaisons.
+** Retourne le nouveau token ou NULL en cas d'erreur.
+*/
 t_token	*init_new_token(t_token *tmp, t_token *prev)
 {
 	t_token		*new_token;
@@ -47,6 +57,11 @@ t_token	*init_new_token(t_token *tmp, t_token *prev)
 	return (new_token);
 }
 
+/*
+** Parcourt la liste pour trouver le dernier token d'un type donne.
+** Utilise pour determiner quel operateur doit devenir racine de l'AST.
+** Retourne le dernier token trouve ou NULL si aucun.
+*/
 t_token	*find_last_token_of_type(t_token *tokens, t_type type)
 {
 	t_token		*current;
@@ -63,6 +78,11 @@ t_token	*find_last_token_of_type(t_token *tokens, t_type type)
 	return (last_found);
 }
 
+/*
+** Cree une nouvelle liste avec tous les tokens apres un token donne.
+** Utilise pour obtenir la partie droite lors du splitting.
+** Retourne la nouvelle liste ou NULL si vide/erreur.
+*/
 t_token	*get_tokens_after(t_token *current)
 {
 	t_token		*new_list;
@@ -90,6 +110,11 @@ t_token	*get_tokens_after(t_token *current)
 	return (new_list);
 }
 
+/*
+** Cree une nouvelle liste avec tous les tokens apres un token donne.
+** Utilise pour obtenir la partie droite lors du splitting.
+** Retourne la nouvelle liste ou NULL si vide/erreur.
+*/
 t_token	*get_tokens_before(t_token *tokens, t_token *current)
 {
 	t_token		*new_list;

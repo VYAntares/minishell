@@ -6,12 +6,17 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 01:50:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 01:52:43 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:29:33 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Recherche une variable d'environnement par son nom
+** Parcourt la liste chaînée des variables d'environnement
+** Retourne la valeur correspondante ou NULL si non trouvée
+*/
 char	*get_env_value(t_env *env, const char *name)
 {
 	t_env	*current;
@@ -27,6 +32,11 @@ char	*get_env_value(t_env *env, const char *name)
 	return (NULL);
 }
 
+/*
+** Convertit un entier en chaîne de caractères pour l'expansion
+** Utilisé pour $$ (PID) et $? (exit status)
+** Incrémente l'index et retourne la valeur convertie
+*/
 char	*get_int_value_of(int env, int *i)
 {
 	char	*env_value;
@@ -38,6 +48,11 @@ char	*get_int_value_of(int env, int *i)
 	return (env_value);
 }
 
+/*
+** Extrait le nom d'une variable d'environnement depuis une ligne
+** Avance l'index jusqu'à la fin du nom (alphanum + underscore)
+** Retourne la valeur de la variable ou chaîne vide si inexistante
+*/
 char	*extract_env_value(char	*line, t_shell *shell, int *i, int *start)
 {
 	char	*env_name;
@@ -58,6 +73,11 @@ char	*extract_env_value(char	*line, t_shell *shell, int *i, int *start)
 	return (env_value);
 }
 
+/*
+** Reconstruit une ligne en remplaçant une variable par sa valeur
+** Concatène : début de ligne + valeur expandée + fin de ligne
+** Retourne la nouvelle ligne ou NULL en cas d'erreur
+*/
 char	*expand_line(char *line, char *env_value, int start, int i)
 {
 	char	*expanded_line;
@@ -74,6 +94,11 @@ char	*expand_line(char *line, char *env_value, int start, int i)
 	return (expanded_line);
 }
 
+/*
+** Point d'entrée principal pour l'expansion des variables
+** Gère les cas spéciaux $$ et $? puis les variables normales
+** Retourne la ligne avec la variable expandée
+*/
 char	*launch_expansion(char *line, t_shell *shell, int *i, int *start)
 {
 	char	*env_value;

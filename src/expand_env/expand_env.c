@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 11:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:01:36 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:24:57 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Expanse les variables d'environnement dans un token_word
+** Parcourt le contenu à la recherche de '$' suivi d'un caractère
+** Remplace chaque variable par sa valeur via launch_expansion
+** Retourne 0 en cas de succès
+*/
 int	expand_env_var(t_token_word *token_word, t_shell *shell)
 {
 	int		i;
@@ -37,6 +43,12 @@ int	expand_env_var(t_token_word *token_word, t_shell *shell)
 	return (0);
 }
 
+/*
+** Reconstruit le tableau d'arguments après expansion des variables
+** Calcule le nouveau nombre d'arguments (avec splitting)
+** Crée le nouveau tableau et remplace l'ancien
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	rebuild_command_arg(t_cmd *cmd)
 {
 	int				i;
@@ -66,6 +78,12 @@ int	rebuild_command_arg(t_cmd *cmd)
 	return (0);
 }
 
+/*
+** Point d'entrée principal pour l'expansion des variables d'une commande
+** Préprocesse les dollars, expanse toutes les variables non-quotées
+** Reconstruit les arguments après expansion et splitting
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	expand_var(t_cmd *cmd, t_shell *shell)
 {
 	t_token_word	*list;

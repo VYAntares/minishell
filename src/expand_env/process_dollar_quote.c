@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 01:47:40 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:14:12 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:22:07 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Traite les dollars en fin de token non-quoté avant une quote
+** Compte les dollars consécutifs en fin de chaîne
+** Supprime le dernier dollar si le nombre est impair
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	process_dollar(t_token_word	*current)
 {
 	char			*new_content;
@@ -41,6 +47,12 @@ int	process_dollar(t_token_word	*current)
 	return (0);
 }
 
+/*
+** Préprocesse les dollars dans les redirections
+** Applique process_dollar aux tokens non-quotés suivis de quotes
+** Parcourt la liste des parties de mots d'une redirection
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	prepro_dol_redir(t_token_word *word_parts)
 {
 	t_token_word	*current;
@@ -60,6 +72,12 @@ int	prepro_dol_redir(t_token_word *word_parts)
 	return (0);
 }
 
+/*
+** Préprocesse les dollars dans les arguments de commande
+** Applique process_dollar aux tokens non-quotés suivis de quotes
+** Parcourt la liste des parties de mots d'un argument
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	preprocess_dollar_quotes(t_token_word **head)
 {
 	t_token_word	*current;

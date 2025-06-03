@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:40:50 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:56:28 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:40:43 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Double la capacité du tableau de fichiers quand il est plein
+** Copie les fichiers existants dans le nouveau tableau
+** Libère l'ancien tableau et ferme le répertoire en cas d'erreur
+** Retourne le nouveau tableau ou NULL si échec
+*/
 char	**realloc_capacity(char **files, int *capacity, int count, DIR *dir)
 {
 	char	**new_files;
@@ -39,6 +45,12 @@ char	**realloc_capacity(char **files, int *capacity, int count, DIR *dir)
 	return (new_files);
 }
 
+/*
+** Remplit le tableau avec les fichiers correspondant au wildcard
+** Ignore les fichiers cachés sauf si le pattern commence par '.'
+** Réalloue dynamiquement si le tableau devient trop petit
+** Retourne le tableau rempli ou NULL en cas d'erreur
+*/
 char	**fill_wildcard_array(DIR *dir, const char *wildcard_str,
 								char **files, int *count)
 {
@@ -68,6 +80,12 @@ char	**fill_wildcard_array(DIR *dir, const char *wildcard_str,
 	return (files);
 }
 
+/*
+** Finalise le tableau de fichiers trouvés
+** Crée un tableau final de taille exacte terminé par NULL
+** Trie les fichiers par ordre alphabétique
+** Retourne le tableau final ou NULL en cas d'erreur
+*/
 char	**match_wildcard_array(char **files, int count)
 {
 	char	**new_files;
@@ -95,6 +113,11 @@ char	**match_wildcard_array(char **files, int count)
 	return (files);
 }
 
+/*
+** Gère le cas où aucun fichier ne correspond au wildcard
+** Retourne un tableau contenant uniquement le pattern original
+** Suit le comportement standard du shell (pas d'expansion)
+*/
 char	**no_match_wildcard(const char *wildcard_str, char **files)
 {
 	files[0] = ft_strdup(wildcard_str);
@@ -105,8 +128,9 @@ char	**no_match_wildcard(const char *wildcard_str, char **files)
 }
 
 /*
-** Fonction pour développer un motif de wildcard en liste
-** de fichiers correspondants
+** Point d'entrée principal pour l'expansion des wildcards
+** Ouvre le répertoire courant et cherche les fichiers correspondants
+** Retourne le pattern original si aucun match, sinon liste triée
 */
 char	**expand_wildcard(const char *wildcard_str)
 {

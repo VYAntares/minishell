@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:59:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 22:43:10 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:48:04 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Construit une chaîne composite à partir d'une liste de token_word
+** Concatène tous les contenus et vérifie la présence d'un wildcard
+** Retourne NULL si aucun '*' trouvé (pas d'expansion nécessaire)
+** Retourne la chaîne complète si wildcard présent
+*/
 char	*build_composite_wildcard_str(t_token_word *list)
 {
 	t_token_word	*current;
@@ -39,6 +45,12 @@ char	*build_composite_wildcard_str(t_token_word *list)
 	return (wildcard_str);
 }
 
+/*
+** Convertit un tableau de fichiers en liste chaînée de token_word
+** Crée un token_word de type T_NO_QUOTE pour chaque fichier
+** Construit une liste chaînée et libère le tableau original
+** Retourne la nouvelle liste ou NULL en cas d'erreur
+*/
 t_token_word	*expanded_wildcard_list(char **expanded)
 {
 	t_token_word	*new_word;
@@ -68,6 +80,12 @@ t_token_word	*expanded_wildcard_list(char **expanded)
 	return (head);
 }
 
+/*
+** Expanse les wildcards dans une liste de token_word
+** Construit le pattern, l'expanse et remplace la liste originale
+** Libère l'ancienne liste et installe la nouvelle
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	expand_wildcard_in_word_list(t_token_word **list)
 {
 	t_token_word	*new_list;
@@ -94,6 +112,12 @@ int	expand_wildcard_in_word_list(t_token_word **list)
 	return (0);
 }
 
+/*
+** Point d'entrée principal pour l'expansion des wildcards d'une commande
+** Vérifie d'abord si des wildcards sont présents
+** Expanse tous les arguments puis les redirections
+** Retourne 0 en cas de succès, 1 en cas d'erreur
+*/
 int	launch_expand_wildcards(t_cmd *cmd)
 {
 	int				i;

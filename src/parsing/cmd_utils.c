@@ -6,12 +6,17 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 17:49:49 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 22:42:01 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:09:07 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Compte le nombre d'arguments d'une commande en ignorant les redirections.
+** Saute les tokens de redirection et leurs fichiers associes.
+** Retourne le nombre total d'arguments (commande + parametres).
+*/
 int	count_args(t_token *tokens)
 {
 	t_token		*current;
@@ -36,6 +41,11 @@ int	count_args(t_token *tokens)
 	return (count);
 }
 
+/*
+** Initialise une structure t_cmd avec les champs de base.
+** Alloue le tableau d'arguments selon le nombre calcule.
+** Retourne 1 en cas de succes, 0 en cas d'erreur d'allocation.
+*/
 int	init_cmd(t_cmd *cmd, t_token *tokens)
 {
 	if (!tokens)
@@ -53,6 +63,11 @@ int	init_cmd(t_cmd *cmd, t_token *tokens)
 	return (1);
 }
 
+/*
+** Ajoute un argument au tableau cmd->arg a l'index donne.
+** Le premier argument (index 0) devient aussi cmd->name.
+** Retourne 1 en cas de succes, 0 si duplication echoue.
+*/
 int	add_command_arg(t_cmd *cmd, t_token *current, int i)
 {
 	if (i == 0)
@@ -68,6 +83,11 @@ int	add_command_arg(t_cmd *cmd, t_token *current, int i)
 	return (1);
 }
 
+/*
+** Sauvegarde les t_token_word pour chaque argument de la commande.
+** Necessaire pour l'expansion des variables et des wildcards.
+** Construit un tableau parallele a cmd->arg avec les metadonnees.
+*/
 void	track_word_tokens(t_cmd *cmd, t_token *tokens)
 {
 	t_token		*current;
@@ -93,6 +113,11 @@ void	track_word_tokens(t_cmd *cmd, t_token *tokens)
 	cmd->list_word[i] = NULL;
 }
 
+/*
+** Point d'entree pour creer une structure t_cmd complete.
+** Compte, initialise, remplit les arguments et trace les tokens.
+** Retourne la commande prete ou NULL en cas d'erreur.
+*/
 t_cmd	*create_command(t_token *tokens)
 {
 	t_token		*current;

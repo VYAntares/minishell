@@ -3,15 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   init_shell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/26 19:04:34 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 18:38:29 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 20:50:37 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Cree un noeud d'environnement a partir d'une chaine "NAME=value".
+** Parse la chaine pour separer le nom et la valeur.
+** Retourne le noeud alloue ou NULL en cas d'erreur.
+*/
 t_env	*create_env_node(const char *env_str)
 {
 	t_env		*node;
@@ -35,6 +40,11 @@ t_env	*create_env_node(const char *env_str)
 	return (node);
 }
 
+/*
+** Cree un noeud d'environnement avec nom et valeur donnes.
+** Version simplifiee pour creer des variables predefinies.
+** Retourne le noeud alloue ou NULL en cas d'erreur.
+*/
 void	*create_minimal_env(char *name, char *value)
 {
 	t_env	*node;
@@ -52,6 +62,11 @@ void	*create_minimal_env(char *name, char *value)
 	return (node);
 }
 
+/*
+** Initialise un environnement minimal avec PWD, PATH et SHLVL.
+** Utilise en cas d'absence d'environnement externe.
+** Retourne la liste chainee d'environnement ou NULL.
+*/
 t_env	*init_minimal_env(void)
 {
 	t_env	*head;
@@ -78,6 +93,11 @@ t_env	*init_minimal_env(void)
 	return (head);
 }
 
+/*
+** Initialise l'environnement du shell depuis envp.
+** Cree une liste chainee de variables d'environnement.
+** Retourne la liste ou un environnement minimal si envp vide.
+*/
 t_env	*init_env(char **envp)
 {
 	t_env		*head;
@@ -104,6 +124,11 @@ t_env	*init_env(char **envp)
 	return (head);
 }
 
+/*
+** Initialise la structure principale du shell.
+** Configure l'environnement, le PID, le statut et SHLVL.
+** Retourne la structure shell initialisee ou NULL.
+*/
 t_shell	*init_shell(char **envp)
 {
 	t_shell		*shell;

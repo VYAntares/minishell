@@ -6,12 +6,19 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 00:39:02 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 22:38:49 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:34:59 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Met a jour le repertoire courant et les variables PWD/OLDPWD.
+** 1. Sauvegarde le repertoire actuel avec getcwd() dans old_pwd
+** 2. Change de repertoire avec chdir(), affiche erreur si echec
+** 3. Recupere le nouveau repertoire et met a jour PWD/OLDPWD
+** Maintient la coherence entre le systeme et les variables shell.
+*/
 int	update_repertory(char *path, t_shell *shell)
 {
 	char	*old_pwd;
@@ -41,6 +48,13 @@ int	update_repertory(char *path, t_shell *shell)
 	return (dmb_free(old_pwd), 0);
 }
 
+/*
+** Implemente la commande cd (change directory) du shell.
+** Sans argument ou avec ~: va dans HOME (repertoire utilisateur)
+** Avec argument: va dans le repertoire specifie (relatif ou absolu)
+** Gere l'erreur si HOME n'est pas defini dans l'environnement.
+** Retourne 0 si succes, 1 en cas d'erreur de changement.
+*/
 int	builtin_cd(t_cmd *cmd, t_shell *shell)
 {
 	char	*path;

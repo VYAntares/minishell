@@ -6,7 +6,7 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/14 21:30:32 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/20 00:15:36 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:00:29 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 
 sig_atomic_t	g_sigint_received;
 
+/*
+** Nettoie les fichiers temporaires crees par les heredocs.
+** Parcourt toutes les commandes et leurs redirections pour supprimer
+** les fichiers temporaires generes par les heredocs (<<).
+*/
 void	cleanup_heredoc_files(t_cmd *cmd)
 {
 	t_file_redir	*redir;
@@ -33,6 +38,11 @@ void	cleanup_heredoc_files(t_cmd *cmd)
 	}
 }
 
+/*
+** Lit une ligne utilisateur, la tokenise, la parse et l'execute.
+** Gere le cycle complet : lecture -> analyse syntaxique -> execution.
+** Retourne 1 pour quitter le shell (EOF), 0 pour continuer.
+*/
 int	read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 {
 	char	*input;
@@ -61,7 +71,11 @@ int	read_and_execute(t_token *tokens, t_ast *ast, t_shell *shell)
 	}
 	return (0);
 }
-
+/*
+** Point d'entree du programme.
+** Initialise le shell, configure les signaux et lance la boucle
+** principale qui lit et execute les commandes utilisateur.
+*/
 int	main(int ac, char **av, char **envp)
 {
 	t_shell		*shell;
@@ -84,5 +98,5 @@ int	main(int ac, char **av, char **envp)
 	}
 	rl_clear_history();
 	dmb_gc();
-	return (0);
+	return (shell->exit_status);
 }

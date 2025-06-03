@@ -6,12 +6,17 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 20:50:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:24:57 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:12:08 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Trouve la parenthese fermante correspondant a une ouvrante donnee.
+** Utilise un compteur pour gerer les parentheses imbriquees.
+** Retourne le token ')' correspondant ou NULL si non trouve.
+*/
 t_token	*find_matching_closing_par(t_token *opening)
 {
 	t_token		*tmp;
@@ -34,6 +39,11 @@ t_token	*find_matching_closing_par(t_token *opening)
 	return (NULL);
 }
 
+/*
+** Trouve la parenthese ouvrante correspondant a une fermante donnee.
+** Parcourt vers l'arriere en comptant les niveaux d'imbrication.
+** Retourne le token '(' correspondant ou NULL si non trouve.
+*/
 t_token	*find_matching_opening_par(t_token *closing)
 {
 	t_token		*tmp;
@@ -56,6 +66,11 @@ t_token	*find_matching_opening_par(t_token *closing)
 	return (NULL);
 }
 
+/*
+** Trouve la premiere parenthese ouvrante dans une liste de tokens.
+** Parcourt lineairement jusqu'a trouver un T_PARENTH_OPEN.
+** Retourne le premier token '(' trouve ou NULL si aucun.
+*/
 t_token	*find_opening_par(t_token *tokens)
 {
 	t_token		*opening;
@@ -72,6 +87,11 @@ t_token	*find_opening_par(t_token *tokens)
 	return (NULL);
 }
 
+/*
+** Extrait le contenu entre une parenthese ouvrante et sa fermante.
+** Cree une nouvelle liste avec tous les tokens internes.
+** Retourne la liste du contenu ou NULL en cas d'erreur.
+*/
 t_token	*extract_parenthesis_content(t_token *start)
 {
 	t_token		*current;

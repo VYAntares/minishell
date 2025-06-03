@@ -6,12 +6,21 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/23 17:49:55 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/20 00:11:08 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:23:35 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Execute une commande simple avec gestion complete des cas speciaux.
+** 1. Verifie validite de la commande (nom, arguments non vides)
+** 2. Expanse les variables ($HOME) et wildcards (*) dans les arguments
+** 3. Si builtin (cd, echo, etc) execute directement dans le shell parent
+** 4. Sinon fork un processus enfant pour executer la commande externe
+** 5. Parent attend l'enfant et retourne son code de sortie
+** Gere signaux, erreurs fork et nettoyage memoire automatiquement.
+*/
 int	execute_command(t_cmd *cmd, t_shell *shell)
 {
 	pid_t	pid;
@@ -40,6 +49,14 @@ int	execute_command(t_cmd *cmd, t_shell *shell)
 	return (status);
 }
 
+/*
+** Execute un sous-shell isole pour les expressions entre parentheses.
+** exemple: (cmd1 && cmd2) || cmd3 - les parentheses sont un subshell
+** 1. Fork un processus enfant completement isole du parent
+** 2. Enfant execute l'AST du contenu des parentheses recursivement
+** 3. Parent attend et recupere le code de sortie du sous-shell
+** Isolation complete: variables, signaux, etc. n'affectent pas le parent.
+*/
 int	execute_subshell(t_ast *sub_shell, t_shell *shell)
 {
 	pid_t	pid;
@@ -69,6 +86,16 @@ int	execute_subshell(t_ast *sub_shell, t_shell *shell)
 	}
 }
 
+/*
+** Point d'entree recursif pour executer tout type de noeud AST.
+** Dispatche selon le type de noeud:
+** - AST_CMD: execute une commande simple
+** - AST_PIPE: execute un pipe (cmd1 | cmd2)
+** - AST_AND: execute && avec logique court-circuit (droite si gauche OK)
+** - AST_OR: execute || avec logique court-circuit (droite si gauche KO)
+** - AST_SUB_SHELL: execute un sous-shell entre parentheses
+** Retourne le code de sortie final selon la logique de chaque operateur.
+*/
 int	execute_ast(t_ast *ast, t_shell *shell)
 {
 	if (!ast)

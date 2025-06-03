@@ -6,12 +6,17 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:10:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/20 00:16:05 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:15:05 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Genere un nom unique de fichier temporaire pour heredoc.
+** Utilise un compteur statique pour eviter les collisions.
+** Retourne le chemin complet ou NULL en cas d'erreur.
+*/
 char	*create_temp_file(void)
 {
 	static int	counter;
@@ -27,6 +32,11 @@ char	*create_temp_file(void)
 	return (temp_file);
 }
 
+/*
+** Lit les lignes utilisateur jusqu'au delimiteur de fin d'heredoc.
+** Expanse les variables d'environnement et ecrit dans le fichier.
+** Retourne 0 si succes, 1 en cas d'erreur d'expansion.
+*/
 int	process_heredoc_lines(int fd, char *delimiter, t_shell *shell)
 {
 	char	*line;
@@ -47,6 +57,11 @@ int	process_heredoc_lines(int fd, char *delimiter, t_shell *shell)
 	}
 }
 
+/*
+** Orchestre l'execution complete d'un heredoc.
+** Cree un processus enfant pour lire l'input et ecrit dans un fichier.
+** Retourne 0 si succes, 130 si interruption (Ctrl+C).
+*/
 int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
 {
 	char	*temp_file;
@@ -73,6 +88,11 @@ int	handle_heredoc(t_file_redir *redir, t_shell *shell, char *delimiter)
 	return (0);
 }
 
+/*
+** Reconstruit le delimiteur d'heredoc en concatenant ses parties.
+** Assemble les token_word pour obtenir le delimiteur final.
+** Retourne la chaine complete ou NULL en cas d'erreur.
+*/
 char	*purify_q(t_file_redir	*redir)
 {
 	t_token_word	*parts;
@@ -90,6 +110,11 @@ char	*purify_q(t_file_redir	*redir)
 	return (delimiter);
 }
 
+/*
+** Point d'entree pour traiter tous les heredocs d'un AST.
+** Parcourt toutes les commandes et leurs redirections.
+** Retourne le statut final ou 130 en cas d'interruption.
+*/
 int	launch_heredoc(t_ast *ast, t_shell *shell)
 {
 	t_file_redir	*redir;

@@ -3,15 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   operator_token.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 22:39:11 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 20:58:50 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Detecte et traite les operateurs logiques doubles (&&, ||).
+** Configure le type et la valeur du token si trouve.
+** Retourne 1 si operateur double detecte, 0 sinon.
+*/
 int	handle_double_operator(t_token *new, int *i, char *input)
 {
 	if (input[*i] == '&' && input[*i + 1] == '&')
@@ -31,6 +36,11 @@ int	handle_double_operator(t_token *new, int *i, char *input)
 	return (0);
 }
 
+/*
+** Detecte et traite les redirections doubles (<<, >>).
+** Heredoc pour << et append pour >>.
+** Retourne 1 si redirection double detectee, 0 sinon.
+*/
 int	handle_double_redir(t_token *new, int *i, char *input)
 {
 	if (input[*i] == '<' && input[*i + 1] == '<')
@@ -50,6 +60,11 @@ int	handle_double_redir(t_token *new, int *i, char *input)
 	return (0);
 }
 
+/*
+** Detecte et traite les operateurs simples (|, >, <).
+** Pipe et redirections d'entree/sortie basiques.
+** Retourne 1 si operateur simple detecte, 0 sinon.
+*/
 int	handle_single_operator(t_token *new, int *i, char *input)
 {
 	if (input[*i] == '|')
@@ -76,6 +91,11 @@ int	handle_single_operator(t_token *new, int *i, char *input)
 	return (0);
 }
 
+/*
+** Detecte et traite les wildcards (*) et parentheses.
+** Gere l'expansion de fichiers et le groupement de commandes.
+** Retourne 1 si caractere special detecte, 0 sinon.
+*/
 int	handle_wild_and_parenthesis(t_token *new, int *i, char *input)
 {
 	if (input[*i] == '*')
@@ -102,6 +122,11 @@ int	handle_wild_and_parenthesis(t_token *new, int *i, char *input)
 	return (0);
 }
 
+/*
+** Cree un token operateur en testant tous les types possibles.
+** Essaie doubles puis simples operateurs dans l'ordre de priorite.
+** Retourne 1 si token cree avec succes, 0 en cas d'erreur.
+*/
 int	add_operator_token(t_token **list, int *i, char *input)
 {
 	t_token	*new;

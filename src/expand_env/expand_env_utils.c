@@ -6,12 +6,17 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 01:55:02 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:02:13 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:30:05 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Détermine si un token_word doit être splité après expansion
+** Retourne 1 si contient espaces/tabs ET aucune quote, 0 sinon
+** Les parties quotées empêchent le splitting
+*/
 int	should_we_split(t_token_word *list_word)
 {
 	int				has_quote;
@@ -35,6 +40,11 @@ int	should_we_split(t_token_word *list_word)
 	return (1);
 }
 
+/*
+** Compte le nombre d'arguments après splitting d'un token_word
+** Reconstruit le mot complet puis le split sur les espaces
+** Retourne le nombre de mots résultants
+*/
 int	count_arg_after_split(t_token_word *list_word)
 {
 	t_token_word	*word;
@@ -57,6 +67,11 @@ int	count_arg_after_split(t_token_word *list_word)
 	return (j);
 }
 
+/*
+** Reconstruit un mot complet à partir d'une liste de token_word
+** Concatène tous les contenus des parties (quotées et non-quotées)
+** Retourne la chaîne complète reconstruite
+*/
 char	*rebuild_word(t_token_word *list_word)
 {
 	char			*tmp;
@@ -75,6 +90,11 @@ char	*rebuild_word(t_token_word *list_word)
 	return (tmp);
 }
 
+/*
+** Remplit le nouveau tableau d'arguments avec ou sans splitting
+** Si splitting requis : split le mot et ajoute chaque partie
+** Si pas de splitting : ajoute le mot reconstruit tel quel
+*/
 void	fill_new_args(t_token_word *list_word, int *k, char **new_args)
 {
 	int		j;
@@ -101,6 +121,11 @@ void	fill_new_args(t_token_word *list_word, int *k, char **new_args)
 	}
 }
 
+/*
+** Remplace l'ancien tableau d'arguments par le nouveau
+** Met à jour le compteur d'arguments et le nom de commande
+** Libère la mémoire de l'ancien tableau
+*/
 void	replace_args_and_free(char **new_args, t_cmd *cmd, int k, int new_ac)
 {
 	int		i;

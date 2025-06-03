@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:36:15 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 03:07:36 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:38:01 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Fonction récursive de matching de pattern avec wildcards
+** Retourne 1 si le pattern correspond à la chaîne, 0 sinon
+** Gère '*' comme correspondance de 0 ou plusieurs caractères
+** Compare caractère par caractère pour les autres cas
+*/
 int	match_wildcard(const char *wildcard_str, const char *str)
 {
 	if (*wildcard_str == '\0' && *str == '\0')
@@ -24,6 +30,12 @@ int	match_wildcard(const char *wildcard_str, const char *str)
 	return (0);
 }
 
+/*
+** Vérifie si un token_word contient des wildcards expandables
+** Retourne 0 si '*' trouvé dans une partie quotée (pas d'expansion)
+** Retourne 1 si '*' trouvé dans une partie non-quotée
+** Parcourt toutes les parties du token_word
+*/
 int	has_wildcard_in_word(t_token_word *word_parts)
 {
 	t_token_word	*word;
@@ -42,6 +54,12 @@ int	has_wildcard_in_word(t_token_word *word_parts)
 	return (flag);
 }
 
+/*
+** Vérifie si une commande contient des wildcards à expander
+** Contrôle d'abord tous les arguments de la commande
+** Puis vérifie les redirections si aucun wildcard dans les arguments
+** Retourne 1 si au moins un wildcard trouvé, 0 sinon
+*/
 int	has_wildcard_in_cmd(t_cmd *cmd)
 {
 	int				has_wildcard;

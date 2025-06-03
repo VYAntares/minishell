@@ -1,17 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parenthesis_operator_.c                            :+:      :+:    :+:   */
+/*   parenthesis_operator.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/11 01:04:45 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:24:49 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:14:50 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Convertit le type d'un token en type de nœud AST correspondant
+** Retourne AST_AND, AST_OR, AST_PIPE selon le token, AST_CMD par défaut
+*/
 t_ast_type	get_ast_type(t_token *token)
 {
 	if (!token)
@@ -25,6 +29,11 @@ t_ast_type	get_ast_type(t_token *token)
 	return (AST_CMD);
 }
 
+/*
+** Vérifie si le premier opérateur apparaît après le second dans la liste
+** Parcourt depuis first_op pour chercher second_op
+** Retourne 1 si first_op est le dernier, 0 sinon
+*/
 int	check_if_operator_is_last(t_token *first_op, t_token *second_op)
 {
 	t_token		*tmp;
@@ -48,6 +57,11 @@ int	check_if_operator_is_last(t_token *first_op, t_token *second_op)
 	return (0);
 }
 
+/*
+** Trouve les derniers opérateurs OR, AND et PIPE hors des parenthèses
+** Maintient un compteur de parenthèses pour ignorer celles imbriquées
+** Met à jour les pointeurs vers les derniers opérateurs trouvés
+*/
 void	point_last_operator_outside_parenthesis(t_token **or,
 											t_token **and,
 											t_token **pipe,
@@ -75,6 +89,12 @@ void	point_last_operator_outside_parenthesis(t_token **or,
 	}
 }
 
+/*
+** Trouve l'opérateur de plus faible priorité le plus à droite
+** Priorité : OR < AND < PIPE (évaluation de droite à gauche)
+** Ignore les opérateurs à l'intérieur des parenthèses
+** Retourne l'opérateur trouvé ou NULL si aucun
+*/
 t_token	*find_last_priority_operator(t_token *tokens)
 {
 	t_token		*current;

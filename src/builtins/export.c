@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 12:15:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:14:23 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:47:50 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Convertit la liste chainee d'environnement en tableau de chaines.
+** Chaque element au format "NAME=value" pour compatibilite avec sort.
+** Utilise deux ft_strjoin successifs: nom+"=" puis +valeur.
+** Termine le tableau par NULL pour les fonctions de manipulation.
+*/
 void	create_and_fill_env(char **env_array, t_shell *shell)
 {
 	int		i;
@@ -32,6 +38,12 @@ void	create_and_fill_env(char **env_array, t_shell *shell)
 	env_array[i] = NULL;
 }
 
+/*
+** Affiche l'environnement au format bash "declare -x".
+** Pour chaque variable: "declare -x NAME="value""
+** Separe nom et valeur sur '=' et met la valeur entre guillemets.
+** Variables sans valeur affichees sans guillemets ni '='.
+*/
 void	display_array(char **env_array)
 {
 	char	*equals_pos;
@@ -56,6 +68,12 @@ void	display_array(char **env_array)
 	}
 }
 
+/*
+** Trie le tableau d'environnement par ordre alphabetique.
+** Algorithme bubble sort: compare chaque paire et echange si necessaire.
+** Utilise ft_strncmp pour comparaison lexicographique standard.
+** Modifie le tableau en place pour economiser la memoire.
+*/
 void	bubble_sort(char **env_array)
 {
 	int		i;
@@ -82,6 +100,13 @@ void	bubble_sort(char **env_array)
 	}
 }
 
+/*
+** Affiche toutes les variables d'environnement triees (export sans args).
+** 1. Compte les variables pour allouer le tableau
+** 2. Convertit la liste en tableau de chaines 
+** 3. Trie alphabetiquement et affiche au format declare -x
+** Fonction principale appelee par "export" sans arguments.
+*/
 int	print_sorted_env(t_shell *shell)
 {
 	t_env	*current;
@@ -104,6 +129,13 @@ int	print_sorted_env(t_shell *shell)
 	return (0);
 }
 
+/*
+** Point d'entree principal de la commande export.
+** Sans arguments: affiche env trie au format declare -x
+** Avec arguments: traite chaque argument (avec/sans affectation)
+** Distingue "export VAR" (declaration) et "export VAR=val" (affectation).
+** Accumule les erreurs dans status mais continue le traitement.
+*/
 int	builtin_export(t_cmd *cmd, t_shell *shell)
 {
 	int		i;

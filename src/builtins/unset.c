@@ -6,12 +6,19 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 00:44:43 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 00:44:59 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 22:53:06 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Supprime une variable d'environnement de la liste chainee.
+** Parcourt la liste pour trouver le nom exact (longueurs identiques).
+** Gere la suppression en tete (prev=NULL) et en milieu/fin de liste.
+** Libere completement le noeud: nom, valeur et structure.
+** Relie les noeuds precedent et suivant pour maintenir la chaine.
+*/
 void	delete_line_env(t_shell *shell, t_cmd *cmd, int i)
 {
 	t_env	*current;
@@ -38,6 +45,13 @@ void	delete_line_env(t_shell *shell, t_cmd *cmd, int i)
 	}
 }
 
+/*
+** Implemente la commande unset qui supprime des variables d'environnement.
+** Valide chaque argument comme identifiant avant suppression.
+** Continue le traitement meme en cas d'erreur sur un argument.
+** Accumule les erreurs dans status et retourne le resultat final.
+** Exemple: unset HOME PATH VAR_INVALIDE → supprime HOME et PATH.
+*/
 int	builtin_unset(t_cmd *cmd, t_shell *shell)
 {
 	int		i;

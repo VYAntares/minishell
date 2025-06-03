@@ -6,12 +6,17 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/31 13:10:02 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:21:12 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:05:51 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Cree un noeud AST en divisant les tokens autour d'un operateur.
+** Split les tokens avant/apres l'operateur et parse recursivement.
+** Retourne le noeud avec left/right ou NULL en cas d'erreur.
+*/
 t_ast	*add_ast_node(t_token *tokens, t_token *current, t_ast_type type)
 {
 	t_token		*before_tokens;
@@ -30,6 +35,11 @@ t_ast	*add_ast_node(t_token *tokens, t_token *current, t_ast_type type)
 	return (node);
 }
 
+/*
+** Parse une commande simple avec ses arguments et redirections.
+** Cree la structure t_cmd et attache toutes les redirections trouvees.
+** Retourne un noeud AST_CMD ou NULL en cas d'erreur.
+*/
 t_ast	*parse_command(t_token *tokens)
 {
 	t_token		*current;
@@ -56,6 +66,11 @@ t_ast	*parse_command(t_token *tokens)
 	return (cmd_node);
 }
 
+/*
+** Parse les pipes en cherchant le dernier token T_PIPE.
+** Si pipe trouve, cree un noeud AST_PIPE, sinon parse comme commande.
+** Retourne le noeud pipe ou commande selon le contenu.
+*/
 t_ast	*parse_pipes(t_token *tokens)
 {
 	t_token		*current;
@@ -66,6 +81,11 @@ t_ast	*parse_pipes(t_token *tokens)
 	return (parse_command(tokens));
 }
 
+/*
+** Parse les operateurs logiques && et || en cherchant le dernier.
+** Le dernier operateur trouve devient la racine pour respecter l'associativite.
+** Retourne le noeud logique ou descend vers parse_pipes si aucun.
+*/
 t_ast	*parse_logical_ops(t_token *tokens)
 {
 	t_token		*or;
@@ -89,6 +109,11 @@ t_ast	*parse_logical_ops(t_token *tokens)
 	}
 }
 
+/*
+** Parse les expressions avec parentheses en respectant les priorites.
+** Cherche operateurs hors parentheses d'abord, puis traite le contenu.
+** Retourne un noeud AST_SUB_SHELL ou operateur selon la structure.
+*/
 t_ast	*parse_parenthesis(t_token *tokens)
 {
 	t_token		*content;

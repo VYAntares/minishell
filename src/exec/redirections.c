@@ -6,12 +6,19 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/26 10:00:00 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 02:28:27 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:29:04 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Traite le cas special des redirections sans commande (ex: > file.txt).
+** Verifie que tous les fichiers peuvent etre ouverts sans erreur.
+** Pour entree: ouvre en lecture et ferme (test d'existence)
+** Pour sortie: cree/ecrase le fichier selon le type de redirection
+** Retourne 0 si tous les fichiers sont accessibles, 1 sinon.
+*/
 int	only_redirection(t_cmd *cmd)
 {
 	t_file_redir	*redir;
@@ -41,6 +48,13 @@ int	only_redirection(t_cmd *cmd)
 	return (0);
 }
 
+/*
+** Traite le cas special des redirections sans commande (ex: > file.txt).
+** Verifie que tous les fichiers peuvent etre ouverts sans erreur.
+** Pour entree: ouvre en lecture et ferme (test d'existence)
+** Pour sortie: cree/ecrase le fichier selon le type de redirection
+** Retourne 0 si tous les fichiers sont accessibles, 1 sinon.
+*/
 int	process_outpout_redirection(t_file_redir *redir,
 								t_file_redir **last_output)
 {
@@ -60,6 +74,13 @@ int	process_outpout_redirection(t_file_redir *redir,
 	return (0);
 }
 
+/*
+** Traite une redirection d'entree (< ou <<) individuellement.
+** Ouvre le fichier en lecture seule pour verifier l'acces.
+** Redirige stdin SEULEMENT si c'est la derniere redirection d'entree.
+** Applique la semantique bash: derniere redirection gagne.
+** Ferme le fd temporaire apres redirection ou test.
+*/
 int	process_input_redirection(t_file_redir *redir, t_file_redir **last_input)
 {
 	int	fd;
@@ -75,6 +96,13 @@ int	process_input_redirection(t_file_redir *redir, t_file_redir **last_input)
 	return (0);
 }
 
+/*
+** Parcourt toutes les redirections et les traite dans l'ordre.
+** Dispatche vers process_output ou process_input selon le type.
+** Maintient l'ordre d'evaluation tout en appliquant que les dernieres.
+** Permet de detecter les erreurs des redirections intermediaires.
+** Retourne des le premier echec de redirection.
+*/
 int	process_all_redirections(t_file_redir *redir,
 							t_file_redir **last_input,
 							t_file_redir **last_output)
@@ -97,6 +125,14 @@ int	process_all_redirections(t_file_redir *redir,
 	return (0);
 }
 
+/*
+** Point d'entree principal pour l'execution des redirections.
+** 1. expand_redir(): expanse $VAR et wildcards dans les noms de fichiers
+** 2. Cas special: redirections seules sans commande (ex: > file.txt)
+** 3. find_lasts_redirection(): identifie les dernieres entree/sortie
+** 4. process_all_redirections(): applique toutes les redirections
+** Respecte la semantique bash: seules les dernieres redirections comptent.
+*/
 int	execute_redirections(t_cmd *cmd, t_shell *shell)
 {
 	t_file_redir	*redir;

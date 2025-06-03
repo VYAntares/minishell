@@ -6,12 +6,18 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 02:46:33 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/18 22:43:00 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:44:57 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Reconstruit le contenu complet d'une redirection
+** Concatène tous les token_word de la redirection
+** Utilisé après expansion des wildcards pour obtenir le nom final
+** Retourne la chaîne complète ou NULL en cas d'erreur
+*/
 char	*redirection_content(t_file_redir *redir)
 {
 	char			*new_content;
@@ -34,6 +40,11 @@ char	*redirection_content(t_file_redir *redir)
 	return (new_content);
 }
 
+/*
+** Affiche un message d'erreur pour redirection ambiguë
+** Appelé quand un wildcard correspond à plusieurs fichiers
+** Retourne 1 pour indiquer une erreur de redirection
+*/
 int	ambiguous_multiple_file_detected(t_file_redir *redir)
 {
 	ft_putstr_fd("miniHell: ", 2);
@@ -42,6 +53,12 @@ int	ambiguous_multiple_file_detected(t_file_redir *redir)
 	return (1);
 }
 
+/*
+** Reconstruit le contenu d'une redirection après expansion wildcards
+** Vérifie qu'il n'y a pas d'ambiguïté (plusieurs fichiers)
+** Exception : T_APPEND autorise plusieurs fichiers
+** Retourne 0 en cas de succès, 1 si ambiguë
+*/
 int	rebuild_redirection_content(t_file_redir *redir)
 {
 	char			*new_content;
@@ -68,6 +85,12 @@ int	rebuild_redirection_content(t_file_redir *redir)
 	return (0);
 }
 
+/*
+** Expanse les wildcards dans toutes les redirections d'une commande
+** Ignore les heredocs (pas d'expansion de wildcards)
+** Reconstruit les arguments si au moins une expansion effectuée
+** Retourne 1 en cas d'erreur, rebuild_command_arg_wildcard sinon
+*/
 int	expand_wildcard_in_redir(t_cmd *cmd, int expanded_something)
 {
 	t_file_redir	*redir;

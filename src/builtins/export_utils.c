@@ -1,29 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins_utils.c                                   :+:      :+:    :+:   */
+/*   export_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 00:52:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 01:06:44 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:45:18 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
-int	handle_export_declaration(char *arg, int *status)
-{
-	if (!is_valid_identifier(arg))
-	{
-		ft_putstr_fd("minishell: export: '", 2);
-		ft_putstr_fd(arg, 2);
-		ft_putendl_fd("': not a valid identifier", 2);
-		*status = 1;
-	}
-	return (0);
-}
-
+/*
+** Verifie qu'un nom de variable respecte les regles Unix.
+** Doit commencer par lettre ou underscore, puis lettres/chiffres/underscore.
+** Exemples valides: "VAR", "_test", "PATH2" / Invalides: "2VAR", "test-var"
+** Retourne 1 si valide, 0 sinon.
+*/
 int	is_valid_identifier(const char *id)
 {
 	int	i;
@@ -42,6 +36,30 @@ int	is_valid_identifier(const char *id)
 	return (1);
 }
 
+/*
+** Gere une declaration export sans valeur (ex: export VAR).
+** Valide que l'identifiant respecte les regles de nommage.
+** Affiche une erreur si l'identifiant est invalide et met status=1.
+** Ne cree pas la variable, juste validation pour compatibilite bash.
+*/
+int	handle_export_declaration(char *arg, int *status)
+{
+	if (!is_valid_identifier(arg))
+	{
+		ft_putstr_fd("minishell: export: '", 2);
+		ft_putstr_fd(arg, 2);
+		ft_putendl_fd("': not a valid identifier", 2);
+		*status = 1;
+	}
+	return (0);
+}
+
+/*
+** Ajoute une nouvelle variable d'environnement a la fin de la liste.
+** Alloue un nouveau noeud t_env avec nom et valeur dupliques.
+** Gere le cas de la premiere variable (liste vide).
+** Retourne 0 si succes, 1 en cas d'erreur d'allocation.
+*/
 int	add_env_variable(t_shell *shell, const char *name, const char *value)
 {
 	t_env	*new_env;
@@ -69,6 +87,12 @@ int	add_env_variable(t_shell *shell, const char *name, const char *value)
 	return (0);
 }
 
+/*
+** Met a jour une variable existante ou l'ajoute si inexistante.
+** Parcourt la liste pour trouver le nom correspondant.
+** Si trouve: remplace la valeur, si absent: ajoute en fin de liste.
+** Strategie: chercher puis modifier, ou creer si pas trouve.
+*/
 int	update_env_variable(t_shell *shell, const char *name, const char *value)
 {
 	t_env	*current;
@@ -91,6 +115,13 @@ int	update_env_variable(t_shell *shell, const char *name, const char *value)
 	return (add_env_variable(shell, name, value));
 }
 
+/*
+** Traite un export avec affectation (ex: export VAR=value).
+** 1. Parse l'argument pour separer nom et valeur sur '='
+** 2. Valide l'identifiant selon les regles Unix
+** 3. Met a jour ou cree la variable dans l'environnement
+** Gere les erreurs de parsing et de validation proprement.
+*/
 int	handle_export_with_value(char *arg, t_shell *shell, int *status)
 {
 	char	*equals_pos;

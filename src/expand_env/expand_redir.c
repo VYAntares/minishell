@@ -6,12 +6,19 @@
 /*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/14 01:53:27 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/14 01:59:42 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:33:19 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Reconstruit le nom de fichier final apres expansion des variables.
+** Concatene tous les token_word d'une redirection en une seule chaine.
+** Exemple: "> $HOME/file.txt" devient "> /Users/nom/file.txt"
+** Remplace redir->content par la version finale expansee.
+** Appele apres que toutes les expansions soient terminees.
+*/
 int	rebuild_redirection(t_cmd *cmd)
 {
 	char			*new_content;
@@ -38,6 +45,13 @@ int	rebuild_redirection(t_cmd *cmd)
 	return (0);
 }
 
+/*
+** Expanse les variables d'environnement dans un token_word de redirection.
+** Detecte l'ambiguite: si expansion contient espaces sans quotes.
+** Exemple ambigu: VAR="file1 file2" puis > $VAR (vers quels fichiers?)
+** Single quotes bloquent l'expansion: > '$HOME' reste litteralement $HOME
+** Double quotes permettent l'expansion: > "$HOME" devient > /Users/nom
+*/
 int	expand_redir_name(t_token_word *current,
 					t_shell *shell,
 					t_file_redir *redir)
@@ -61,6 +75,13 @@ int	expand_redir_name(t_token_word *current,
 	return (0);
 }
 
+/*
+** Lance l'expansion pour une redirection complete.
+** Ignore les heredocs (delimiteur ne doit pas etre expanse).
+** Parcourt tous les token_word et les expanse individuellement.
+** Marque la redirection comme ambigue si necessaire.
+** Retourne 0 si succes, 1 en cas d'erreur d'expansion.
+*/
 int	launch_redir_expansion(t_shell *shell, t_file_redir *redir)
 {
 	t_token_word	*current;
@@ -81,6 +102,14 @@ int	launch_redir_expansion(t_shell *shell, t_file_redir *redir)
 	return (0);
 }
 
+/*
+** Point d'entree pour l'expansion de toutes les redirections d'une commande.
+** 1. Expanse les variables dans chaque redirection
+** 2. Detecte les redirections ambigues (multiples fichiers)
+** 3. Reconstruit les noms finaux si pas d'ambiguite
+** 4. Ignore les heredocs qui ont un traitement special
+** Prerequis obligatoire avant l'execution des redirections.
+*/
 int	expand_redir(t_cmd *cmd, t_shell *shell)
 {
 	t_file_redir	*redir;

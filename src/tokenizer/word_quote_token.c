@@ -3,15 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   word_quote_token.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eahmeti <eahmeti@student.42.fr>            +#+  +:+       +#+        */
+/*   By: eahmeti <eahmeti@student.42lausanne.ch>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/29 22:37:30 by eahmeti           #+#    #+#             */
-/*   Updated: 2025/05/13 17:54:55 by eahmeti          ###   ########.fr       */
+/*   Updated: 2025/05/25 21:13:15 by eahmeti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../minishell.h"
 
+/*
+** Crée un token_word pour du contenu entre guillemets (simple ou double)
+** Extrait le contenu entre les guillemets et définit le type approprié
+** Ajoute le nouveau token à la liste et avance l'index
+** Retourne le nouveau token créé ou NULL en cas d'erreur
+*/
 t_token_word	*define_word_quote_type(t_token_word **list, char *content,
 									int *i, int *start)
 {
@@ -37,6 +43,12 @@ t_token_word	*define_word_quote_type(t_token_word **list, char *content,
 	return (new_word);
 }
 
+/*
+** Crée un token_word pour du contenu sans guillemets
+** Extrait le contenu jusqu'au prochain délimiteur (opérateur, espace, etc.)
+** Définit le type comme T_NO_QUOTE et ajoute à la liste
+** Retourne le nouveau token créé ou NULL en cas d'erreur
+*/
 t_token_word	*define_word_no_quote(t_token_word **list, char *content,
 									int	*i, int	*start)
 {
@@ -57,6 +69,12 @@ t_token_word	*define_word_no_quote(t_token_word **list, char *content,
 	return (new_word);
 }
 
+/*
+** Analyse le contenu d'un token pour identifier les parties quotées
+** Parcourt le contenu et crée des token_word selon le type de quote
+** Assigne la liste de token_word au token principal
+** Gère les transitions entre contenu quoté et non-quoté
+*/
 void	analyze_quote_content(t_token_word **list, t_token *new,
 								char *content)
 {
@@ -80,6 +98,12 @@ void	analyze_quote_content(t_token_word **list, t_token *new,
 	new->type_word = *list;
 }
 
+/*
+** Extrait le contenu complet d'un mot depuis l'input
+** Gère les guillemets ouverts/fermés et vérifie leur cohérence
+** S'arrête aux délimiteurs (opérateurs, espaces)
+** Retourne le contenu extrait ou NULL si erreur de syntaxe
+*/
 char	*create_content_word(char *input, int *i)
 {
 	char	*content;
@@ -108,6 +132,12 @@ char	*create_content_word(char *input, int *i)
 	return (content);
 }
 
+/*
+** Crée et ajoute un token de type T_WORD à la liste de tokens
+** Extrait le contenu, crée le token et analyse ses parties quotées
+** Initialise tous les champs du token et l'ajoute à la liste
+** Retourne 1 en cas de succès, 0 en cas d'erreur
+*/
 int	add_word_token(t_token **list, int *i, char *input)
 {
 	char			*content;
