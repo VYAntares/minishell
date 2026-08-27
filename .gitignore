@@ -1,0 +1,15 @@
+# Build artifacts
+*.o
+*.a
+*.so
+*.d
+obj/
+
+# Editor / OS
+.DS_Store
+*.swp
+*~
+.vscode/
+
+# Binaries
+minishell
